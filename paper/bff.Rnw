@@ -106,14 +106,14 @@ library(metabf) # BFFs for meta-analysis
   framework for hypothesis testing and parameter estimation, as Bayes factors
   (for any tested parameter), support intervals (at any level of interest), and
   point estimates can be easily read off from a plot of the Bayes factor
-  function. This provides data analysts with a unified framework for statistical
-  inference that is distinct from conventional frequentist and Bayesian
-  approaches: Bayes factor function inference uses the Bayesian evidence
-  calculus, but without synthesizing data and prior. At the same time, Bayes
-  factor function inference is closely related to likelihood-based inference,
-  but also includes a natural way to deal with nuisance parameters. Applications
-  to several real world examples illustrate how our framework is of practical
-  value to data analysts who aim to make quantitative inferences. \\[1ex]
+  function. This approach shares similarities but is also distinct from
+  conventional Bayesian and frequentist inference approaches. For instance, it
+  uses the Bayesian evidence calculus, but without synthesizing data and prior,
+  or it defines statistical evidence in terms of relative likelihoods, but also
+  includes a natural way to deal with nuisance parameters. Applications to
+  several real-world examples illustrate how our framework is of practical value
+  to data analysts who aim to make quantitative inferences.
+  \\[1ex]
   \emph{Keywords}: Bayesian inference, integrated likelihood, meta-analysis,
   nuisance parameters, replication studies, support interval
 \end{abstract}
@@ -335,15 +335,16 @@ frequentist inference, but is also distinct in other ways.
 % % special cases for certain priors and nuisance/focus parameter combinations.
 
 This paper is structured as follows. In the following
-Section~\ref{sec:BFtheory}, we introduce the general theory of Bayes factors,
+(Section~\ref{sec:BFtheory}), we introduce the general theory of Bayes factors,
 support sets, and maximum evidence estimates. We then discuss their connection
-other types of inference in Section~\ref{sec:connections}. Various real data
-examples in Section~\ref{sec:applications} illustrate similarities and
-differences of the proposal to conventional frequentist and Bayesian approaches.
-We conclude with a discussion of the advantages and limitations of the approach,
-and opportunities for future research (Section~\ref{sec:discussion}).% We also
-% provide a free and open-source R package \texttt{metabf} that implements the
-% proposed Bayes factor framework for meta-analysis.
+to other approaches to statistical inference (Section~\ref{sec:connections}).
+Various real data examples in Section~\ref{sec:applications} illustrate
+similarities and differences of the proposal to conventional frequentist and
+Bayesian approaches. We conclude with a discussion of the advantages and
+limitations of our framework, and opportunities for future research
+(Section~\ref{sec:discussion}).
+% We also provide a free and open-source R package \texttt{metabf} that
+% implements the proposed Bayes factor framework for meta-analysis.
 
 
 \section{Bayes factor function inference}
@@ -352,15 +353,13 @@ and opportunities for future research (Section~\ref{sec:discussion}).% We also
 Suppose we observe data $y$ with an assumed distribution with
 density/probability mass function $p(y \given \theta, \psi)$ that depends on
 parameters $\theta \in \Theta$ and $\psi \in \Psi$, with $\theta$ being the
-focus parameters and $\psi$ being possible nuisance parameters. Consider the
-Bayes factor \citep{Jeffreys1939, Good1958, Kass1995} for quantifying the
-evidence that the observed data $y$ provide for the null hypothesis
-$H_0 \colon \theta = \theta_0$ relative to the alternative hypothesis
-$H_1 \colon \theta \neq \theta_0$, with prior $p(\theta, \psi \given H_1)$
-assigned to the parameters under $H_1$ and prior $p(\psi \given H_0)$ assigned
-to the nuisance parameters under $H_0$. A natural measure of relative evidence
-for the two hypotheses is the Bayes factor, the data-based updating factor of
-the prior odds of the hypotheses to their posterior odds
+focus parameters and $\psi$ being possible nuisance parameters. Consider two
+hypotheses, the null hypothesis $H_0 \colon \theta = \theta_0$ postulating that
+$\theta$ takes a certain value $\theta_{0}$ and the alternative hypothesis
+$H_1 \colon \theta \neq \theta_0$ postulating that $\theta$ takes a different
+value. A natural measure of relative evidence for the two hypotheses is the
+Bayes factor \citep{Jeffreys1939, Good1958, Kass1995}, the data-based updating
+factor of the prior odds of the hypotheses to their posterior odds
 \begin{subequations}
 \begin{align}
     \BF_{01}(y;\theta_0)
@@ -369,29 +368,34 @@ the prior odds of the hypotheses to their posterior odds
     &= \frac{p(y \given H_0)}{p(y \given H_1)} \label{eq:bf01predictive} \\
     &= \frac{\int_{\Psi} p(y \given \theta_0, \psi) p(\psi \given H_0) \, \mathrm{d}\psi}{\int_{\Theta} \int_{\Psi} p(y \given \theta, \psi) \,p(\theta, \psi \given H_1) \,\mathrm{d}\psi \, \mathrm{d}\theta}
     %= \frac{\pi(\theta = \theta_0 \given y, H_1)}{p\theta = \theta_0 \given H_1)}
-    \label{eq:bf01compute}.
+    \label{eq:bf01compute}
 \end{align}
 \label{eq:bf01}
 \end{subequations}
+with $p(\theta, \psi \given H_1)$ denoting the prior assigned to the parameters
+under $H_1$ and $p(\psi \given H_0)$ the prior assigned to the nuisance
+parameters under $H_0$.
 
-The Bayes factor hence represents the data-based core of the Bayesian belief
-calculus, and it remains useful even if one rejects the idea of assigning
-probabilities to $H_0$ and $H_1$, since this is not necessary
+As~\eqref{eq:bf01update} shows, the Bayes factor represents the data-based core
+of the Bayesian belief calculus. It remains useful even if one rejects the idea
+of assigning probabilities to $H_0$ and $H_1$, since this is not necessary
 \citep{Goodman1999}. The alternative expression of the Bayes factor in
 equation~\eqref{eq:bf01predictive} shows that this update is dictated by the
-relative predictive accuracy of the two hypotheses -- how well they predicted
-the observed data $y$ \citep{Gneiting2007, Fong2020}. Finally, the last
-equation~\eqref{eq:bf01compute} shows how the Bayes factor is typically
-calculated, i.e., by dividing the likelihood of $y$ under the null value
-$\theta_0$ (possibly marginalized over the prior of $\psi$ under $H_0$) by the
-likelihood of $y$ marginalized over the prior of $\theta$ (and possibly $\psi$)
+relative predictive accuracy of the two hypotheses. That is, the posterior odds
+of the null hypothesis $H_{0}$ increase if it outperforms the competing
+alternative hypothesis $H_{1}$ in predicting the data $y$, and vice versa
+\citep{Good1952, Gneiting2007}. Finally, the last
+equation~\eqref{eq:bf01compute} shows how the Bayes factor can be calculated,
+i.e., by dividing the likelihood of $y$ under the null value $\theta_0$
+(possibly marginalized over the prior of $\psi$ under $H_0$) by the likelihood
+of $y$ marginalized over the prior of $\theta$ (and possibly $\psi$)
 under~$H_1$. The priors for $\theta$ and $\psi$ may also be point priors, in
 which case the Bayes factor reduces to a likelihood ratio.
 
 The idea now is to consider the Bayes factor~\eqref{eq:bf01} as a function of
 $\theta_0$, that is, to vary the tested parameter value (the point null
 hypothesis $H_0 \colon \theta = \theta_0$) in order to assess the support for
-different parameter values over the alternative, see the right plot in
+different parameter values over the alternative $H_{1}$, see the right plot in
 Figure~\ref{fig:pvalfun} for an example. Like the \textit{P}-value function,
 this \emph{Bayes factor function} (BFF) helps to address cognitive challenges
 with inferential statistics \citep{Greenland2017}. For example, it shifts the
@@ -401,11 +405,12 @@ hypotheses. By looking at the BFF, data analysts can then identify hypotheses
 that receive equal or even less support from the data than the privileged one;
 for example, a parameter value indicating a very large treatment effect may
 receive equal support as the value of no treatment effect \citep[sometimes
-called `counternull', see][]{Rosenthal1994}. For one- or two-dimensional focus
-parameters $\theta$, the BFF can be graphed so that the relative support for
-parameter values can be visually assessed. For higher dimensional focus
-parameters, this becomes more difficult and the BFF may need to be summarized in
-some form.
+called `counternull', see][]{Rosenthal1994}.
+
+For one- or two-dimensional focus parameters $\theta$, the BFF can be graphed so
+that the relative support for parameter values can be visually assessed. For
+higher dimensional focus parameters, this becomes more difficult and the BFF may
+need to be summarized in some form.
 
 
 \subsection{Support sets}
@@ -430,11 +435,11 @@ better supported by the data than the alternative $H_1$. The choice of the
 support level is arbitrary, just as the choice of the confidence level from a
 confidence set is. One may, for example, report the support level $k = 1$ as it
 represents the tipping point at which the parameter values begin to be supported
-over the alternative. Moreover, conventions for Bayes factor evidence levels can
-be used. For example, based on the conventions from \citet{Jeffreys1961}, a
-support set at level $k = 10$ includes the parameter values that receive
-`strong' relative support from the data, while a $k = 1/10$ support set includes
-the parameter values that are at least not strongly contradicted.
+over the alternative. Conventions for Bayes factor evidence levels can also be
+used. For example, based on the conventions from \citet{Jeffreys1961}, a support
+set at level $k = 10$ includes the parameter values that receive `strong'
+relative support from the data, while a $k = 1/10$ support set includes the
+parameter values that are at least not strongly contradicted.
 
 
 \subsection{The maximum evidence estimate}
@@ -453,14 +458,14 @@ The associated \emph{evidence level}
 \begin{align*}
 \kME = \BF_{01}(y;\thatME),
 \end{align*}
-that is, the Bayes factor evaluated at the MEE, quantifies the evidential value
-of the estimate $\thatME$ over the alternative. Evidence levels close to
-$\kME = 1$ indicate that the MEE receives little support over the alternative
-hypothesis $H_1$, whereas large evidence levels $\kME$ indicate that the MEE
-receives substantial support over the alternative hypothesis $H_1$. A useful
-summary of a BFF could hence be to report the MEE, its evidence level, and a
-support set, similar to how a \textit{P}-value function may be summarized with a
-point estimate and confidence set.
+that is, the BFF evaluated at the MEE, quantifies the evidential value of the
+estimate $\thatME$ over the alternative. Evidence levels close to $\kME = 1$
+indicate that the MEE receives little support over the alternative hypothesis
+$H_1$, whereas large evidence levels $\kME$ indicate that the MEE receives
+substantial support over the alternative hypothesis $H_1$. A useful summary of a
+BFF could hence be to report the MEE, its evidence level, and a support set,
+similar to how a \textit{P}-value function may be summarized with a point
+estimate and confidence set.
 % The MEE may additionally be supplemented with a support set, similarly to how
 % frequentist estimates are typically supplemented with a confidence set.
 
@@ -502,8 +507,8 @@ following we will consider an example from \citet{Abani2022}. This randomised
 controlled trial found a reduction in mortality of patients hospitalised with
 COVID-19 when treated with baricitinib compared to usual care (age-adjusted log
 hazard ratio $y = \Sexpr{round(y, 2)}$ with standard error
-$\sigma = \Sexpr{round(se, 3)}$ estimated with Cox regression). To derive a
-Bayes factor for testing $H_{0} \colon \theta = \theta_{0}$ against
+$\sigma = \Sexpr{round(se, 3)}$ estimated with Cox regression). To obtain a
+Bayes factor for contrasting $H_{0} \colon \theta = \theta_{0}$ against
 $H_{1} \colon \theta \neq \theta_{0}$ we need to formulate a prior for $\theta$
 under the alternative $H_{1}$. We will now discuss three choices with different
 characteristics shown in Table~\ref{tab:normalinference}.
@@ -515,11 +520,11 @@ characteristics shown in Table~\ref{tab:normalinference}.
   \caption{Bayes factor function, maximum evidence estimate, evidence value, and
     $k$ support interval for a normal mean based on one observation $y$ from
     $Y \mid \theta \sim \Nor(\theta, \sigma^{2})$ with known variance
-    $\sigma^{2}$ and for three prior distributions under the alternative
-    $H_{1}$: A normal prior (left), a normal prior centered around the parameter
-    value of the null hypothesis $\theta_{0}$ (middle), a point prior shifted
-    away from the parameter value of the null hypothesis $\theta_{0}$ by $d > 0$
-    (right).}
+    $\sigma^{2}$ and for three prior distributions for $\theta$ under the
+    alternative $H_{1}$: A normal prior (left), a normal prior centered around
+    the parameter value of the null hypothesis $\theta_{0}$ (middle), a point
+    prior shifted away from the parameter value of the null hypothesis
+    $\theta_{0}$ by $d > 0$ (right).}
   \label{tab:normalinference}
   \resizebox{\columnwidth}{!}{%
   \begin{tabular}{l c c c}
@@ -547,15 +552,15 @@ an alternative hypothesis of interest (e.g., the prior mean $m$ could be set to
 a minimum clinically important treatment effect and $v$ could be set to zero to
 obtain a point prior as typically used in a power analysis). For example,
 \citet{Abani2022} reported a meta-analytic log hazard ratio and standard error
-based on eight previous trials, which could be used to specify the mean
-$m = \Sexpr{round(m, 2)}$ and variance $v = \Sexpr{round(s, 3)}^{2}$ of the
-prior, see Figure~\ref{fig:normal} for the resulting BFF (orange). In this case,
-the MEE is given by $\thatME =y = \Sexpr{round(y, 2)}$ with the support interval
-centered around it. Due to the apparent conflict between the observed data and
-the prior under the alternative, the $k = 1$ support interval spans an wide
-range, indicating that large ($\theta \approx -0.35$) up to even slightly
-harmful ($\theta \approx 0.08$) treatment effects are supported by the data over
-the alternative.
+based on eight previous trials, which could be used to set the prior mean and
+variance to $m = \Sexpr{round(m, 2)}$ and variance
+$v = \Sexpr{round(s, 3)}^{2}$, see Figure~\ref{fig:normal} for the resulting BFF
+(orange). In this case, the MEE is given by $\thatME =y = \Sexpr{round(y, 2)}$
+with the support interval centered around it. Due to the apparent conflict
+between the observed data and the specified prior under the alternative, the
+$k = 1$ support interval spans an wide range, indicating that large
+($\theta \approx -0.35$) up to even slightly harmful ($\theta \approx 0.08$)
+treatment effects are supported by the data over the alternative.
 
 The formulae in Table~\ref{tab:normalinference} (left column) show that as the
 prior mean $m$ becomes closer to the observed data $y$, the evidence level
@@ -754,15 +759,16 @@ the data (blue BFF), the support interval based on the local prior is wider.
 
 
 The last prior in the right most column of Table~\ref{tab:normalinference}
-demonstrates potentially pathological behavior of BFF inference. This
-alternative represents a point prior shifted from the null value $\theta_{0}$ by
-$d > 0$. The prior is again `local' in the sense that it is different for each
-tested parameter value of the null hypothesis $\theta_{0}$, and as such encodes
-an alternative hypothesis that the log hazard ratio is greater than the tested
+represents a point prior shifted from the null value $\theta_{0}$ by $d > 0$.
+The prior is again `local' in the sense that it is different for each tested
+parameter value of the null hypothesis $\theta_{0}$, and as such encodes an
+alternative hypothesis that the log hazard ratio is greater than the tested
 parameter value. However, this leads to an ever-increasing BFF, see
 Figure~\ref{fig:normal} for a numerical illustration. As a result, the MEE and
 its evidence level do not exist, while the support interval still exists but its
-right limit extends to infinity.
+right limit extends to infinity. Although such a prior seems unrealistic, the
+example demonstrates that a poorly chosen prior can lead to pathological
+behavior of the resulting BFF.
 
 % the evidence level and support interval turn out to be
 % \begin{align}
@@ -816,11 +822,11 @@ A general distinction can be made between \emph{global} priors, which do not
 depend on the value of $\theta_{0}$ under the null hypothesis and \emph{local}
 priors, which do. In the latter case, the interpretation of the BFF is more
 intricate, since for each parameter value the BFF quantifies the support over a
-different alternative. For easier interpretation, global priors may hence be
-preferred over local priors. At the same time, local priors correspond to the
-typical use of `default' Bayes factors, which is to center the prior around
-$\theta_{0}$, and as such may be preferred in the same situations where default
-Bayes factors would be used.
+different alternative. For a more natural interpretation, global priors may
+hence be preferred over local priors. At the same time, local priors correspond
+to the typical use of `default' Bayes factors, which is to center the prior
+around $\theta_{0}$, and as such may be preferred in the same situations where
+default Bayes factors would be used.
 
 Finally, it is usually advisable to report sensitivity analyses for plausible
 ranges of priors, to assess the robustness of the conclusions. A convenient
@@ -828,9 +834,9 @@ visual sensitivity analysis is, for example, to plot different BFFs resulting
 from different prior specifications, as shown in Figure~\ref{fig:normal}. One
 can go a step further and use a `reverse-Bayes` approach \citep{Held2021b},
 which involves systematically determining the prior that represents the tipping
-point and changes the conclusions of the analysis. Data analysts can then argue
-whether or not such a prior is plausible in the light of external knowledge and
-data.
+point and changes the conclusions of the analysis. Data analysts can then reason
+about whether or not such a prior is plausible in the light of external
+knowledge and data.
 
 % TODO maybe write about nuisance parameters, that they can be improper?
 
@@ -879,18 +885,19 @@ this prior is
   \times p(\theta \mid H_{1}).
 \end{align}
 This means that the posterior can be obtained by multiplying the BFF with the
-prior. It is, however, important to emphasize that multiplying a BFF based on
-priors under the alternative that depend on the null (e.g., commonly used
-`local' normal or Cauchy priors that are centered around $\theta_{0}$) cannot be
-transformed to a genuine posterior distribution in this way, but multiplication
-with the prior will result in a different posterior for every $\theta$.
+prior. It is, however, important to emphasize that BFFs based on priors under
+the alternative that depend on the null (e.g., commonly used `local' normal or
+Cauchy priors that are centered around $\theta_{0}$) cannot be transformed to a
+genuine posterior distribution in this way, but multiplication with the prior
+will result in a different posterior for every $\theta$.
 
 The link~\eqref{eq:posterior} also provides a convenient way to compute BFFs in
-more general settings: One of the many general Bayesian inference programs, such
-as Stan \citep{Carpenter2017}, can be used to compute a posterior density, which
-can then be divided by the prior density to obtain a BFF. The caveats are that
-this only works for global priors under the alternative and with the same prior
-assigned to the nuisance parameters under the null and alternative.
+more general settings: One of the many programs for computing Bayesian posterior
+distributions, such as Stan \citep{Carpenter2017}, can be used to compute a
+posterior density, which can then be divided by the prior density to obtain a
+BFF. The caveat is again that this only works for global priors under the
+alternative and with the same prior assigned to the nuisance parameters under
+the null and alternative.
 
 << "posterior-BFF-connection" >>=
 ## ## verify that posterior BFF correspondonce correct
@@ -913,8 +920,8 @@ assigned to the nuisance parameters under the null and alternative.
 ## lines(tseq, posterior/prior, lty = 2, col = 2)
 @
 
-The relationship between posterior and BFF also exposes its connection to
-another Bayesian inference quantity -- the relative belief ratio
+The relationship between the posterior and the BFF also exposes its connection
+to another Bayesian inference quantity -- the relative belief ratio
 \begin{align}
   \label{eq:RB}
   \mathrm{RB}(\theta \mid H_{1}) = \underbrace{\frac{p(\theta \mid y, H_{1})}{p(\theta \mid H_{1})}}_{= \BF_{01}(y; \theta)},
@@ -954,11 +961,12 @@ The universal bound can thus be used to transform BFFs into conservative
 from a BFF corresponds to a 95\% conservative confidence set and
 $p = \max\{\BF_{01}, 1\}$ corresponds to a conservative $P$-value. Remarkably,
 the bound holds without adjustment even when the data collection is continuously
-monitored and stopped as soon as evidence against $H_{0}$ is found. However, it
-is important to note that \textit{P}-values and confidence sets obtained in this
-way are usually much more conservative than ordinary ones which are calibrated
-to have exact type I error rate and coverage, respectively. Finally, if the data
-model is misspecified, the bound is obviously invalid.
+monitored and stopped as soon as evidence against $H_{0}$ is found
+\citep{Robbins1970}. However, it is important to note that \textit{P}-values and
+confidence sets obtained in this way are usually much more conservative than
+ordinary ones which are calibrated to have exact type I error rate and coverage,
+respectively. Finally, if the data model is misspecified, the bound is obviously
+invalid.
 
 \subsection{Maximum integrated likelihood}
 
@@ -1016,16 +1024,15 @@ alternatives.% Moreover, the way the informativeness
 \subsection{Likelihoodist inference}
 The likelihoodist school of statistical inference \citep{Barnard1949,
   Edwards1971, Royall1997} rejects the use of prior distributions to formulate
-alternatives or to eliminate nuisance parameters, but it also shares many
-features with the BFF paradigm. That is, if point priors are assigned to the
-parameters, the Bayes factor reduces to a likelihood ratio which is the evidence
-measure used by likelihoodists. For this reason, BFF inferences correspond to
+alternatives or to eliminate nuisance parameters, but it also shares features
+with the BFF paradigm. That is, if point priors are assigned to the parameters,
+the Bayes factor reduces to a likelihood ratio which is the evidence measure
+used by likelihoodists. For this reason, BFF inferences correspond to
 likelihoodist inferences if the Bayesian and likelihoodist agree on the used
 point priors.
 
 However, there is disagreement when it comes to the use of support sets.
-Likelihoodists typically define their support sets based on the relative
-likelihood
+Likelihoodists define their support sets based on the relative likelihood
 \begin{align*}
   L(\theta) = \frac{p(y \mid \theta)}{p(y \mid \that_{\textrm{ML}})}.
 \end{align*}
@@ -1179,28 +1186,28 @@ text(x = min(p0seq), y = c(7, 1/7),
 
 Figure~\ref{fig:bartosproportion} shows the resulting BFF for a range of
 probabilities from 0.5 to 0.515. Looking at the BFF evaluated at $\theta = 0.5$,
-we can see the Bayes factor reported by \citet{Bartos2023}: There is extreme
-evidence ($\BF_{01} = 1/(\Sexpr{signif(1/bf05, digits = 3)})$) against
-$\theta = 0.5$ and in favor of the alternative concentrated around
-$\theta =0.51$. This result hence provides decisive evidence against the
-hypothesis that coins tend to land on the same side with equal probability.
-However, the BFF framework permits further insights. For example, we can see
-that all probability values up to about 0.504 and all values larger than 0.512
-are decisively refuted by the data, each having an associated Bayes factor below
-$10^{-3}$. Furthermore, the $k = 1$ support interval from 0.506 to 0.509 shows
-the probability values that are better supported by the data than the specified
-alternative, which excludes the theoretically predicted $\theta = 0.51$. The MEE
-at $\hat{\mu}_{\mathrm{ME}} = 0.508$ is the best supported value, with
+we can see the result reported by \citet{Bartos2023}: There is extreme evidence
+($\BF_{01} = 1/(\Sexpr{signif(1/bf05, digits = 3)})$) against $\theta = 0.5$ and
+in favor of the alternative concentrated around $\theta =0.51$. This result
+hence provides decisive evidence against the hypothesis that coins tend to land
+on the same side with equal probability. However, the BFF framework permits
+further insights. For example, we can see that all probability values up to
+about 0.504 and all values larger than 0.512 are decisively refuted by the data,
+each having an associated Bayes factor below $10^{-3}$. Furthermore, the $k = 1$
+support interval from 0.506 to 0.509 shows the probability values that are
+better supported by the data than the specified alternative, which excludes the
+theoretically predicted $\theta = 0.51$. The MEE at
+$\hat{\theta}_{\mathrm{ME}} = 0.508$ is the best supported value, with
 $\kME = 6.51$ indicating substantial evidence over the alternative concentrated
 around 0.51.
 
-Both the $k=1$ support interval and the MEE coincide with the 95\% credible
-interval and posterior mean based on a uniform prior distribution which were
-reported by \citet{Bartos2023} alongside the Bayes factor for $\theta = 0.5$.
-The difference, however, is that MEE, Bayes factor, and support intervals are
-all linked to the same BFF based on the same prior and data model, whereas this
-is not the case for their Bayes factor, posterior mean, and credible interval
-approach.
+% Both the $k=1$ support interval and the MEE coincide with the 95\% credible
+% interval and posterior mean based on a uniform prior distribution which were
+% reported by \citet{Bartos2023} alongside the Bayes factor for $\theta = 0.5$.
+% The difference, however, is that MEE, Bayes factor, and support intervals are
+% all coherently linked to the same BFF based on the same prior and data model,
+% whereas this is not the case for their Bayes factor, posterior mean, and
+% credible interval approach.
 
 \subsection{Meta-analysis}
 The previous analysis assumed that coin flips were independent among
@@ -1286,7 +1293,7 @@ plot(x = dat$yi, y = ybreaks, type = "n",
      panel.first = graphics::grid(ny = NA, lty = 3),
      main = bquote("Data from Bartos et al. (2023)" * ""))
 axis(side = 2, at = ybreaks, labels = dat$person, las = 2, cex.axis = 0.5)
-mtext(text = "Coin flipper", side = 2, line = 4)
+mtext(text = "Participant", side = 2, line = 4)
 arrows(x = dat$lower, x1 = dat$upper, y0 = ybreaks, angle = 90, code = 3,
        length = 0)
 points(x = dat$yi, y = ybreaks, pch = 20, cex = 1)
@@ -1360,7 +1367,7 @@ text(x = 0, y = c(2, 1/2),
      pos = 4, cex = 0.6, col = adjustcolor("black", alpha.f = 0.8))
 @
 \caption{Bayes factor analysis of coin flipping experiments from
-  \citet{Bartos2023}, taking into account between-flipper heterogeneity. The
+  \citet{Bartos2023}, taking into account between-participant heterogeneity. The
   product of a truncated beta prior
   (\mbox{$\theta \mid H_{1} \sim \Beta(\Sexpr{a}, \Sexpr{b})_{[\Sexpr{l}, \Sexpr{u}]}$})
   for $\theta$ and a half-normal prior with scale \Sexpr{scale} for $\tau$ are
@@ -1496,11 +1503,11 @@ possible in order to assess whether consistent results can be obtained
 \citep{NSF2019}. Various types of Bayes factor approaches have been proposed to
 quantify the degree to which a replication study has replicated an original
 study \citep{Verhagen2014, Ly2018, Harms2019, Pawel2022b, Pawel2023d}. A common
-idea of all approaches is that the posterior distribution of the unknown
-parameters based on the data from the original study is used as the prior
-distribution in the analysis of the replication data. If the replication data
-support this prior distribution, this suggests replication success. We will now
-show how this idea translates to analyzing replication studies with BFFs.
+idea is that the posterior distribution of the unknown parameters based on the
+data from the original study is used as the prior distribution in the analysis
+of the replication data. If the replication data support this prior
+distribution, this suggests replication success. We will now show how this idea
+translates to analyzing replication studies with BFFs.
 
 Suppose that original and replication study provide an effect estimate $y_{o}$
 and $y_{r}$ with standard error $\sigma_{o}$ and $\sigma_{r}$, respectively.
@@ -1715,10 +1722,10 @@ evidence against parameter values, but at the cost of losing the ability to
 quantify evidence \emph{in favour} of parameter values \citep{Pawel2023}.
 Finally, where under their control, data analysts should design experiments and
 studies so that conclusive inferences can be drawn from the data collected, and
-this is also applies to BFF inferences. While some research has been done on
-study design with support intervals \citep{Pawel2023}, future research needs to
-investigate how experiments need to be designed to enable conclusive inference
-with BFFs.
+this is also applies to BFF inferences. % While some research has been done on
+% study design with support intervals \citep{Pawel2023}, f
+Future research needs to investigate how experiments need to be designed to
+enable conclusive inference with BFFs.
 
 
 Bayesian, likelihoodist, or predictive reasoning may all motivate the Bayes
@@ -1733,9 +1740,10 @@ hypothesis to making gradual and quantitative inferences.
 
 
 \section*{Acknowledgments}
-I thank František Bartoš, Andrew Fowlie, Leonhard Held, and Eric-Jan Wagenmakers
-for valuable comments on drafts of the manuscript. The acknowledgment of these
-individuals does not imply their endorsement of the paper.
+We thank František Bartoš, Andrew Fowlie, Małgorzata Roos, Leonhard Held, and
+Eric-Jan Wagenmakers for valuable comments on drafts of the manuscript. The
+acknowledgment of these individuals does not imply their endorsement of the
+paper.
 
 \section*{Conflict of interest}
 We declare no conflict of interest.
