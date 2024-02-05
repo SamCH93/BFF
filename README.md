@@ -1,4 +1,4 @@
-# BFF
+# A Bayes Factor Framework for Unified Parameter Estimation and Hypothesis Testing
 
 This repository contains code and data related to the working paper
 
