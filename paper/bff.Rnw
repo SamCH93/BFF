@@ -260,8 +260,8 @@ probabilities of hypotheses can all be derived from it. The posterior provides a
 synthesis of the data and the prior distribution, which can be seen as an
 advantage but also as a challenge in the absence of prior knowledge. In
 particular, for testing of hypotheses, it can be difficult to specify prior
-probabilities such as `$p(\text{the treatment effect is absent})$' and
-`$p(\text{the treatment effect is present})$'. One approach to address this, is
+probabilities such as `$\Pr(\text{the treatment effect is absent})$' and
+`$\Pr(\text{the treatment effect is present})$'. One approach to address this, is
 to report the \emph{Bayes factor} \citep{Jeffreys1939, Good1958, Kass1995},
 i.e., the updating factor of the prior to posterior odds of two hypotheses.
 % However, the posterior However, for
@@ -655,12 +655,12 @@ delta <- 0.1
 
 k <- 1
 ## normal prior
-bf1 <- function(t0) sqrt(1 + v/se2)*exp(-0.5*((y - t0seq)^2/se2 - (y - m)^2/(se2 + v)))
-bf1b <- function(t0) sqrt(1 + v/se2)*exp(-0.5*((y - t0seq)^2/se2))
+bf1 <- function(t0) sqrt(1 + v/se2)*exp(-0.5*((y - t0)^2/se2 - (y - m)^2/(se2 + v)))
+bf1b <- function(t0) sqrt(1 + v/se2)*exp(-0.5*((y - t0)^2/se2))
 ## local normal prior
-bf2 <- function(t0) sqrt(1 + v/se2)*exp(-0.5*((y - t0seq)^2/(se2*(1 + se2/v))))
+bf2 <- function(t0) sqrt(1 + v/se2)*exp(-0.5*((y - t0)^2/(se2*(1 + se2/v))))
 ## pathological prior
-bf3 <- function(t0) exp((-delta*(y - t0seq) + delta^2*0.5)/se2)
+bf3 <- function(t0) exp((-delta*(y - t0) + delta^2*0.5)/se2)
 bfs <- sapply(X = list(bf1, bf1b, bf2, bf3), FUN = function(f) f(t0seq))
 
 ## SI for normal prior
@@ -687,6 +687,7 @@ axis(side = 2, at = bfbks, labels = bflabs, las = 1)
 abline(h = 1, lty = 2, col = adjustcolor(col = "black", alpha.f = 0.3))
 arrows(x0 = sis[,1], x1 = sis[,2], y0 = k + c(-0.0025, 0.0025, 0, 0), col = colors,
        code = 3, length = 0.075, angle = 90)
+points(x = c(y, y, y), y = c(bf1(y), bf1b(y), bf2(y)), col = colors[1:3], pch = 20)
 legend("topleft", lty = 1, col = colors, lwd = 1.5, cex = 0.7,
        title = expression("Prior under"~ italic(H)[1]),
        legend = c(bquote(theta ~ "~ N(" * .(round(m, 2)) * "," ~ .(round(sqrt(v), 2))^2 * ")"),
@@ -729,11 +730,12 @@ text(x = min(t0seq), y = c(2, 1/2),
 ## (y - t0)^2 - (y - t0 - delta)^2
 ## 2*delta*(y - t0) - delta^2
 @
-\caption{Bayes factor function and $k = \Sexpr{k}$ support intervals for a
-  normal mean $\theta$ based on data $y =\Sexpr{round(y, 2)}$ with standard
-  error $\sigma = \Sexpr{round(se, 3)}$ for different prior distributions for
-  the mean under the alternative $H_{1}$.}
-% TODO replace with real example?
+\caption{Bayes factor function, MEE, and $k = \Sexpr{k}$ support interval for a
+  log hazard ratio $\theta$ based on estimated log hazard ratio
+  $y =\Sexpr{round(y, 2)}$ with standard error $\sigma = \Sexpr{round(se, 3)}$
+  from the RECOVERY trial \citep{Abani2022} for different prior distributions
+  for the $\theta$ under the alternative $H_{1}$. A normal likelihood
+  $Y \mid \theta \sim \Nor(\theta, \sigma^{2}_{i})$ is assumed for the data.}
 \label{fig:normal}
 \end{figure}
 
@@ -832,11 +834,11 @@ Finally, it is usually advisable to report sensitivity analyses for plausible
 ranges of priors, to assess the robustness of the conclusions. A convenient
 visual sensitivity analysis is, for example, to plot different BFFs resulting
 from different prior specifications, as shown in Figure~\ref{fig:normal}. One
-can go a step further and use a `reverse-Bayes` approach \citep{Held2021b},
-which involves systematically determining the prior that represents the tipping
-point and changes the conclusions of the analysis. Data analysts can then reason
-about whether or not such a prior is plausible in the light of external
-knowledge and data.
+can go a step further and use a `reverse-Bayes` approach \citep{Good1950,
+  Held2021b}, which involves systematically determining the prior that
+represents the tipping point and changes the conclusions of the analysis. Data
+analysts can then reason about whether or not such a prior is plausible in the
+light of external knowledge and data.
 
 % TODO maybe write about nuisance parameters, that they can be improper?
 
@@ -865,6 +867,332 @@ knowledge and data.
 % informative priors' that span a wide range of parameter values but exclude
 % values that are physically impossible \citep{Gelman2009}.
 
+\subsection{Sequential analysis}
+An attractive property of Bayesian inference is that it provides a coherent way
+to analyze data that come in batches. That is, the same posterior distribution
+is obtained regardless of whether all data are analyzed at once, or whether the
+posterior distribution based on one batch is used as the prior for the other.
+
+If we have two batches $y_{1}$ and $y_{2}$, the BFF based on both batches is
+\begin{align*}
+  \BF_{01}(y_{1}, y_{2} ; \theta_{0})
+  % &= \frac{p(y_{1}, y_{2} \mid H_{0})}{p(y_{1}, y_{2} \mid H_{1})} \\
+  % &= \frac{p(y_{2} \mid y_{1}, H_{0})}{p(y_{2} \mid y_{1}, H_{1})}
+  %   \times \frac{p(y_{1} \mid H_{0})}{p(y_{1} \mid H_{1})}\\
+  % &= \frac{\int_{\Psi} p(y_{2} \mid \theta_{0}, \psi) \, p(\psi \mid y_{1}, H_{0}) \, \mathrm{d}\psi}{\int_{\Theta} \int_{\Psi} p(y_{2} \mid \theta, \psi) \, p(\theta, \psi \mid y_{1}, H_{1}) \, \mathrm{d}\psi  \, \mathrm{d}\theta} \times
+  %   \frac{\int_{\Psi} p(y_{1} \mid \theta_{0}, \psi) \, p(\psi \mid H_{0}) \, \mathrm{d}\psi}{\int_{\Theta} \int_{\Psi} p(y_{1} \mid \theta, \psi) \, p(\theta, \psi \mid H_{1}) \, \mathrm{d}\psi  \, \mathrm{d}\theta} \\
+  &= \BF_{01}(y_{1} ; \theta_{0}) \times \BF_{01}(y_{2} \mid y_{1} ; \theta_{0})
+\end{align*}
+where
+\begin{align*}
+  \BF_{01}(y_{2} \mid y_{1} ; \theta_{0})
+  &= \frac{\int_{\Psi} p(y_{2} \mid \theta_{0}, \psi) \, p(\psi \mid y_{1}, H_{0}) \, \mathrm{d}\psi}{\int_{\Theta} \int_{\Psi} p(y_{2} \mid \theta, \psi) \, p(\theta, \psi \mid y_{1}, H_{1}) \, \mathrm{d}\psi  \, \mathrm{d}\theta}
+\end{align*}
+is the partial Bayes factor obtained from using the posterior distributions
+$p(\psi \mid y_{1}, H_{0})$ and $p(\theta, \psi \mid y_{1}, H_{1})$ based on the
+first batch $y_{1}$ to compute the Bayes factor based on the second batch
+$y_{2}$ \citep[p.186]{OHagan2004}. This result generalizes to more than two
+batches by
+\begin{align*}
+  \BF_{01}(y_{1}, y_{2}, \dots, y_{n} ; \theta_{0})
+  &= \BF_{01}(y_{1} ; \theta_{0}) \times \prod_{i=2}^{n} \BF_{01}(y_{i} \mid y_{1}, y_{2}, \dots, y_{i-1} ; \theta_{0}),
+\end{align*}
+that is, a BFF based on all the available data can be obtained by updating the
+BFF based on the previous batches by the partial Bayes factor. Thus, like
+ordinary Bayesian inference with posterior distributions, BFF inference is
+sequentially coherent.
+
+
+\subsection{Asymptotic behaviour of the Bayes factor function}
+It is of interest to understand the asymptotic behaviour of the BFF. Applying
+Laplace's method expanded around the MLE \cite[equation 6]{Kass1995} gives the
+following approximation to the logarithm of the BFF
+\begin{align*}
+  \log \BF_{01}(Y;\theta_{0}) \approx
+  \log \frac{p(Y \mid \theta_{0}, \hat{\psi}_{\mathrm{ML}})}{
+  p(Y \mid \hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}}^{*})} +
+  \frac{1}{2} \log \left\{\frac{p(\hat{\psi}_{\mathrm{ML}}^{*} \mid H_{0})}{
+  p(\hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}} \mid H_{1})}\right\}
+  + \frac{1}{2} \log \frac{|\hat{\Sigma}_{0}|}{|\hat{\Sigma}_{1}|}
+  + \frac{d_{1} - d_{0}}{2} \log (2 \pi)
+\end{align*}
+with $(\hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}})$ the joint maximum
+likelihood estimator (MLE), $\hat{\psi}_{\mathrm{ML}}^{*}$ the MLE under
+$H_{0}$, observed information matrices $\hat{\Sigma}_{i}$, the negative Hessian
+matrices of the log-likelihood evaluated at the corresponding maximum likelihood
+estimator, and $d_{i}$ the dimension of the parameters for hypothesis
+$i \in \{0, 1\}$. TODO: UNDERSTAND THIS BETTER! WHAT HAPPENS WHEN N GROWS? DOES
+THE BFF PEAK AT THE TRUE VALUE? DOES IT GO CORRECTLY TO +-INFINITY AT THE
+TRUE/NON-TRUE VALUE? HOW DOES THE PRIOR AFFECT IT? HOW DOES THE DIMENSIONALITY
+AFFECT IT?
+
+
+As a concrete example where the distribution of the BFF can be derived in
+closed-form, consider again inference about a normal mean based on data
+$Y \mid \theta \sim \Nor(\theta, \kappa^{2}/n)$, where $\kappa^{2}$ denotes a
+unit-variance and $n$ the sample size. The logarithm of the BFF based on a
+normal prior $\theta \mid H_{1} \sim \Nor(m, v)$ can then be written as
+\begin{align}
+  \log \BF_{01}(Y;\theta_{0})
+  % &= \frac{1}{2}\left\{\log\left(1 + \frac{n \, v}{\kappa^{2}}\right) -
+  % \frac{(Y - \theta_{0})^{2}}{\kappa^{2}/n} +
+  % \frac{(Y - m)^{2}}{v + \kappa^{2}/n}\right\} \nonumber \\
+  &= \frac{1}{2}\left[\log\left(1 + \frac{n \, v}{\kappa^{2}}\right) +
+ \frac{(\theta_{0} - m)^{2}}{v} -
+    \left\{Y - \frac{(\theta_{0} - m)\kappa^{2}}{n \, v} - \theta_{0}\right\}^{2}\frac{v \, n}{\kappa^{2}(v + \kappa^{2}/n)} \right].
+  \label{eq:logbfnormal}
+\end{align}
+Hence, when the data are generated from
+$Y \mid \theta_{*} \sim \Nor(\theta_{*}, \kappa^{2}/n)$ with true mean
+$\theta_{*}$, we have that
+\begin{align*}
+  % \left\{
+  % -2\log \BF_{01}(Y;\theta_{0}) +
+  % \log\left(1 + \frac{n \, v}{\kappa^{2}}\right) +
+  % \frac{(\theta_{0} - m)^{2}}{v}
+  % \right\} \left(1 + \frac{\kappa^{2}}{v\, n}\right) &=
+    \left\{Y - \frac{(\theta_{0} - m)\kappa^{2}}{n \, v} - \theta_{0}\right\}^{2} \frac{n}{\kappa^{2}} \sim \chi^{2}_{1,\lambda}
+\end{align*}
+with non-centrality parameter
+$\lambda = n\left\{\theta_{*} - \frac{(\theta_{0} - m)\kappa^{2}}{n \, v} - \theta_{0}\right\}^{2}/\kappa^{2}.$
+Thus, by rearranging terms in~\eqref{eq:logbfnormal}, we can compute the
+probability that the Bayes factor is below some threshold $\gamma$ by
+\begin{align*}
+  \Pr(\BF_{01}(Y;\theta_{0}) \leq \gamma \mid \theta_{*}) =
+  1 - \Pr(\chi_{1,\lambda}^{2} \leq X)
+\end{align*}
+with
+\begin{align*}
+  X = \left\{
+  \log\left(1 + \frac{n \, v}{\kappa^{2}}\right) +
+  \frac{(\theta_{0} - m)^{2}}{v} -
+  2\log \gamma
+  \right\} \left(1 + \frac{\kappa^{2}}{v\, n}\right).
+\end{align*}
+
+\begin{figure}[!htb]
+<< "BF-asymptotic", fig.height = 4.5, fig.width = 8 >>=
+## BFF for normal mean
+bff <- function(t0, y, kappa, n, m, v) {
+    sqrt(1 + v*n/kappa^2)*
+        exp(-0.5*((y - t0)^2*n/kappa^2 - (y - m)^2/(kappa^2/n + v)))
+}
+
+## CDF of the BF
+pbf. <- function(q, t0, kappa, n, m, v, tstar) {
+    lambda <- (tstar - (t0 - m)*kappa^2/n/v - t0)^2*n/kappa^2
+    A <- log(1 + n*v/kappa^2) + (t0 - m)^2/v - 2*log(q)
+    if (A <= 0) p <- 1
+    else {
+        p <- pchisq(q = A*(1 + kappa^2/v/n), df = 1,
+                    ncp = lambda, lower.tail = FALSE)
+    }
+    return(p)
+}
+pbf <- Vectorize(FUN = pbf.)
+
+## quantile function of the BF
+qbf. <- function(p, t0, kappa, n, m, v, tstar) {
+    upper <- bff(t0 = t0, y = t0, kappa = kappa, n = n, m = m, v = v)
+    if (p == 0) {
+        q <- 0
+    } else if (p == 1) {
+        q <- upper
+    } else {
+        rootFun <- function(q) {
+            pbf(q = q, t0 = t0, kappa = kappa, n = n, m = m, v = v,
+                tstar = tstar) - p
+        }
+        res <- try(uniroot(f = rootFun,
+                           interval = c(.Machine$double.eps, upper),
+                           tol = .Machine$double.eps^0.75)$root,
+                   silent = TRUE)
+        if (inherits(res, "try-error")) q <- NaN
+        else q <- res
+    }
+    return(q)
+}
+qbf <- Vectorize(FUN = qbf.)
+
+## different sample sizes
+ns <- c(50, 500, 5000)
+cols <- hcl.colors(n = length(ns), palette = "viridis", alpha = 0.9,
+                   rev = TRUE)
+cols2 <- adjustcolor(col = cols, alpha.f = 0.4)
+cols3 <- adjustcolor(col = cols, alpha.f = 0.1)
+t0seq <- seq(-1, 1, length.out = 500)
+tstar <- 0
+kappa <- 2
+m <- 1
+v <- 4
+p <- 0.5
+plower <- 0.05
+pupper <- 0.95
+bfmedians <- sapply(X = ns, FUN = function(n) {
+    qbf(p = p, t0 = t0seq, kappa = kappa, n = n, m = t0seq, v = v,
+        tstar = tstar)
+})
+bfupper <- sapply(X = ns, FUN = function(n) {
+    qbf(p = pupper, t0 = t0seq, kappa = kappa, n = n, m = t0seq, v = v,
+        tstar = tstar)
+})
+bflower <- sapply(X = ns, FUN = function(n) {
+    qbf(p = plower, t0 = t0seq, kappa = kappa, n = n, m = t0seq, v = v,
+        tstar = tstar)
+})
+
+par(mar = c(4, 5, 1, 1.5))
+bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100)
+bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100")
+matplot(t0seq, y = bfupper, type = "l", lty = 2,
+        col = cols2, log = "y", ylim = c(1/1000, 120),
+        las = 1, xlab = bquote("Mean" ~ theta),
+        ylab = bquote("BFF distribution (" *
+                      .(round(plower*100, 1)) * "/" * .(round(p*100, 1)) * "/" *
+                          .(round(pupper*100, 1)) * "% quantiles)"),
+        yaxt = "n",
+        panel.first = graphics::grid(lty = 3, equilogs = FALSE))
+axis(side = 2, at = bfbks, labels = bflabs, las = 1)
+for (i in seq(1, length(ns))) {
+    polygon(x = c(t0seq, rev(t0seq)), y = c(bfupper[,i], rev(bflower[,i])),
+            col = cols3[i], border = FALSE)
+}
+matlines(t0seq, y = bflower, type = "l", lty = 2,
+         col = cols2)
+matlines(t0seq, y = bfmedians, type = "l", lwd = 1.5, lty = 1,
+         col = cols)
+abline(h = 1, lty = 3, col = adjustcolor(col = "black", alpha.f = 0.1))
+abline(v = tstar, lty = 3, col = adjustcolor(col = "black", alpha.f = 0.1))
+legend("topright", legend = rev(ns), title = expression("Sample size" ~ italic(n)),
+       lty = 1, lwd = 1.5, col = rev(cols), bg = "white")
+arrows(x0 = min(t0seq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
+       col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
+text(x = min(t0seq), y = c(2.5, 1/2.5),
+     labels = c(expression("Support for" ~ theta),
+                expression("Support for" ~ italic(H)[1])),
+     pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
+@
+\caption{Distribution of the BFF for different sample sizes. A data model
+  $Y \mid \theta \sim \Nor(\theta, \kappa^{2}/n)$ is assumed and data are
+  generated from a true mean $\theta_{*} = \Sexpr{tstar}$ and unit-variance
+  $\kappa^{2} = \Sexpr{kappa^2}$. The BFF is based on a local normal prior
+  $\theta \mid H_{1} \sim \Nor(\theta_{0}, v = \Sexpr{v})$ assigned to $\theta$
+  under the alternative.}
+\label{fig:BFFdistribution}
+\end{figure}
+
+Figure~\ref{fig:BFFdistribution} shows the distribution of the BFF for different
+sample sizes, a true mean of $\theta_{*} = \Sexpr{tstar}$, a unit-variance of
+$\kappa^{2} = \Sexpr{kappa^2}$, and with a local normal prior with unit variance
+\citep[a unit-information prior, see][]{Kass1995b} specified under the
+alternative. We see that, as the sample size increases, the BFF becomes more
+peaked around the true mean, as it should. Similar, the further away the BFF
+from the true mean. TODO: IMPROVE THIS DESCRIPTION
+
+<< eval = FALSE >>=
+
+## ## simulate BFFs
+## set.seed(44)
+## kappa <- 2
+## m <- 0.5
+## v <- 4
+## n <- 50
+## t0seq <- seq(-0.5, 0.75, length.out = 200)
+## tstar <- 0.2 # true value
+## bff <- function(t0, y, kappa, n, m, v) {
+##     sqrt(1 + v*n/kappa^2)*
+##         exp(-0.5*((y - t0)^2*n/kappa^2 - (y - m)^2/(kappa^2/n + v)))
+## }
+## y <- rnorm(n = 10000, mean = tstar, sd = kappa/sqrt(n))
+## bffs <- sapply(X = y, FUN = function(y) {
+##     bff(t0 = t0seq, y = y, kappa = kappa, n = n, m = m, v = v)
+## })
+## col <- adjustcolor(col = "black", alpha.f = 0.005)
+## matplot(x = t0seq, y = log(bffs), type = "l", col = col, lty = 1)
+## lines(x = t0seq, y = rowMeans(log(bffs)))
+## abline(v = tstar, lty = 2, col = 2)
+## lines(t0seq, y = log(bff(t0seq, y = tstar, kappa, n, m, v)),
+##       lty = 2, col = 4)
+
+
+## CDF of the BF
+bff <- function(t0, y, kappa, n, m, v) {
+    sqrt(1 + v*n/kappa^2)*
+        exp(-0.5*((y - t0)^2*n/kappa^2 - (y - m)^2/(kappa^2/n + v)))
+}
+kappa <- 4
+m <- -0.5
+v <- 3
+n <- 1000
+t0 <- -0.5
+tstar <- -0.5
+y <- rnorm(n = 10000000, mean = tstar, sd = kappa/sqrt(n))
+bf <- bff(t0, y, kappa, n, m, v)
+
+lbf2x <- function(lbf, t0, kappa, n, m, v) {
+    (-2*lbf + log(1 + n*v/kappa^2) + (t0 - m)^2/v)*(1 + kappa^2/v/n)
+}
+x2lbf <- function(x, t0, kappa, n, m, v) {
+    -0.5*(x/(1 + kappa^2/v/n)) - log(1 + n*v/kappa^2) - (t0 - m)^2/v
+}
+
+pbf. <- function(q, t0, kappa, n, m, v, tstar) {
+    lambda <- (tstar - (t0 - m)*kappa^2/n/v - t0)^2*n/kappa^2
+    A <- log(1 + n*v/kappa^2) + (t0 - m)^2/v - 2*log(q)
+    if (A <= 0) p <- 1
+    else {
+        p <- pchisq(q = A*(1 + kappa^2/v/n), df = 1,
+                    ncp = lambda, lower.tail = FALSE)
+    }
+    return(p)
+}
+pbf <- Vectorize(FUN = pbf.)
+
+qseq <- exp(seq(log(1/1000), log(100000), length.out = 200))
+plot(qseq, pbf(q = qseq, t0, kappa, n, m, v, tstar), type = "l", log = "x",
+     ylim = c(0, 1))
+lines(qseq, ecdf(bf)(qseq), lty = 2, col = 2)
+
+
+## A <- n/kappa^2
+## B <- -1/(kappa^2/n + v)
+## a <- t0
+## b <- m
+## C <- A + B
+## y <- 0.3
+## ## C == v*n/kappa^2/(kappa^2/n + v)
+## c <- (A*a + B*b)/C
+## c == (n*t0*(kappa^2/n + v) - m*kappa^2)/v/n
+## kappa^2/n/v*(t0 - m) + t0
+## A*B/C == -1/v
+## A*(y - a)^2 + B*(y - b)^2
+## (y - kappa^2/n/v*(t0 - m) - t0)^2*v*n/kappa^2/(kappa^2/n + v) - (t0 - m)^2/v
+
+## log(dnorm(y, t0, kappa/sqrt(n))/dnorm(y, m, sqrt(v + kappa^2/n)))
+
+## 0.5*(log(1 + n*v/kappa^2) -
+##      (y - (t0 - m)*kappa^2/n/v - t0)^2*v*n/kappa^2/(v + kappa^2/n) +
+##      (t0 - m)^2/v)
+
+
+## logbf <- log(dnorm(y, t0, kappa/sqrt(n))/dnorm(y, m, sqrt(v + kappa^2/n)))
+
+
+
+## X <- (y - (t0 - m)*kappa^2/n/v - t0)^2*n/kappa^2
+## (-2*logbf + log(1 + n*v/kappa^2) + (t0 - m)^2/v)*(1 + kappa^2/v/n)
+
+## flogbf <- function(logbf, t0, kappa, n, m, v) {
+##     X <- lbf2x(lbf = logbf, t0 = t0, kappa = kappa, n = n, m = m, v = v)
+##     lambda <- (tstar - (t0 - m)^2*kappa^2/n/v - t0)^2
+##     dchisq(x = X, df = 1, ncp = lambda)*2*(1 + kappa^2/v/n)
+## }
+## logbfseq <- seq(-10, 10, 0.01)
+## plot(logbfseq, flogbf(logbfseq, t0 = t0, kappa = kappa, n = n, m = m, v = v), type = "l")
+
+
+
+@
 
 \section{Connection to other inference frameworks}
 \label{sec:connections}
@@ -885,11 +1213,13 @@ this prior is
   \times p(\theta \mid H_{1}).
 \end{align}
 This means that the posterior can be obtained by multiplying the BFF with the
-prior. It is, however, important to emphasize that BFFs based on priors under
-the alternative that depend on the null (e.g., commonly used `local' normal or
-Cauchy priors that are centered around $\theta_{0}$) cannot be transformed to a
-genuine posterior distribution in this way, but multiplication with the prior
-will result in a different posterior for every $\theta$.
+prior as a consequence of the so-called Savage-Dickey density ratio
+\citep{Dickey1971, Verdinelli1995, Wagenmakers2010}. It is, however, important
+to emphasize that BFFs based on priors under the alternative that depend on the
+null (e.g., commonly used `local' normal or Cauchy priors that are centered
+around $\theta_{0}$) cannot be transformed to a genuine posterior distribution
+in this way, but multiplication with the prior will result in a different
+posterior for every $\theta$.
 
 The link~\eqref{eq:posterior} also provides a convenient way to compute BFFs in
 more general settings: One of the many programs for computing Bayesian posterior
@@ -928,16 +1258,14 @@ to another Bayesian inference quantity -- the relative belief ratio
 \end{align}
 see e.g., \citet{Evans2015}. This quantity is the updating factor of the prior
 to the posterior density/probability mass function, and is related to the Bayes
-factor via the so-called Savage-Dickey density ratio \citep{Dickey1971,
-  Verdinelli1995, Wagenmakers2010}.
-
-An estimation and testing framework centered around the relative belief ratio
-was developed by \citet{Evans1997, Evans2015}. This framework is perhaps the
-closest to the one presented here. However, as with the posterior distribution
-there is only a correspondence between relative belief ratio inferences and BFF
-inference if the prior for $\theta$ is the same for every $\theta_{0}$, and it
-does not hold anymore when, for example, local priors centered around the value
-of the null $\theta_{0}$ are used.
+factor via the previously mentioned Savage-Dickey density ratio. An estimation
+and testing framework centered around the relative belief ratio was developed by
+\citet{Evans1997, Evans2015}. This framework is perhaps the closest to the one
+presented here. However, as with the posterior distribution there is only a
+correspondence between relative belief ratio inferences and BFF inference if the
+prior for $\theta$ is the same for every $\theta_{0}$, and it does not hold
+anymore when, for example, local priors centered around the value of the null
+$\theta_{0}$ are used.
 
 %% should I also mention that relative belief makes no sense when we have point
 %% hypotheses while BF makes complete sense?
@@ -1023,11 +1351,11 @@ alternatives.% Moreover, the way the informativeness
 
 \subsection{Likelihoodist inference}
 The likelihoodist school of statistical inference \citep{Barnard1949,
-  Edwards1971, Royall1997} rejects the use of prior distributions to formulate
-alternatives or to eliminate nuisance parameters, but it also shares features
-with the BFF paradigm. That is, if point priors are assigned to the parameters,
-the Bayes factor reduces to a likelihood ratio which is the evidence measure
-used by likelihoodists. For this reason, BFF inferences correspond to
+  Edwards1971, Royall1997, Blume2002} rejects the use of prior distributions to
+formulate alternatives or to eliminate nuisance parameters, but it also shares
+features with the BFF paradigm. That is, if point priors are assigned to the
+parameters, the Bayes factor reduces to a likelihood ratio which is the evidence
+measure used by likelihoodists. For this reason, BFF inferences correspond to
 likelihoodist inferences if the Bayesian and likelihoodist agree on the used
 point priors.
 
@@ -1689,11 +2017,17 @@ Senn
   46]{Senn2008}
 \end{quote}
 It raises the question of whether a synthesis of prior and likelihood is
-appropriate in this situation. The BFF, on the other hand, seems to be more
-robust to such prior-data conflicts because it relies only on the data-based
-core of Bayesian inference.
+appropriate in this situation. % The BFF, on the other hand, seems to be more
+% robust to such prior-data conflicts because it relies only on the data-based
+% core of Bayesian inference.
 
 
+
+\subsection{Regression models}
+
+TODO: ADD A MORE COMPLICATED EXAMPLE WITH REGRESSION MODELS, FOR EXAMPLE, G
+PRIOR, COULD ALSO USE MCMC/INLA TO ESTIMATE POSTERIOR AND THEN USE SAVAGE-DICKEY
+TO GET BFF
 
 \section{Discussion}
 \label{sec:discussion}
