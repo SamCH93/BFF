@@ -125,26 +125,26 @@ library(metabf) # BFFs for meta-analysis
 A universal problem in data analysis is making inferences about unknown
 parameters of a statistical model based on observed data. In practice, data
 analysts are often interested in two tasks: (i) estimating the parameters (i.e.,
-finding the most plausible value(s) based on the observed data) and (ii) testing
-hypotheses related to them (i.e., using the observed data to quantify the
-evidence that the parameter takes a certain value). While these tasks may seem
-different at first, there are several statistical concepts that provide a link
-between the two.
+finding the most plausible value or a range of plausible values based on the
+observed data) and (ii) testing hypotheses related to them (i.e., using the
+observed data to quantify the evidence that the parameter takes a certain
+value). While these tasks may seem different at first, there are several
+statistical concepts that provide a link between the two.
 
 In frequentist statistics, there is a duality between parameter estimation and
 hypothesis testing as \textit{P}-values, confidence intervals, and point
 estimates correspond in the sense that the \textit{P}-value for a tested
 parameter value is less than $\alpha$ if the $(1-\alpha)100\%$ confidence
-interval excludes that parameter value, and that the \textit{P}-value is largest
-when the tested parameter value is the point estimate. The
-\emph{\textit{P}-value function} -- the \textit{P}-value viewed as a function of
-the tested parameter \citep[for an overview see e.g.,][]{Bender2005, Fraser2019}
--- provides a link between these concepts.\footnote{One may alternatively look
-  at closely related quantities: One minus the two-sided \textit{P}-value
-  function known as \emph{confidence curve} \citep{Cox1958b, Birnbaum1961}, one
-  minus the one-sided \textit{P}-value function known as \emph{confidence
-    distribution}, or its derivative known as \emph{confidence density}
-  \citep{XieSingh2013, SchwederHjort2016}.} A visualization of the
+interval excludes that parameter value, and that the (two-sided)
+\textit{P}-value is largest when the tested parameter value is the point
+estimate. The \emph{\textit{P}-value function} -- the \textit{P}-value viewed as
+a function of the tested parameter \citep[for an overview see
+e.g.,][]{Bender2005, Fraser2019} -- provides a link between these concepts. One
+may alternatively look at closely related quantities: One minus the two-sided
+\textit{P}-value function known as \emph{confidence curve} \citep{Cox1958b,
+  Birnbaum1961}, one minus the one-sided \textit{P}-value function known as
+\emph{confidence distribution}, or its derivative known as \emph{confidence
+  density} \citep{XieSingh2013, SchwederHjort2016}. A visualization of the
 \textit{P}-value function, such as shown in the left plot in
 Figure~\ref{fig:pvalfun}, provides the observer with a wealth of information, as
 \textit{P}-values (for any tested parameter), confidence intervals (at any level
@@ -292,7 +292,7 @@ factors but also parameter estimation are therefore faced with a dilemma; they
 can either supply their Bayes factors with a posterior distribution conditional
 on one hypothesis being true (e.g., the posterior of a treatment effect,
 assuming the effect is indeed present), which can lead to contradictory
-conclusions with the Bayes factor \citep[for examples, see][]{Aitkin2005,
+conclusions with the Bayes factor \citep[for examples, see][]{Stone1997,
   Wagenmakers2020}, or they can assign prior probabilities to the tested
 hypotheses and report a posterior averaged over both hypotheses
 \citep{Campbell2022}, but this requires specification of prior probabilities
@@ -301,28 +301,28 @@ in the first place rather than the posterior probabilities of the hypotheses.
 
 Our goal is therefore to propose a unifying framework for estimation and
 hypothesis testing based on Bayes factors, building on ideas already hinted at
-in earlier work \citep{Pawel2023} and also closely related to approaches
-proposed in the physics community \citep{Afzal2023, Fowlie2024}. The idea is the
-same as for the \textit{P}-value function; we consider the Bayes factor as a
-function of the tested parameter. We then use this \emph{Bayes factor
-  function}\footnote{Our conception of Bayes factor functions differs from the
-  Bayes factor functions introduced by \citet{Johnson2023}. The latter are Bayes
-  factors viewed as a function of a hyperparameter of the prior \emph{under the
-    alternative hypothesis} but for a fixed null hypothesis. We acknowledge that
-  introducing another concept with the same name may be confusing, but we think
-  that Bayes factor function is the most appropriate name, in analogy to
-  \textit{P}-value function. An alternative might be to call our concept
-  `support curve' in analogy to the confidence curve, but we think Bayes factor
-  function is more appropriate.} to derive point estimates, interval estimates,
-and Bayes factors (as shown in the right plot in Figure~\ref{fig:pvalfun}). Our
-framework builds on the recently proposed Bayesian support interval
-\citep{Wagenmakers2020, Pawel2023} and extends it with the novel concept of
-point estimation based on Bayes factors. We call the resulting estimate the
-\emph{maximum evidence estimate} (MEE) -- the parameter value that receives the
-most evidential support from the data over a specified alternative hypothesis.
-Our framework provides data analysts with a unified framework for statistical
-inference that is in some ways related to Bayesian, likelihood, and frequentist
-frequentist inference, but is also distinct in other ways.
+in earlier work \citep{Pawel2023} and also closely related to the `Bayes factor
+surface' \citep{Fowlie2024} and `\textit{K} ratio` \citep{Afzal2023} approaches
+recently proposed in the physics community. The idea is the same as for the
+\textit{P}-value function; we consider the Bayes factor as a function of the
+tested parameter. We then use this \emph{Bayes factor function}\footnote{Our
+  conception of Bayes factor functions differs from the Bayes factor functions
+  introduced by \citet{Johnson2023}. The latter are Bayes factors viewed as a
+  function of a hyperparameter of the prior \emph{under the alternative
+    hypothesis} but for a fixed null hypothesis. We acknowledge that introducing
+  another concept with the same name may be confusing, but we think that Bayes
+  factor function is the most appropriate name, in analogy to \textit{P}-value
+  function. An alternative might be to call our concept `support curve' in
+  analogy to the confidence curve, but we think Bayes factor function is more
+  appropriate.} to derive point estimates, interval estimates, and Bayes factors
+(as shown in the right plot in Figure~\ref{fig:pvalfun}). Our framework builds
+on the recently proposed Bayesian support interval \citep{Wagenmakers2020,
+  Pawel2023} and extends it with the novel concept of point estimation based on
+Bayes factors. We call the resulting estimate the \emph{maximum evidence
+  estimate} (MEE) -- the parameter value that receives the most evidential
+support from the data over a specified alternative hypothesis. This provides
+data analysts with a unified framework for statistical inference centred around
+the Bayes factor.
 % When there are no nuisance parameters, the MEE is equivalent to the maximum
 % likelihood estimate. When there are nuisance parameters, the MEE eliminates them
 % via marginalization over the prior of the nuisance parameters and is typically
@@ -339,9 +339,8 @@ This paper is structured as follows. In the following
 support sets, and maximum evidence estimates. We then discuss their connection
 to other approaches to statistical inference (Section~\ref{sec:connections}).
 Various real data examples in Section~\ref{sec:applications} illustrate
-similarities and differences of the proposal to conventional frequentist and
-Bayesian approaches. We conclude with a discussion of the advantages and
-limitations of our framework, and opportunities for future research
+properties of the Bayes factor framework. We conclude with a discussion of the
+advantages, limitations, and opportunities for future research
 (Section~\ref{sec:discussion}).
 % We also provide a free and open-source R package \texttt{metabf} that
 % implements the proposed Bayes factor framework for meta-analysis.
@@ -407,39 +406,39 @@ for example, a parameter value indicating a very large treatment effect may
 receive equal support as the value of no treatment effect \citep[sometimes
 called `counternull', see][]{Rosenthal1994}.
 
-For one- or two-dimensional focus parameters $\theta$, the BFF can be graphed so
-that the relative support for parameter values can be visually assessed. For
-higher dimensional focus parameters, this becomes more difficult and the BFF may
-need to be summarized in some form.
+For one- or two-dimensional focus parameters $\theta$, the BFF can be plotted as
+a curve or surface, respectively, so that the relative support for parameter
+values can be visually assessed. For higher dimensional focus parameters, this
+becomes more difficult and the BFF may need to be summarized in some way, which
+we discuss in the following.
 
 
 \subsection{Support sets}
 The BFF can be used to obtain \emph{support sets} \citep{Wagenmakers2020,
   Pawel2023} which are set-valued estimates for $\theta$ based on inverting the
 Bayes factor~\eqref{eq:bf01} similar to how \textit{P}-value functions are
-inverted to obtain confidence sets. Specifically, a support set at level~$k$ is
-defined by
+inverted to obtain confidence sets. Specifically, a support set at support
+level~$k > 0$ is defined by
 \begin{align*}
     S_k = \left\{\theta_0 : \BF_{01}(y;\theta_0) \geq k\right\}
 \end{align*}
 that is, the parameter values for which the Bayes factor indicates at least
 evidence of level~$k$ over the specified alternative. In practice, a $k$ support
-set (typically an interval) is obtained from `cutting' the BFF
-at $k$ and taking the parameter values above as part of the support set (see the
-right plot in Figure~\ref{fig:pvalfun} for illustration). It may happen that for
-certain choices of $k$ the support set is empty because the data are not
-informative enough to constitute relative evidence at that level.
+set (typically an interval) is obtained from `cutting' the BFF at $k$ and taking
+the parameter values above as part of the support set (see the right plot in
+Figure~\ref{fig:pvalfun} for illustration). It may happen that for certain
+choices of $k$ the support set is empty because the data do not constitute
+relative evidence at that level.
 
-A support set at level~$k = 1$ contains the parameter values that are equally or
-better supported by the data than the alternative $H_1$. The choice of the
-support level is arbitrary, just as the choice of the confidence level from a
-confidence set is. One may, for example, report the support level $k = 1$ as it
-represents the tipping point at which the parameter values begin to be supported
-over the alternative. Conventions for Bayes factor evidence levels can also be
-used. For example, based on the conventions from \citet{Jeffreys1961}, a support
-set at level $k = 10$ includes the parameter values that receive `strong'
-relative support from the data, while a $k = 1/10$ support set includes the
-parameter values that are at least not strongly contradicted.
+The choice of the support level is arbitrary, just as the choice of the
+confidence level from a confidence set is. One may, for example, report the
+support level $k = 1$ as it represents the tipping point at which the parameter
+values begin to be supported over the alternative. Conventions for Bayes factor
+evidence levels can also be used. For example, based on the conventions from
+\citet{Jeffreys1961}, a support set at level $k = 10$ includes the parameter
+values that receive `strong' relative support from the data, while a $k = 1/10$
+support set includes the parameter values that are at least not strongly
+contradicted.
 
 
 \subsection{The maximum evidence estimate}
@@ -492,122 +491,7 @@ s <- diff(log(ciHRprior))/2/qnorm(p = 0.975)
 v <- s^2
 t0seq <- seq(-0.5, 0.1, 0.01)
 delta <- 0.1
-@
 
-
-\subsection{Example: Normal mean}
-Assume we observe a single observation $y$ assumed to be sampled (at least
-approximately) from a normal distribution
-$Y \mid \theta \sim \Nor(\theta, \sigma^{2})$. Assume that $\sigma^{2}$ is known
-and we want to conduct inferences regarding $\theta$. This is a simple but
-frequently encountered scenario, for example, $y$ could be an estimated
-regression coefficient from a generalized linear model or from a Cox
-proportional hazard model, and $\sigma$ its estimated standard error. In the
-following we will consider an example from \citet{Abani2022}. This randomised
-controlled trial found a reduction in mortality of patients hospitalised with
-COVID-19 when treated with baricitinib compared to usual care (age-adjusted log
-hazard ratio $y = \Sexpr{round(y, 2)}$ with standard error
-$\sigma = \Sexpr{round(se, 3)}$ estimated with Cox regression). To obtain a
-Bayes factor for contrasting $H_{0} \colon \theta = \theta_{0}$ against
-$H_{1} \colon \theta \neq \theta_{0}$ we need to formulate a prior for $\theta$
-under the alternative $H_{1}$. We will now discuss three choices with different
-characteristics shown in Table~\ref{tab:normalinference}.
-
-\begingroup
-\renewcommand{\arraystretch}{2.25}
-\begin{table}[!hbt]
-  \centering
-  \caption{Bayes factor function, maximum evidence estimate, evidence value, and
-    $k$ support interval for a normal mean based on one observation $y$ from
-    $Y \mid \theta \sim \Nor(\theta, \sigma^{2})$ with known variance
-    $\sigma^{2}$ and for three prior distributions for $\theta$ under the
-    alternative $H_{1}$: A normal prior (left), a normal prior centered around
-    the parameter value of the null hypothesis $\theta_{0}$ (middle), a point
-    prior shifted away from the parameter value of the null hypothesis
-    $\theta_{0}$ by $d > 0$ (right).}
-  \label{tab:normalinference}
-  \resizebox{\columnwidth}{!}{%
-  \begin{tabular}{l c c c}
-    \toprule
-    & \multicolumn{3}{c}{Prior for $\theta$ under $H_{1}$} \\
-    \cmidrule(lr){2-4}
-    & $\theta \sim \Nor(m, v)$ & $\theta \sim \Nor(\theta_{0}, v)$ & $\theta = \theta_{0} + d$\\
-    \midrule
-    $\BF_{01}$ & $\exp\left[-\frac{1}{2}\left\{\frac{(y - \theta_{0})^{2}}{\sigma^{2}} - \frac{(y - m)^{2}}{\sigma^{2} + v}  \right\}\right] \sqrt{1 + \frac{v}{\sigma^2}}$ & $\exp\left[-\frac{1}{2}\left\{\frac{(y - \theta_{0})^{2}}{\sigma^{2}(1 + \sigma^{2}/v)}\right\}\right] \sqrt{1 + \frac{v}{\sigma^2}}$ & $\exp\left\{\frac{2 d (\theta_{0} - y) + d^{2}}{2 \sigma^{2}}\right\}$\\
-    $\thatME$ & $y$ & $y$ & non-existent \\
-    $\kME$ & $\exp\left\{\frac{(y - m)^{2}}{2(\sigma^{2} + v)}  \right\} \sqrt{1 + \frac{v}{\sigma^2}}$ & $\sqrt{1 + \frac{v}{\sigma^2}}$ & non-existent \\
-    $k$ SI & $y \pm \sigma \sqrt{\log(1 + \frac{v}{\sigma^2}) + \frac{(y - m)^{2}}{\sigma^{2} + v} - \log k^{2}}$ & $y \pm \sigma \sqrt{\left\{\log(1 + \frac{v}{\sigma^2}) - \log k^{2}\right\}(1 + \frac{\sigma^{2}}{v})}$ & $\left[y + \frac{\sigma^{2}\log k}{d} - \frac{d}{2}, \infty\right]$\\
-    \bottomrule
-  \end{tabular}%
-  }
-\end{table}
-\endgroup
-
-
-Perhaps the simplest choice is a prior that does not depend on the parameter
-value $\theta_0$ of the null hypothesis, for example, a normal prior with mean
-$m$ and variance $v$ (left column in Table~\ref{tab:normalinference}). The
-hyperparameters $m$ and $v$ may be specified based on external data or based on
-an alternative hypothesis of interest (e.g., the prior mean $m$ could be set to
-a minimum clinically important treatment effect and $v$ could be set to zero to
-obtain a point prior as typically used in a power analysis). For example,
-\citet{Abani2022} reported a meta-analytic log hazard ratio and standard error
-based on eight previous trials, which could be used to set the prior mean and
-variance to $m = \Sexpr{round(m, 2)}$ and variance
-$v = \Sexpr{round(s, 3)}^{2}$, see Figure~\ref{fig:normal} for the resulting BFF
-(orange). In this case, the MEE is given by $\thatME =y = \Sexpr{round(y, 2)}$
-with the support interval centered around it. Due to the apparent conflict
-between the observed data and the specified prior under the alternative, the
-$k = 1$ support interval spans an wide range, indicating that large
-($\theta \approx -0.35$) up to even slightly harmful ($\theta \approx 0.08$)
-treatment effects are supported by the data over the alternative.
-
-The formulae in Table~\ref{tab:normalinference} (left column) show that as the
-prior mean $m$ becomes closer to the observed data $y$, the evidence level
-$\kME$ decreases and the support interval becomes narrower. This is because an
-alternative closer to the data clearly has better predictive accuracy of the
-data than an alternative further away. Figure~\ref{fig:normal} illustrates this
-phenomenon with another prior distributions (one with mean at the observed log
-hazard ratio $y = \Sexpr{round(y, 2)}$, the blue BFF), which is still centered
-at the observed log hazard ratio estimate but with far narrower $k = 1$ support
-interval than the orange one with the mean $m$ based on the eight previous
-trials.
-
-% Compared to the prior mean $m$, the effect of the prior variance $v$ on the
-% resulting inference is more nuanced: Increasing $v$ will initially increase
-% $\kME$ and decrease the width of the support interval, but at a certain point it
-% will decrease $\kME$ and increase the width of the support interval again. In
-% the limit -- when a completely diffuse prior is chosen ($v \to \infty$) -- the
-% evidence level~$\kME$ goes to infinity and the support interval extends to the
-% entire real number line, indicating that the data contribute overwhelming
-% support for any parameter value over the diffuse alternative. This phenomenon
-% illustrates that for diffuse priors, BFF inferences conflict with posterior
-% inferences based on the conditional posterior obtained by updating the diffuse
-% prior, thus representing the well-known Jeffreys-Lindley paradox from a
-% different perspective \citep{Robert2014, Wagenmakers2021a}.
-
-% From~\eqref{eq:kfe} we see that the evidence value $\kME$ monotonically
-% increases as the absolute difference between the MEE $\hat{\mu}_{\mathrm{ME}}$
-% and the prior mean $m$ increases. Similarly, the width of the support
-% interval~\eqref{eq:sifixed} increases with increasing difference between
-% $\hat{\mu}_{\mathrm{ME}}$ and $m$. In contrast, the prior variance $v$ is
-% non-monotonically related to $\kME$ and the width of the support interval:
-% Depending on the difference between the prior mean $m$ and the MEE
-% $\hat{\mu}_{\mathrm{ME}}$, the evidence level~$\kME$ and the width of the
-% support interval will first decrease but then increase again with increasing
-% prior variance $v$. On the one side of the extremes -- when a point prior is
-% chosen at the observed MEE ($m = \that$ and $v \downarrow 0$) under $H_1$ -- the
-% data contribute no new evidence about $\mu$ and the evidence level is therefore
-% $\kME =1$ and the support interval is equal to the usual relative likelihood
-% interval $\hat{\mu}_{\mathrm{ME}} \pm \sigma \sqrt{-2\log k}$ \citep[see
-% e.g.,][]{Royall1997}. On the other side of the extremes -- when a completely
-% diffuse prior is chosen ($v \to \infty$) -- the evidence level~$\kME$ goes to
-% infinity and the support interval extends to the entire real number line,
-% indicating that the data contribute overwhelming new evidence about $\mu$.
-
-
-\begin{figure}[!htb]
-<< "normal-mean-example", fig.height = 4 >>=
 ## ## from RECOVERY
 ## delta <- 0.05
 ## m <- 0.22
@@ -671,8 +555,124 @@ si2 <- function(k) y + c(-1, 1)*sqrt(se2)*sqrt((log(1 + v/se2) - log(k^2))*(1 + 
 ## SI for pathological prior
 si3 <- function(k) c(y + se2*log(k)/delta - delta/2, 1e+100) #Inf)
 sis <- t(sapply(X = list(si1, si1b, si2, si3), FUN = function(f) f(k)))
+@
 
 
+\subsection{Example: Normal mean}
+Assume we observe a single observation $y$ assumed to be sampled (at least
+approximately) from a normal distribution
+$Y \mid \theta \sim \Nor(\theta, \sigma^{2})$. Assume that $\sigma^{2}$ is known
+and we want to conduct inferences regarding $\theta$. This is a simple but
+frequently encountered scenario, for example, $y$ could be an estimated
+regression coefficient from a generalized linear model or from a Cox
+proportional hazard model, and $\sigma$ its estimated standard error. In the
+following we will consider an example from \citet{Abani2022}. This randomised
+controlled trial found a reduction in mortality of patients hospitalised with
+COVID-19 when treated with baricitinib compared to usual care (age-adjusted log
+hazard ratio $y = \Sexpr{round(y, 2)}$ with standard error
+$\sigma = \Sexpr{round(se, 3)}$ estimated with Cox regression). To obtain a
+Bayes factor for contrasting $H_{0} \colon \theta = \theta_{0}$ against
+$H_{1} \colon \theta \neq \theta_{0}$ we need to formulate a prior for $\theta$
+under the alternative $H_{1}$. We will now discuss three choices with different
+characteristics shown in Table~\ref{tab:normalinference}.
+
+\begingroup
+\renewcommand{\arraystretch}{2.25}
+\begin{table}[!hbt]
+  \centering
+  \caption{Bayes factor function $\BF_{01}$, maximum evidence estimate
+    $\thatME$, evidence value $\kME$, and $k$ support interval (SI) for a normal
+    mean based on one observation $y$ from
+    $Y \mid \theta \sim \Nor(\theta, \sigma^{2})$ with known variance
+    $\sigma^{2}$ and for three prior distributions for $\theta$ under the
+    alternative $H_{1}$: A normal prior (left), a normal prior centered around
+    the parameter value of the null hypothesis $\theta_{0}$ (middle), a point
+    prior shifted away from the parameter value of the null hypothesis
+    $\theta_{0}$ by $d > 0$ (right).}
+  \label{tab:normalinference}
+  \resizebox{\columnwidth}{!}{%
+  \begin{tabular}{l c c c}
+    \toprule
+    & \multicolumn{3}{c}{Prior for $\theta$ under $H_{1}$} \\
+    \cmidrule(lr){2-4}
+    & $\theta \sim \Nor(m, v)$ & $\theta \sim \Nor(\theta_{0}, v)$ & $\theta = \theta_{0} + d$\\
+    \midrule
+    $\BF_{01}$ & $\exp\left[-\frac{1}{2}\left\{\frac{(y - \theta_{0})^{2}}{\sigma^{2}} - \frac{(y - m)^{2}}{\sigma^{2} + v}  \right\}\right] \sqrt{1 + \frac{v}{\sigma^2}}$ & $\exp\left[-\frac{1}{2}\left\{\frac{(y - \theta_{0})^{2}}{\sigma^{2}(1 + \sigma^{2}/v)}\right\}\right] \sqrt{1 + \frac{v}{\sigma^2}}$ & $\exp\left\{\frac{2 d (\theta_{0} - y) + d^{2}}{2 \sigma^{2}}\right\}$\\
+    $\thatME$ & $y$ & $y$ & non-existent \\
+    $\kME$ & $\exp\left\{\frac{(y - m)^{2}}{2(\sigma^{2} + v)}  \right\} \sqrt{1 + \frac{v}{\sigma^2}}$ & $\sqrt{1 + \frac{v}{\sigma^2}}$ & non-existent \\
+    $k$ SI & $y \pm \sigma \sqrt{\log(1 + \frac{v}{\sigma^2}) + \frac{(y - m)^{2}}{\sigma^{2} + v} - \log k^{2}}$ & $y \pm \sigma \sqrt{\left\{\log(1 + \frac{v}{\sigma^2}) - \log k^{2}\right\}(1 + \frac{\sigma^{2}}{v})}$ & $\left[y + \frac{\sigma^{2}\log k}{d} - \frac{d}{2}, \infty\right]$\\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table}
+\endgroup
+
+
+Perhaps the simplest choice is a prior that does not depend on the parameter
+value $\theta_0$ of the null hypothesis, for example, a normal prior with mean
+$m$ and variance $v$ (left column in Table~\ref{tab:normalinference}). The
+hyperparameters $m$ and $v$ may be specified based on external data or based on
+an alternative hypothesis of interest (e.g., the prior mean $m$ could be set to
+a minimum clinically important treatment effect and $v$ could be set to zero to
+obtain a point prior as typically used in a power analysis). For example,
+\citet{Abani2022} reported a meta-analytic log hazard ratio and standard error
+based on eight previous trials, which could be used to set the prior mean and
+variance to $m = \Sexpr{round(m, 2)}$ and variance
+$v = \Sexpr{round(s, 3)}^{2}$, see Figure~\ref{fig:normal} for the resulting BFF
+(orange). In this case, the MEE is given by $\thatME =y = \Sexpr{round(y, 2)}$
+with the support interval centered around it. Due to the apparent conflict
+between the observed data and the specified prior under the alternative, the
+$k = 1$ support interval spans an wide range from $\Sexpr{round(sis[1,1], 2)}$
+to $\Sexpr{round(sis[1,2], 2)}$, indicating that very beneficial up to slightly
+harmful treatment effects are supported by the data over the alternative.
+
+The formulae in Table~\ref{tab:normalinference} (left column) show that as the
+prior mean $m$ becomes closer to the observed data $y$, the evidence level
+$\kME$ decreases and the support interval becomes narrower. This is because an
+alternative closer to the data clearly has better predictive accuracy of the
+data than an alternative further away. Figure~\ref{fig:normal} illustrates this
+phenomenon with another prior distributions (one with mean at the observed log
+hazard ratio $y = \Sexpr{round(y, 2)}$, the blue BFF), which is still centered
+at the observed log hazard ratio estimate but with far narrower $k = 1$ support
+interval from $\Sexpr{round(sis[2,1], 2)}$ to $\Sexpr{round(sis[2,2], 2)}$ than
+the orange BFF with the mean $m = \Sexpr{round(m, 2)}$ based on the eight
+previous trials.
+
+% Compared to the prior mean $m$, the effect of the prior variance $v$ on the
+% resulting inference is more nuanced: Increasing $v$ will initially increase
+% $\kME$ and decrease the width of the support interval, but at a certain point it
+% will decrease $\kME$ and increase the width of the support interval again. In
+% the limit -- when a completely diffuse prior is chosen ($v \to \infty$) -- the
+% evidence level~$\kME$ goes to infinity and the support interval extends to the
+% entire real number line, indicating that the data contribute overwhelming
+% support for any parameter value over the diffuse alternative. This phenomenon
+% illustrates that for diffuse priors, BFF inferences conflict with posterior
+% inferences based on the conditional posterior obtained by updating the diffuse
+% prior, thus representing the well-known Jeffreys-Lindley paradox from a
+% different perspective \citep{Robert2014, Wagenmakers2021a}.
+
+% From~\eqref{eq:kfe} we see that the evidence value $\kME$ monotonically
+% increases as the absolute difference between the MEE $\hat{\mu}_{\mathrm{ME}}$
+% and the prior mean $m$ increases. Similarly, the width of the support
+% interval~\eqref{eq:sifixed} increases with increasing difference between
+% $\hat{\mu}_{\mathrm{ME}}$ and $m$. In contrast, the prior variance $v$ is
+% non-monotonically related to $\kME$ and the width of the support interval:
+% Depending on the difference between the prior mean $m$ and the MEE
+% $\hat{\mu}_{\mathrm{ME}}$, the evidence level~$\kME$ and the width of the
+% support interval will first decrease but then increase again with increasing
+% prior variance $v$. On the one side of the extremes -- when a point prior is
+% chosen at the observed MEE ($m = \that$ and $v \downarrow 0$) under $H_1$ -- the
+% data contribute no new evidence about $\mu$ and the evidence level is therefore
+% $\kME =1$ and the support interval is equal to the usual relative likelihood
+% interval $\hat{\mu}_{\mathrm{ME}} \pm \sigma \sqrt{-2\log k}$ \citep[see
+% e.g.,][]{Royall1997}. On the other side of the extremes -- when a completely
+% diffuse prior is chosen ($v \to \infty$) -- the evidence level~$\kME$ goes to
+% infinity and the support interval extends to the entire real number line,
+% indicating that the data contribute overwhelming new evidence about $\mu$.
+
+
+\begin{figure}[!htb]
+<< "normal-mean-example", fig.height = 4 >>=
 colors <- palette.colors(n = 5, palette = "Okabe-Ito", alpha = 0.9)[2:5]
 bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
@@ -808,7 +808,7 @@ behavior of the resulting BFF.
 \subsection{Choice of the prior}
 
 As the previous example showed, the prior assigned to the parameters under the
-alternative has a substantial impact on BFF inference. The `sensitivity' of
+alternative has a substantial impact on BFF inference. This `sensitivity' of
 Bayes factors to prior distributions enables data analysts to accurately
 quantify the support of parameter values over informative alternative hypotheses
 when they are available, but poses a challenge in their absence
@@ -820,6 +820,20 @@ advantages and disadvantages. Here we will not reiterate general considerations
 on prior specification for Bayes factors \citep[see e.g., Section 5
 in][]{Kass1995} but focus on specific considerations related to BFFs.
 
+As in other Bayes factor applications, BFFs are only unambiguously defined if
+priors for focus parameters are proper under the alternative $H_1$ (i.e.,
+integrate to one), whereas priors for nuisance parameters may be improper as
+long as the same prior is assigned under both the null $H_0$ and the alternative
+$H_1$ so that arbitrary constants cancel out.
+% However, compared to traditional Bayesian posterior estimation approaches, the
+% prior serves a different purpose and affects inference in a different way, since
+% the resulting inferences are not a synthesis of prior and data (e.g., the MEE is
+% not a weighted average of data and prior means), but rather the prior encodes
+% plausible parameter values. As such, improper priors, for instance, uniform
+% priors over the real number line are discouraged, and analysts should instead
+% aim to specify at least `weakly informative priors' that span a wide range of
+% parameter values but exclude values that are physically impossible
+% \citep{Gelman2009}.
 A general distinction can be made between \emph{global} priors, which do not
 depend on the value of $\theta_{0}$ under the null hypothesis and \emph{local}
 priors, which do. In the latter case, the interpretation of the BFF is more
@@ -853,19 +867,6 @@ light of external knowledge and data.
 % careful in its specification. We now discuss some general and
 % meta-analysis-specific considerations.
 
-% As in other Bayes factor applications, inferences only make sense if priors for
-% focus parameters are proper under the alternative $H_1$ (i.e., integrate to
-% one), whereas priors for nuisance parameters may be improper as long as the same
-% prior is assigned under both the null $H_0$ and the alternative $H_1$ so that
-% arbitrary constants cancel out. However, compared to traditional Bayesian
-% posterior estimation approaches, the prior serves a different purpose and
-% affects inference in a different way, since the resulting inferences are not a
-% synthesis of prior and data (e.g., the MEE is not a weighted average of data and
-% prior means), but rather the prior encodes plausible parameter values. As such,
-% improper priors, for instance, uniform priors over the real number line are
-% discouraged, and analysts should instead aim to specify at least `weakly
-% informative priors' that span a wide range of parameter values but exclude
-% values that are physically impossible \citep{Gelman2009}.
 
 \subsection{Sequential analysis}
 An attractive property of Bayesian inference is that it provides a coherent way
@@ -904,28 +905,18 @@ sequentially coherent.
 
 
 \subsection{Asymptotic behaviour of the Bayes factor function}
-It is of interest to understand the asymptotic behaviour of the BFF. Applying
-Laplace's method expanded around the MLE \cite[equation 6]{Kass1995} gives the
-following approximation to the logarithm of the BFF
-\begin{align*}
-  \log \BF_{01}(Y;\theta_{0}) \approx
-  \log \frac{p(Y \mid \theta_{0}, \hat{\psi}_{\mathrm{ML}})}{
-  p(Y \mid \hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}}^{*})} +
-  \frac{1}{2} \log \left\{\frac{p(\hat{\psi}_{\mathrm{ML}}^{*} \mid H_{0})}{
-  p(\hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}} \mid H_{1})}\right\}
-  + \frac{1}{2} \log \frac{|\hat{\Sigma}_{0}|}{|\hat{\Sigma}_{1}|}
-  + \frac{d_{1} - d_{0}}{2} \log (2 \pi)
-\end{align*}
-with $(\hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}})$ the joint maximum
-likelihood estimator (MLE), $\hat{\psi}_{\mathrm{ML}}^{*}$ the MLE under
-$H_{0}$, observed information matrices $\hat{\Sigma}_{i}$, the negative Hessian
-matrices of the log-likelihood evaluated at the corresponding maximum likelihood
-estimator, and $d_{i}$ the dimension of the parameters for hypothesis
-$i \in \{0, 1\}$. TODO: UNDERSTAND THIS BETTER! WHAT HAPPENS WHEN N GROWS? DOES
-THE BFF PEAK AT THE TRUE VALUE? DOES IT GO CORRECTLY TO +-INFINITY AT THE
-TRUE/NON-TRUE VALUE? HOW DOES THE PRIOR AFFECT IT? HOW DOES THE DIMENSIONALITY
-AFFECT IT?
-
+It is of interest to understand the asymptotic behaviour of the BFF, that is,
+how does the BFF (and quantities derived from it) behave as more data are
+generated under a certain `true' hypothesis? It is well-known that Bayes factors
+are consistent in the sense that when the data are generated under one of the
+contrasted hypotheses, the Bayes factor tends to overwhelmingly favour that
+hypothesis over the alternative as more data are generated, i.e., go to zero or
+infinity, depending on the orientation of the Bayes factor \citep[see
+e.g.,][]{Dawid2011}. Since the BFF is nothing else than the Bayes factor
+evaluated for various null hypotheses, this consistency property carries over to
+the BFF. That is, as more data are generated from the model with true parameter
+$\theta_{*}$, the BFF at $\theta_{0} = \theta_{*}$ will go to infinity, while
+the BFF at $\theta_{0} \neq \theta_{*}$ will go to zero.
 
 As a concrete example where the distribution of the BFF can be derived in
 closed-form, consider again inference about a normal mean based on data
@@ -1083,14 +1074,15 @@ text(x = min(t0seq), y = c(2.5, 1/2.5),
 
 Figure~\ref{fig:BFFdistribution} shows the distribution of the BFF for different
 sample sizes, a true mean of $\theta_{*} = \Sexpr{tstar}$, a unit-variance of
-$\kappa^{2} = \Sexpr{kappa^2}$, and with a local normal prior with unit variance
-\citep[a unit-information prior, see][]{Kass1995b} specified under the
-alternative. We see that, as the sample size increases, the BFF becomes more
-peaked around the true mean, as it should. Similar, the further away the BFF
-from the true mean. TODO: IMPROVE THIS DESCRIPTION
+$\kappa^{2} = \Sexpr{kappa^2}$, and with a local normal prior with the same unit
+variance \citep[a unit-information prior, see][]{Kass1995b} specified under the
+alternative. We see that as the sample size increases, the distribution of the
+BFF at the true mean shifts toward larger values, indicating more evidence for
+the true mean, as it should. On the other hand, the further away the BFF is
+evaluated from the true mean, the more its distribution shifts toward smaller
+values, indicating increasing evidence for the alternative, as it should.
 
 << eval = FALSE >>=
-
 ## ## simulate BFFs
 ## set.seed(44)
 ## kappa <- 2
@@ -1194,107 +1186,87 @@ lines(qseq, ecdf(bf)(qseq), lty = 2, col = 2)
 
 @
 
+
+To understand the asymptotic behaviour of the MEE, we may look at an
+approximation of the Bayes factor. Suppose that the data
+$Y = \{Y_{1}, Y_{2}, \dots, Y_{n}\}$ are independent and identically distributed
+and denote by $\hat{\psi}_{0}$ maximizer of the log likelihood of the data under
+the null and $\hat{\theta}_{1}$, $\hat{\psi}_{1}$ the maximizer under the
+alternative hypothesis. Denote by $n V_{0}$ and $n V_{1}$ the modal dispersion
+matrices (minus the inverse of the matrix of second-order partial derivatives of
+the log likelihood evaluated at the corresponding maximizer). Applying a Laplace
+approximation to the logarithm of the BFF \cite[equation 7.27]{OHagan2004} gives
+then
+% \begin{align*}
+%   \log \BF_{01}(Y;\theta_{0}) \approx
+%   \log \frac{p(Y \mid \theta_{0}, \hat{\psi}_{\mathrm{ML}})}{
+%   p(Y \mid \hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}}^{*})} +
+%   \frac{1}{2} \log \left\{\frac{p(\hat{\psi}_{\mathrm{ML}}^{*} \mid H_{0})}{
+%   p(\hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}} \mid H_{1})}\right\}
+%   + \frac{1}{2} \log \frac{|\hat{\Sigma}_{0}|}{|\hat{\Sigma}_{1}|}
+%   + \frac{d_{1} - d_{0}}{2} \log (2 \pi)
+% \end{align*}
+% with $(\hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}})$ the joint maximum
+% likelihood estimator (MLE), $\hat{\psi}_{\mathrm{ML}}^{*}$ the MLE under
+% $H_{0}$, observed information matrices $\hat{\Sigma}_{i}$, the negative Hessian
+% matrices of the log-likelihood evaluated at the corresponding maximum likelihood
+% estimator, and $d_{i}$ the dimension of the parameters for hypothesis
+% $i \in \{0, 1\}$.
+\begin{align}
+  \log \BF_{01}(Y;\theta_{0}) =
+  \log \frac{p(Y \mid \theta_{0}, \hat{\psi}_{0})}{
+  p(Y \mid \hat{\theta}_{1}, \hat{\psi}_{1})}
+  + \frac{\dim(\theta)}{2} \log \frac{n}{2\pi} +
+  \log \frac{p(\hat{\psi}_{0} \mid H_{0})}{
+  p(\hat{\theta}_{1}, \hat{\psi}_{1} \mid H_{1})}
+  + \frac{1}{2} \log \frac{|V_{0}|}{|V_{1}|}
+  + \mathcal{O}\left(n^{-1}\right).
+  \label{eq:bfapprox}
+\end{align}
+% The BFF thus depends on the profile likelihood at $\theta_{0}$ normalized by the
+% maximized likelihood (first term), the ratio of the prior densities evaluated at
+% the maximizers (second term), the sample size and dimension of $\theta$ (third
+% term), and the ratio of the determinants of the modal dispersion matrices
+% (fourth term).
+Equation~\eqref{eq:bfapprox} has much intuitive value: if $\theta_{0}$ is
+different from $\that_{1}$, the log normalized profile likelihood (first term)
+will decrease toward negative infinity, indicating evidence against the
+parameter value $\theta_{0}$. On the other hand, the term will be about zero
+when $\theta_{0}$ is about $\that_{1}$, so that the sample size $n$ (second
+term) increases the log BFF toward positive infinity, indicating evidence for
+$\theta_{0}$. The relative accuracy of the priors (third term) and the relative
+dispersion (fourth term) lead to further adjustments of the BFF. For instance,
+when the observed parameter estimate is likely under the prior, this increases
+the evidence for corresponding hypothesis while a misspecified prior that is in
+conflict with the parameter estimates lowers the evidence for the corresponding
+hypothesis.
+
+To obtain the MEE, the log Bayes factor~\eqref{eq:bfapprox} needs to be
+maximized with respect to $\theta_{0}$. It is clear that this corresponds to
+maximizing the profile likelihood that is adjusted based on the accuracy of the
+prior for the nuisance parameters and the modal dispersion. It is clear that for
+$\theta_{0} = \theta_{*}$, the first term has a chi-squared distribution with
+$\dim(\theta)$ degrees of freedom.
+
+% The derivative with respect $\theta_{0}$ is given by
+% \begin{align}
+%   \frac{d\log \BF_{01}(Y;\theta_{0})}{d \theta_{0}} \approx
+%   \frac{d \log p(Y \mid \theta_{0}, \hat{\psi}_{0})}{d \theta_{0}} +
+%   \frac{d \log p(\hat{\psi}_{0} \mid H_{0})}{d \theta_{0}}
+%   + \frac{1}{2} \frac{d \log |V_{0}|}{d \theta_{0}}
+% \end{align}
+% The MEE is hence closely related to the profile likelihood, though this
+% criterion is adjusted based on the prior. \citet{Severini2007} studied
+
+TODO: UNDERSTAND THIS BETTER! WHAT HAPPENS WHEN N GROWS? DOES
+THE BFF PEAK AT THE TRUE VALUE? DOES IT GO CORRECTLY TO +-INFINITY AT THE
+TRUE/NON-TRUE VALUE? HOW DOES THE PRIOR AFFECT IT? HOW DOES THE DIMENSIONALITY
+AFFECT IT?
+
 \section{Connection to other inference frameworks}
 \label{sec:connections}
 
 We will now explore connections of BFF inference to other inference frameworks.
-
-\subsection{Bayesian inference}
-
-The BFF can, under certain conditions, be transformed into a Bayesian posterior
-distribution. Specifically, assuming a `global' prior under the alternative,
-i.e., a prior $p(\theta \mid H_{1})$ which does not depend on the parameter
-under the null $\theta_{0}$, we have that the posterior distribution based on
-this prior is
-\begin{align}
-  \label{eq:posterior}
-  p(\theta \mid y, H_{1})
-  = \underbrace{\frac{p(y \mid \theta, H_{1})}{p(y \mid H_{1})}}_{= \BF_{01}(y; \theta)}
-  \times p(\theta \mid H_{1}).
-\end{align}
-This means that the posterior can be obtained by multiplying the BFF with the
-prior as a consequence of the so-called Savage-Dickey density ratio
-\citep{Dickey1971, Verdinelli1995, Wagenmakers2010}. It is, however, important
-to emphasize that BFFs based on priors under the alternative that depend on the
-null (e.g., commonly used `local' normal or Cauchy priors that are centered
-around $\theta_{0}$) cannot be transformed to a genuine posterior distribution
-in this way, but multiplication with the prior will result in a different
-posterior for every $\theta$.
-
-The link~\eqref{eq:posterior} also provides a convenient way to compute BFFs in
-more general settings: One of the many programs for computing Bayesian posterior
-distributions, such as Stan \citep{Carpenter2017}, can be used to compute a
-posterior density, which can then be divided by the prior density to obtain a
-BFF. The caveat is again that this only works for global priors under the
-alternative and with the same prior assigned to the nuisance parameters under
-the null and alternative.
-
-<< "posterior-BFF-connection" >>=
-## ## verify that posterior BFF correspondonce correct
-## m <- 3
-## v <- 1
-## y <- 2
-## se <- 0.1
-## vpost <- 1/(1/se^2 + 1/v)
-## mpost <- (y/se^2 + m/v)*vpost
-## tseq <- seq(0, 5, 0.01)
-## bff <- dnorm(x = y, mean = tseq, sd = se)/
-##     dnorm(x = y, mean = m, sd = sqrt(se^2 + v))
-## posterior <- dnorm(x = tseq, mean = mpost, sd = sqrt(vpost))
-## prior <- dnorm(x = tseq, mean = m, sd = sqrt(v))
-## par(mfrow = c(1, 2))
-## plot(tseq, posterior, type = "l", las = 1, ylab = "posterior density")
-## lines(tseq, prior, lty = 2)
-## lines(tseq, bff*prior, lty = 2, col = 2)
-## plot(tseq, bff, type = "l", ylab = "BFF", las = 1)
-## lines(tseq, posterior/prior, lty = 2, col = 2)
-@
-
-The relationship between the posterior and the BFF also exposes its connection
-to another Bayesian inference quantity -- the relative belief ratio
-\begin{align}
-  \label{eq:RB}
-  \mathrm{RB}(\theta \mid H_{1}) = \underbrace{\frac{p(\theta \mid y, H_{1})}{p(\theta \mid H_{1})}}_{= \BF_{01}(y; \theta)},
-\end{align}
-see e.g., \citet{Evans2015}. This quantity is the updating factor of the prior
-to the posterior density/probability mass function, and is related to the Bayes
-factor via the previously mentioned Savage-Dickey density ratio. An estimation
-and testing framework centered around the relative belief ratio was developed by
-\citet{Evans1997, Evans2015}. This framework is perhaps the closest to the one
-presented here. However, as with the posterior distribution there is only a
-correspondence between relative belief ratio inferences and BFF inference if the
-prior for $\theta$ is the same for every $\theta_{0}$, and it does not hold
-anymore when, for example, local priors centered around the value of the null
-$\theta_{0}$ are used.
-
-%% should I also mention that relative belief makes no sense when we have point
-%% hypotheses while BF makes complete sense?
-
-
-\subsection{Frequentist inference}
-The `universal bound' \citep{Kerridge1963, Robbins1970, Royall1997} bounds the
-frequentist probability of obtaining misleading Bayesian evidence. That is, for
-$k < 1$ the probability of obtaining a Bayes factor against $H_{0}$ less than
-$k$ is at most $k$ for any prior under the alternative
-\begin{align*}
-  \Pr\{\BF_{01}(y; H_{0}) \leq k \mid H_{0}\} \leq k.
-\end{align*}
-If there are nuisance parameters, the bound holds only marginalized over the
-prior of the nuisance parameters. For the bound to hold in a strict sense (i.e.,
-for every possible value of the nuisance parameter), special priors must be
-assigned to them \citep{Hendriksen2021, Grunwald2024}.
-
-The universal bound can thus be used to transform BFFs into conservative
-\textit{P}-values and confidence sets, e.g., a $k = 1/20$ support set obtained
-from a BFF corresponds to a 95\% conservative confidence set and
-$p = \max\{\BF_{01}, 1\}$ corresponds to a conservative $P$-value. Remarkably,
-the bound holds without adjustment even when the data collection is continuously
-monitored and stopped as soon as evidence against $H_{0}$ is found
-\citep{Robbins1970}. However, it is important to note that \textit{P}-values and
-confidence sets obtained in this way are usually much more conservative than
-ordinary ones which are calibrated to have exact type I error rate and coverage,
-respectively. Finally, if the data model is misspecified, the bound is obviously
-invalid.
 
 \subsection{Maximum integrated likelihood}
 
@@ -1348,7 +1320,6 @@ alternatives.% Moreover, the way the informativeness
 % support set) differs from the (integrated) MLE.
 
 
-
 \subsection{Likelihoodist inference}
 The likelihoodist school of statistical inference \citep{Barnard1949,
   Edwards1971, Royall1997, Blume2002} rejects the use of prior distributions to
@@ -1359,11 +1330,13 @@ measure used by likelihoodists. For this reason, BFF inferences correspond to
 likelihoodist inferences if the Bayesian and likelihoodist agree on the used
 point priors.
 
-However, there is disagreement when it comes to the use of support sets.
-Likelihoodists define their support sets based on the relative likelihood
-\begin{align*}
+However, there is disagreement when it comes to the use of support sets. When
+there are no nuisance parameters, likelihoodists define their support sets based
+on the relative likelihood
+\begin{align}
   L(\theta) = \frac{p(y \mid \theta)}{p(y \mid \that_{\textrm{ML}})}.
-\end{align*}
+  \label{eq:relLik}
+\end{align}
 For example, \citet{Royall1997} recommended reporting the set of parameter
 values with relative likelihood greater than $k = 1/8$ (at most `strong'
 evidence against them) or $k = 1/32$ (at most `quite strong' evidence against
@@ -1372,6 +1345,141 @@ alternative seems to hardly represent genuine prior knowledge or an alternative
 theory, but rather a cherry-picked alternative that gives to the most biased
 assessment of support for the alternative \citep{Berger1987}.
 
+
+\subsection{Frequentist inference}
+The relative likelihood~\eqref{eq:relLik} serves as an important basis for
+frequentist statistics since under the null hypothesis $-2\log L(\theta_{0})$
+has an asymptotic chi-squared distribution with $\dim(\theta)$ degrees of
+freedom. Frequentists thus also use relative likelihoods but merely as a test
+statistic.
+
+Another connection between frequentist and BFF inference is given by the
+`universal bound' \citep{Kerridge1963, Robbins1970, Royall1997}, which bounds
+the frequentist probability of obtaining misleading Bayesian evidence. That is,
+for $0 < k < 1$ the probability of obtaining a Bayes factor against $H_{0}$ less
+than $k$ is at most $k$ for any prior under the alternative
+\begin{align*}
+  \Pr\{\BF_{01}(y; H_{0}) \leq k \mid H_{0}\} \leq k.
+\end{align*}
+If there are nuisance parameters, the bound holds only marginalized over the
+prior of the nuisance parameters. For the bound to hold in a strict sense (i.e.,
+for every possible value of the nuisance parameter), special priors must be
+assigned to them \citep{Hendriksen2021, Grunwald2024}.
+
+The universal bound can thus be used to transform BFFs into conservative
+\textit{P}-values and confidence sets, e.g., a $k = 1/20$ support set obtained
+from a BFF corresponds to a 95\% conservative confidence set and
+$p = \max\{\BF_{01}, 1\}$ corresponds to a conservative $P$-value. Remarkably,
+the bound holds without adjustment even when the data collection is continuously
+monitored and stopped as soon as evidence against $H_{0}$ is found
+\citep{Robbins1970}. However, it is important to note that \textit{P}-values and
+confidence sets obtained in this way are usually much more conservative than
+ordinary ones which are calibrated to have exact type I error rate and coverage,
+respectively. Finally, if the data model is misspecified, the bound is obviously
+invalid.
+
+
+\subsection{Bayesian inference}
+
+The BFF can, under certain conditions, be transformed into a Bayesian posterior
+distribution. Specifically, assuming a `global' prior under the alternative, a
+prior $p(\theta \mid H_{1})$ which does not depend on the parameter under the
+null $\theta_{0}$, and also that the priors for the nuisance parameters satisfy
+$p(\psi \mid H_{0}) = p(\psi \mid \theta = \theta_{0}, H_{1})$, we have the
+well-known Savage-Dickey density ratio \citep{Dickey1971, Verdinelli1995,
+  Wagenmakers2010} result
+\begin{align}
+  \label{eq:posterior}
+  p(\theta \mid y, H_{1})
+  = \underbrace{\frac{p(y \mid \theta, H_{1})}{p(y \mid H_{1})}}_{= \BF_{01}(y; \theta)}
+  \times p(\theta \mid H_{1}).
+\end{align}
+That is, the posterior can be obtained by multiplying the BFF with the prior. It
+is, however, important to emphasize that BFFs based on priors under the
+alternative that depend on the null (e.g., commonly used `local' normal or
+Cauchy priors that are centered around $\theta_{0}$) cannot be transformed to a
+genuine posterior distribution in this way, but multiplication with the prior
+will result in a different posterior for every $\theta$.
+
+The relative belief inference framework is
+perhaps the closest to the one presented here. However, as with the posterior
+distribution there is only a correspondence between relative belief ratio
+inferences and BFF inference if the prior for $\theta$ is the same for every
+$\theta_{0}$, and it does not hold anymore when, for example, local priors
+centered around the value of the null $\theta_{0}$ are used, or when the prior
+for the nuisance parameters under the null differs from the prior under the
+alternative.
+
+Since, under certain regularity conditions, the posterior is asymptotically
+normally distributed around the maximum likelihood estimate with a covariance
+matrix equal to the observed information matrix \citep[chapter
+5.3]{Bernardo2000}, we can conclude that whenever the BFF has the Savage-Dickey
+density ratio representation~\eqref{eq:posterior}, asymptotically the BFF is the
+asymptotic posterior normal density divided by the prior density, both evaluated
+at $\theta_{0}$. Hence, in contrast to the posterior distribution, the influence
+of the prior on the BFF does not `wash` out as more data are collected.
+% asymptotic normal posterior density divided by prior density?
+
+The link~\eqref{eq:posterior} also provides a convenient way to compute BFFs
+when it applies: One of the many programs for computing Bayesian posterior
+distributions, such as Stan \citep{Carpenter2017} or INLA \citep{Rue2009}, can
+be used to compute a posterior density, which can then be divided by the prior
+density to obtain a BFF. The caveat is again that this only works for global
+priors under the alternative and with the same prior assigned to the nuisance
+parameters under the null and alternative.
+
+<< "posterior-BFF-connection" >>=
+## ## verify that posterior BFF correspondonce correct
+## m <- 3
+## v <- 1
+## y <- 2
+## se <- 0.1
+## vpost <- 1/(1/se^2 + 1/v)
+## mpost <- (y/se^2 + m/v)*vpost
+## tseq <- seq(0, 5, 0.01)
+## bff <- dnorm(x = y, mean = tseq, sd = se)/
+##     dnorm(x = y, mean = m, sd = sqrt(se^2 + v))
+## posterior <- dnorm(x = tseq, mean = mpost, sd = sqrt(vpost))
+## prior <- dnorm(x = tseq, mean = m, sd = sqrt(v))
+## par(mfrow = c(1, 2))
+## plot(tseq, posterior, type = "l", las = 1, ylab = "posterior density")
+## lines(tseq, prior, lty = 2)
+## lines(tseq, bff*prior, lty = 2, col = 2)
+## plot(tseq, bff, type = "l", ylab = "BFF", las = 1)
+## lines(tseq, posterior/prior, lty = 2, col = 2)
+@
+
+The relationship between the posterior and the BFF also exposes its connection
+to another Bayesian inference quantity -- the \emph{relative belief ratio}
+\begin{align}
+  \label{eq:RB}
+  \mathrm{RB}(\theta \mid H_{1}) = \underbrace{\frac{p(\theta \mid y, H_{1})}{p(\theta \mid H_{1})}}_{= \BF_{01}(y; \theta)},
+\end{align}
+see e.g., \citet{Evans2015}. This quantity is the updating factor of the prior
+to the posterior density/probability mass function, and is related to the Bayes
+factor via the aforementioned mentioned Savage-Dickey density ratio. An
+estimation and testing framework centred on the relative belief ratio was
+developed by \citet{Evans1997}. The parameter value that maximizes the relative
+belief ratio was termed the \emph{least relative surprisal estimate}, later also
+referred to as \emph{maximum relative belief estimate} \citep{Evans2015}.
+Clearly this estimate equivalent to the MEE whenever the BFF and relative belief
+ratio coincide. \citet{Evans1997} also defined a $\gamma$ \emph{relative
+  surprise region}, which is the set of parameter values with $\gamma$ posterior
+probability and with highest relative belief ratios among all such sets.
+Similarly, \citet{Shalloway2014} defined an \emph{evidentiary credible region}
+which is equivalent to the relative surprise region, but motivated by
+information theory. While both are closely related to the support set via the
+Savage-Dickey density ratio, they differ from the support set in that they are
+defined by posterior probabilities and not by the minimum evidence that the
+parameter values that they contain receive \citep{Wagenmakers2020}. Thus, a
+relative surprise region may contain parameter values that are not supported by
+the data. For this reason, \citet{Evans2015} defined yet another type of region,
+a $q$ \emph{plausible region} which contains parameter values with a relative
+belief ratio of at least $q$ and as such coincides with the $k$ support set
+whenever the Savage-Dickey density representation applies to the BFF.
+
+%% should I also mention that relative belief makes no sense when we have point
+%% hypotheses while BF makes complete sense?
 
 \section{Applications}
 \label{sec:applications}
@@ -1451,9 +1559,11 @@ BFFbinomial <- function(p, y, n, a, b, l = 0.5, u = 1, log = FALSE) {
 }
 
 ## support interval for binomial proportion
-SIbinomial <- function(k, y, n, a, b) {
+SIbinomial <- function(k, y, n, a, b, l = 0.5, u = 1) {
     mee <- y/n
-    rootFun <- function(p) BFFbinomial(p = p, y = y, n = n, a = a, b = b) - k
+    rootFun <- function(p) {
+        BFFbinomial(p = p, y = y, n = n, a = a, b = b, l = l, u = u) - k
+    }
     lower <- try({uniroot(f = rootFun, interval = c(0, mee))$root})
     upper <- try({uniroot(f = rootFun, interval = c(mee, 1))$root})
     if (inherits(lower, "try-error")) res <- c(NaN, NaN, NaN)
@@ -1516,7 +1626,7 @@ Figure~\ref{fig:bartosproportion} shows the resulting BFF for a range of
 probabilities from 0.5 to 0.515. Looking at the BFF evaluated at $\theta = 0.5$,
 we can see the result reported by \citet{Bartos2023}: There is extreme evidence
 ($\BF_{01} = 1/(\Sexpr{signif(1/bf05, digits = 3)})$) against $\theta = 0.5$ and
-in favor of the alternative concentrated around $\theta =0.51$. This result
+in favour of the alternative concentrated around $\theta =0.51$. This result
 hence provides decisive evidence against the hypothesis that coins tend to land
 on the same side with equal probability. However, the BFF framework permits
 further insights. For example, we can see that all probability values up to
@@ -1764,10 +1874,10 @@ $\tau = 0$ \citep[see e.g.,][]{Rover2021}. We choose a scale $s = \Sexpr{scale}$
 because the resulting prior gives a
 $\Sexpr{round(phn(x = 0.04, s = scale)*100, 1)}\%$ probability to $\tau$ values
 smaller than 0.04, thus encoding the possibility of no heterogeneity (all
-probabilities are the same when $\tau = 0$) up to small amounts of heterogeneity
-(the true participant probabilities differ by a few percentage points). Several
-BFFs for priors with smaller or larger scale parameters are also shown in
-Figure~\ref{fig:bartosmeta} as sensitivity analyses.
+participant probabilities are the same when $\tau = 0$) up to small amounts of
+heterogeneity (the true participant probabilities differ by a few percentage
+points). Several BFFs for priors with smaller or larger scale parameters are
+also shown in Figure~\ref{fig:bartosmeta} as sensitivity analyses.
 
 
 %% both are focus
@@ -1840,8 +1950,8 @@ translates to analyzing replication studies with BFFs.
 Suppose that original and replication study provide an effect estimate $y_{o}$
 and $y_{r}$ with standard error $\sigma_{o}$ and $\sigma_{r}$, respectively.
 Each is supposed to be normally distributed around the underlying effect size
-$\theta$ with (assumed to be known) variance equal to its squared standard error
-$\sigma^{2}$, i.e., $y_{i} \mid \theta \sim \Nor(\theta, \sigma^{2}_{i})$ for
+$\theta$ with (assumed to be known) variance equal to its squared standard
+error, i.e., $y_{i} \mid \theta \sim \Nor(\theta, \sigma^{2}_{i})$ for
 $i \in \{o, r\}$. A `replication BFF' may then be obtained by contrasting the
 null hypothesis $H_{0} \colon \theta = \theta_{0}$ to the alternative
 $H_{1} \colon \theta \sim \Nor(y_{o}, \sigma^{2}_{o})$, where the prior under
@@ -2009,25 +2119,184 @@ $\Sexpr{round(cri[lab == 3, 1], 2)}$ to $\Sexpr{round(cri[lab == 3, 3], 1)}$.
 Clearly, this interval excludes both the original ($y_{o} = \Sexpr{yo}$) and the
 replication effect estimates ($y_{r3} = \Sexpr{yr[lab == 3]}$), leading to an
 opposite conclusion from the BFF, which indicates decisive evidence for the MEE
-at $y_{r}$. This phenomenon is perhaps best described in the words of Stephen
-Senn
-\begin{quote}
-  ``\emph{\textbf{Bayesian}: One who, vaguely expecting a horse and catching a
-    glimpse of a donkey, strongly concludes he has seen a mule.}'' \citep[p.
-  46]{Senn2008}
-\end{quote}
-It raises the question of whether a synthesis of prior and likelihood is
-appropriate in this situation. % The BFF, on the other hand, seems to be more
-% robust to such prior-data conflicts because it relies only on the data-based
-% core of Bayesian inference.
+at $y_{r}$. % This phenomenon is perhaps best described in the words of Stephen
+% Senn
+% \begin{quote}
+%   ``\emph{\textbf{Bayesian}: One who, vaguely expecting a horse and catching a
+%     glimpse of a donkey, strongly concludes he has seen a mule.}'' \citep[p.
+%   46]{Senn2008}
+% \end{quote}
+% It raises the question of whether a synthesis of prior and likelihood is
+% appropriate in this situation. % The BFF, on the other hand, seems to be more
+% % robust to such prior-data conflicts because it relies only on the data-based
+% % core of Bayesian inference.
 
 
 
-\subsection{Regression models}
+\subsection{Logistic regression}
+To illustrate a computationally more involved application of BFFs, we consider
+the study from \citet{Neutra1978}, previously reanalyzed by
+\citet{Sullivan2012}. This epidemiological study investigated the association
+between 14 exposure variables and the risk for neonatal death among pregnant
+women. Notably, among the 2992 births only 17 neonatal deaths occurred, leading
+to challenges in conducting inferences with so many exposure variables.
 
-TODO: ADD A MORE COMPLICATED EXAMPLE WITH REGRESSION MODELS, FOR EXAMPLE, G
-PRIOR, COULD ALSO USE MCMC/INLA TO ESTIMATE POSTERIOR AND THEN USE SAVAGE-DICKEY
-TO GET BFF
+
+\begin{figure}[!htb]
+<< "regression-example-mcmc", cache = TRUE >>=
+## reanalyze the data from Sullivan and Greenland (2008)
+dat <- read.csv(file = "../sullivangreenland2013.csv")
+dat$dyslab <- dat$dyslab/3 # scaled like this in the paper, see caption Table 1
+glm1 <- glm(death ~ ., data = dat, family = "binomial")
+## summary(glm1)
+
+## create three types of priors from from Sullivan and Greenland (2008)
+pm1 <- 0#log(2)
+pm2 <- 0#log(4)
+pm3 <- 0#log(1)
+psd1 <- sqrt(1/2)#(log(8) - log(0.5))/(2*qnorm(p = 0.975))
+psd2 <- sqrt(1/2)#(log(16) - log(1))/(2*qnorm(p = 0.975))
+psd3 <- sqrt(1/2)#(log(4) - log(0.25))/(2*qnorm(p = 0.975))
+priors <- paste0("normal(", c(pm1, pm2, pm3), ", ",
+                 c(psd1, psd2, psd3), ")")
+
+## Bayesian logistic regression model
+set.seed(66)
+library(brms)
+bglm1 <- brm(death ~ ., data = dat,
+             prior = c(set_prior("", class = "Intercept"), # flat prior
+                       set_prior(priors[1], class = "b",
+                                 coef = c("nonwhite", "teenages", "nullip",
+                                          "isoimm", "dyslab", "placord",
+                                          "nomonit", "ward", "prerupt")),
+                       set_prior(priors[2], class = "b",
+                                 coef = c("gestage", "hydram", "twint", "malpres")),
+                       set_prior(priors[3], class = "b", coef = "abort")),
+             iter = 1000000, warmup = 1000, cores = 11,
+             family = "bernoulli")
+
+## summary(bglm1)
+## exp(fixef(bglm1))[-1,]
+## plot(bglm1, N = 15)
+@
+<< "regression-example-inla" >>=
+library(INLA)
+model <- death ~ 1 + nonwhite + teenages + nullip + gestage + isoimm + abort +
+    hydram + dyslab + placord + nomonit + twint + ward + prerupt + malpres
+## define priors for INLA
+pm1 <- 0#log(2)
+pm2 <- 0#log(4)
+pm3 <- 0#log(1)
+prec1 <- 2#1/((log(8) - log(0.5))/(2*qnorm(p = 0.975)))^2
+prec2 <- 2#1/((log(16) - log(1))/(2*qnorm(p = 0.975)))^2
+prec3 <- 2#1/((log(4) - log(0.25))/(2*qnorm(p = 0.975)))^2
+coef1 <- c("nonwhite", "teenages", "nullip", "isoimm", "dyslab", "placord",
+           "nomonit", "ward", "prerupt")
+coef2 <- c("gestage", "hydram", "twint", "malpres")
+coef3 <- c("abort")
+coef <- c(coef1, coef2, coef3)
+pmeans <- as.list(c(rep(pm1, length(coef1)),
+                    rep(pm2, length(coef2)),
+                    rep(pm3, length(coef3))))
+names(pmeans) <- coef
+pprec <- as.list(c(rep(prec1, length(coef1)),
+                   rep(prec2, length(coef2)),
+                   rep(prec3, length(coef3))))
+names(pprec) <- coef
+bglm2 <- inla(formula = model, data = dat, family = "binomial",
+              control.fixed = list(mean = pmeans, prec = pprec))
+@
+<< "regression-analysis", fig.height = 9, fig.width = 8, cache = TRUE >>=
+par(mfrow = c(5, 3), mar = c(4, 4, 3, 1))
+p1coef <-  c("Non-White" = "nonwhite",
+             "Early age" = "teenages",
+             "Nulliparity" = "nullip",
+             "Isoimmunization" = "isoimm",
+             "Labour progress" = "dyslab",
+             "Placental or cord anomaly" = "placord",
+             "No monitor" = "nomonit",
+             "Public ward" = "ward",
+             "Premature rupture of membranes" = "prerupt")
+p2coef <- c("Gestational age" = "gestage",
+            "Hydramnios" = "hydram",
+            "Twin, triplet" = "twint",
+            "Malpresented" = "malpres")
+p3coef <- c("Past abortion" = "abort")
+coefs <- c(p1coef, p2coef, p3coef)
+logORseq <- seq(log(1/10), log(100), length.out = 100)
+ORseq <- exp(logORseq)
+bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
+bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
+orbks <- c(bfbks, 1/3, 3, 30)
+orlabs <- c(bflabs, "1/3", "3", "30")
+for (i in seq(1, length(coefs))) {
+    coef <- coefs[i]
+    mcmcdraws <- brms::as_draws_matrix(bglm1, variable = paste0("b_", coef))
+    postdens <- density(mcmcdraws,  from = min(logORseq), to = max(logORseq),
+                        n = length(logORseq))
+    postdens2 <- dnorm(x = logORseq, mean = mean(mcmcdraws), sd = sd(mcmcdraws))
+    if (coef %in% p1coef) {
+        priordens <- dnorm(x = logORseq, mean = pm1, sd = psd1)
+    } else if (coef %in% p1coef) {
+        priordens <- dnorm(x = logORseq, mean = pm2, sd = psd2)
+    } else {
+        priordens <- dnorm(x = logORseq, mean = pm3, sd = psd3)
+    }
+    plot(ORseq, postdens$y/priordens, type = "l", log = "xy", lwd = 1.5,
+         ylim = c(1/100, 100), las = 1, xlab = "Odds ratio", ylab = "Bayes factor",
+         main = names(coefs)[i],
+         panel.first = graphics::grid(lty = 3, nx = NA, ny = NULL, equilogs = FALSE),
+         xaxt = "n", yaxt = "n")
+    axis(side = 1, at = orbks, labels = orlabs)
+    axis(side = 2, at = bfbks, labels = bflabs, las = 1)
+    abline(v = orbks, lty = 3, col = "lightgrey")
+    ## lines(ORseq, postdens2/priordens, lty = 2, col = 4,lwd = 1.5) # Gaussian approxiation of posterior
+    lines(ORseq, inla.dmarginal(x = logORseq, marginal = bglm2$marginals.fixed[[coef]])/priordens,
+          lty = 2, col = 4, lwd = 1.5)
+    mtext(text = bquote("" %->% "Harm"), side = 1, line = 1.75, at = 2.5, cex = 0.6)
+    mtext(text = bquote("Benefit" %<-% ""), side = 1, line = 1.75, at = 1/3, cex = 0.6)
+}
+plot.new()
+plot.window(xlim = c(1/100 , 100), ylim = c(1/100, 100))
+legend("center", title = "Computational method",
+       legend = c("MCMC", ## "Normal approximation",
+                  "INLA"),
+       lty = c(1, 2), col = c(1, 4) ,lwd = 1.5)
+@
+\caption{Multiple logistic regression BFF analysis of 2992 births with 17
+  neonatal deaths from \citet{Neutra1978}. Each plot shows the BFF related to
+  the exponential of a regression coefficient which can be interpreted as odds
+  ratio. Independent, weakly informative priors $\Nor(0, 1/2)$ are assigned to
+  the coefficients under the alternative $H_{1}$, and when the coefficient are
+  considered as nuisance parameters under the null $H_{0}$. Variables are
+  indicators except early age (0, 20 ,1 15 19, 2 under 15), gestational age
+  ($0 = \text{no}$, $1 = 36--38$ weeks, $2 = 33--36$ weeks; under 33 weeks
+  excluded), isoimmunization ($0 = \text{no}$, $1 = \text{Rh}$,
+  $2 = \text{ABO}$), labour progress ($0 = \text{no}$,
+  $0.33 = \text{prolonged}$, $0.67 = \text{protracted}$, $1 = \text{arrested}$)
+  and past abortion ($0 = \text{none}$, $1 = 1$, $2 = 2+$).}
+\label{fig:glm}
+\end{figure}
+
+Figure~\ref{fig:glm} shows the BFFs related to a logistic regression analysis of
+the data including all exposures as main effects and an intercept term. Each BFF
+relates to the exponential of a regression coefficient, which can be interpreted
+as the odds ratio to experience neonatal death when increasing the exposure by
+one unit while keeping all other exposures fixed. BFFs were computed via the
+Savage-Dickey density ratio and the posterior densities computed via Markov
+chain Monte Carlo (solid black line) as implemented in Stan
+\citep{Carpenter2017} or via intergrated nested Laplace approximation (dashed
+blue line) as implemented in INLA \citep{Rue2009}. An improper flat prior was
+assigned to the intercept under both the null and the alternative, while
+independent $p(\log OR_{i} \mid H_{1}) = \Nor(\log OR_{i} \mid 0, 1/2)$ priors
+were assigned to each coefficient. This prior represents an alternative
+postulating that the median odds ratio is $1$ and that $95\%$ of odds ratios are
+in between $1/4$ and $4$ \citep{Greenland2006}. For the analysis of each
+coefficient, all other coefficients were considered as nuisance parameters with
+the same priors assigned to them under the null as under the alternative.
+
+TODO: ADD INTERPRETATION AND DISCUSSION (DATA ARE REALLY UNINFORMATIVE, BFF can
+tell that there is absence of evidence for most MEEs, etc.)
 
 \section{Discussion}
 \label{sec:discussion}
@@ -2048,15 +2317,16 @@ BFF inference requires the formulation of alternative hypotheses. For this
 reason, BFFs are particularly valuable in contexts where there are strong
 theories or prior data available to formulate alternative hypotheses. In cases
 where there are no clear alternative hypotheses, data analysts may use BFFs
-based on `default` prior distribution \citep[e.g., unit-information priors,
-see][]{Kass1995b} but should acknowledge this limitation and report sensitivity
-analyses (e.g., BFFs for different prior distributions). Another possibility is
-to base BFF inferences on Bayes factor bounds, which give a bound on the maximum
-evidence against parameter values, but at the cost of losing the ability to
-quantify evidence \emph{in favour} of parameter values \citep{Pawel2023}.
-Finally, where under their control, data analysts should design experiments and
-studies so that conclusive inferences can be drawn from the data collected, and
-this is also applies to BFF inferences. % While some research has been done on
+based on `weakly informative` \citep{Gelman2009} or `default` prior distribution
+\citep[e.g., unit-information priors, see][]{Kass1995b} but should acknowledge
+this limitation and report sensitivity analyses (e.g., BFFs for different prior
+distributions). Another possibility is to base BFF inferences on Bayes factor
+bounds, which give a bound on the maximum evidence against parameter values, but
+at the cost of losing the ability to quantify evidence \emph{in favour} of
+parameter values \citep{Pawel2023}. Finally, where under their control, data
+analysts should design experiments and studies so that conclusive inferences can
+be drawn from the data collected, and this is also applies to BFF
+inferences. % While some research has been done on
 % study design with support intervals \citep{Pawel2023}, f
 Future research needs to investigate how experiments need to be designed to
 enable conclusive inference with BFFs.

@@ -1,4 +1,4 @@
-all: pdf clean
+all: pdf
 
 # names of .Rnw .bib. and .bst files
 FILE=bff
