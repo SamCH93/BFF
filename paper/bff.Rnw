@@ -261,8 +261,8 @@ synthesis of the data and the prior distribution, which can be seen as an
 advantage but also as a challenge in the absence of prior knowledge. In
 particular, for testing of hypotheses, it can be difficult to specify prior
 probabilities such as `$\Pr(\text{the treatment effect is absent})$' and
-`$\Pr(\text{the treatment effect is present})$'. One approach to address this, is
-to report the \emph{Bayes factor} \citep{Jeffreys1939, Good1958, Kass1995},
+`$\Pr(\text{the treatment effect is present})$'. One approach to address this,
+is to report the \emph{Bayes factor} \citep{Jeffreys1939, Good1958, Kass1995},
 i.e., the updating factor of the prior to posterior odds of two hypotheses.
 % However, the posterior However, for
 % testing of point hypotheses and model comparisons, Bayes factors
@@ -357,8 +357,8 @@ hypotheses, the null hypothesis $H_0 \colon \theta = \theta_0$ postulating that
 $\theta$ takes a certain value $\theta_{0}$ and the alternative hypothesis
 $H_1 \colon \theta \neq \theta_0$ postulating that $\theta$ takes a different
 value. A natural measure of relative evidence for the two hypotheses is the
-Bayes factor \citep{Jeffreys1939, Good1958, Kass1995}, the data-based updating
-factor of the prior odds of the hypotheses to their posterior odds
+Bayes factor \citep{Jeffreys1939, Good1958, Kass1995, Held2018<}, the data-based
+updating factor of the prior odds of the hypotheses to their posterior odds
 \begin{subequations}
 \begin{align}
     \BF_{01}(y;\theta_0)
@@ -1190,13 +1190,13 @@ lines(qseq, ecdf(bf)(qseq), lty = 2, col = 2)
 To understand the asymptotic behaviour of the MEE, we may look at an
 approximation of the Bayes factor. Suppose that the data
 $Y = \{Y_{1}, Y_{2}, \dots, Y_{n}\}$ are independent and identically distributed
-and denote by $\hat{\psi}_{0}$ maximizer of the log likelihood of the data under
-the null and $\hat{\theta}_{1}$, $\hat{\psi}_{1}$ the maximizer under the
-alternative hypothesis. Denote by $n V_{0}$ and $n V_{1}$ the modal dispersion
-matrices (minus the inverse of the matrix of second-order partial derivatives of
-the log likelihood evaluated at the corresponding maximizer). Applying a Laplace
-approximation to the logarithm of the BFF \cite[equation 7.27]{OHagan2004} gives
-then
+and denote by $\hat{\psi}_{0}$ the maximizer of the log likelihood of the data
+under the null and by $(\hat{\theta}_{1}$, $\hat{\psi}_{1})$ the maximizer under
+the alternative hypothesis. Denote by $n V_{0}$ and $n V_{1}$ the modal
+dispersion matrices (minus the inverse of the matrix of second-order partial
+derivatives of the log likelihood evaluated at the corresponding maximizer).
+Applying a Laplace approximation to the logarithm of the BFF \cite[equation
+7.27]{OHagan2004} gives then
 % \begin{align*}
 %   \log \BF_{01}(Y;\theta_{0}) \approx
 %   \log \frac{p(Y \mid \theta_{0}, \hat{\psi}_{\mathrm{ML}})}{
@@ -1228,18 +1228,18 @@ then
 % the maximizers (second term), the sample size and dimension of $\theta$ (third
 % term), and the ratio of the determinants of the modal dispersion matrices
 % (fourth term).
-Equation~\eqref{eq:bfapprox} has much intuitive value: if $\theta_{0}$ is
-different from $\that_{1}$, the log normalized profile likelihood (first term)
-will decrease toward negative infinity, indicating evidence against the
-parameter value $\theta_{0}$. On the other hand, the term will be about zero
-when $\theta_{0}$ is about $\that_{1}$, so that the sample size $n$ (second
-term) increases the log BFF toward positive infinity, indicating evidence for
-$\theta_{0}$. The relative accuracy of the priors (third term) and the relative
-dispersion (fourth term) lead to further adjustments of the BFF. For instance,
-when the observed parameter estimate is likely under the prior, this increases
-the evidence for corresponding hypothesis while a misspecified prior that is in
-conflict with the parameter estimates lowers the evidence for the corresponding
-hypothesis.
+Equation~\eqref{eq:bfapprox} has much intuitive value: as $\theta_{0}$ becomes
+more different from $\that_{1}$, the log normalized profile likelihood (first
+term) will decrease toward negative infinity, indicating evidence against the
+parameter value $\theta_{0}$. On the other hand, when $\theta_{0}$ is not too
+far from $\that_{1}$ the term will be about zero, so that an increasing sample
+size $n$ (second term) increases the log BFF toward positive infinity,
+indicating evidence for $\theta_{0}$. The relative accuracy of the priors (third
+term) and the relative dispersion (fourth term) lead to further adjustments of
+the BFF. For instance, when a parameter estimate is likely under the
+corresponding prior, this increases the evidence for corresponding hypothesis
+while a misspecified prior that is in conflict with the parameter estimates
+lowers the evidence for the corresponding hypothesis.
 
 To obtain the MEE, the log Bayes factor~\eqref{eq:bfapprox} needs to be
 maximized with respect to $\theta_{0}$. It is clear that this corresponds to
@@ -2136,10 +2136,10 @@ at $y_{r}$. % This phenomenon is perhaps best described in the words of Stephen
 \subsection{Logistic regression}
 To illustrate a computationally more involved application of BFFs, we consider
 the study from \citet{Neutra1978}, previously reanalyzed by
-\citet{Sullivan2012}. This epidemiological study investigated the association
-between 14 exposure variables and the risk for neonatal death among pregnant
-women. Notably, among the 2992 births only 17 neonatal deaths occurred, leading
-to challenges in conducting inferences with so many exposure variables.
+\citet{Greenland2007, Sullivan2012}. This epidemiological study investigated the
+association between 14 exposure variables and the risk for neonatal death. Among
+the 2992 births only 17 neonatal deaths occurred, which leads to challenges in
+conducting inferences with so many exposure variables.
 
 
 \begin{figure}[!htb]
@@ -2161,7 +2161,7 @@ priors <- paste0("normal(", c(pm1, pm2, pm3), ", ",
                  c(psd1, psd2, psd3), ")")
 
 ## Bayesian logistic regression model
-set.seed(66)
+set.seed(42)
 library(brms)
 bglm1 <- brm(death ~ ., data = dat,
              prior = c(set_prior("", class = "Intercept"), # flat prior
@@ -2172,7 +2172,7 @@ bglm1 <- brm(death ~ ., data = dat,
                        set_prior(priors[2], class = "b",
                                  coef = c("gestage", "hydram", "twint", "malpres")),
                        set_prior(priors[3], class = "b", coef = "abort")),
-             iter = 1000000, warmup = 1000, cores = 11,
+             iter = 1000000, warmup = 1000, cores = 12,
              family = "bernoulli")
 
 ## summary(bglm1)
@@ -2206,7 +2206,7 @@ names(pprec) <- coef
 bglm2 <- inla(formula = model, data = dat, family = "binomial",
               control.fixed = list(mean = pmeans, prec = pprec))
 @
-<< "regression-analysis", fig.height = 9, fig.width = 8, cache = TRUE >>=
+<< "regression-analysis", fig.height = 8.8, fig.width = 8, cache = TRUE >>=
 par(mfrow = c(5, 3), mar = c(4, 4, 3, 1))
 p1coef <-  c("Non-White" = "nonwhite",
              "Early age" = "teenages",
@@ -2229,30 +2229,62 @@ bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
 orbks <- c(bfbks, 1/3, 3, 30)
 orlabs <- c(bflabs, "1/3", "3", "30")
+meesinla <- numeric(length = length(coefs))
+meesmcmc <- numeric(length = length(coefs))
+glmest <- numeric(length = length(coefs))
+kmcmc <- numeric(length = length(coefs))
+glmdat <- summary(glm1)$coefficients
 for (i in seq(1, length(coefs))) {
     coef <- coefs[i]
+    ## glm conjugate analysis
+    glmest[i] <- glmdat[rownames(glmdat) == coef, 1]
+    glmse <- glmdat[rownames(glmdat) == coef, 2]
+    ## mcmc analysis
     mcmcdraws <- brms::as_draws_matrix(bglm1, variable = paste0("b_", coef))
     postdens <- density(mcmcdraws,  from = min(logORseq), to = max(logORseq),
                         n = length(logORseq))
     postdens2 <- dnorm(x = logORseq, mean = mean(mcmcdraws), sd = sd(mcmcdraws))
     if (coef %in% p1coef) {
-        priordens <- dnorm(x = logORseq, mean = pm1, sd = psd1)
+        pm <- pm1
+        psd <- psd1
     } else if (coef %in% p1coef) {
-        priordens <- dnorm(x = logORseq, mean = pm2, sd = psd2)
+        pm <- pm2
+        psd <- psd2
     } else {
-        priordens <- dnorm(x = logORseq, mean = pm3, sd = psd3)
+        pm <- pm3
+        psd <- psd3
     }
-    plot(ORseq, postdens$y/priordens, type = "l", log = "xy", lwd = 1.5,
+    priordens <- dnorm(x = logORseq, mean = pm, sd = psd)
+    bff <- postdens$y/priordens
+    bffglm <- dnorm(x = glmest[i], mean = logORseq, sd = glmse) /
+        dnorm(x = glmest[i], mean = pm, sd = sqrt(psd^2 + glmse^2))
+    ## compute MEE
+    BFFinla <- function(logOR) {
+        inla.dmarginal(x = logOR, marginal = bglm2$marginals.fixed[[coef]])/
+            dnorm(x = logOR, mean = pm, sd = psd)
+    }
+    meesinla[i] <- optim(par = 0, fn = function(logOR) -log(BFFinla(logOR)),
+                     method = "Brent", lower = log(1/1000), upper = log(1000))$par
+    meesmcmc[i] <- logORseq[which.max(bff)]
+    kmcmc[i] <- max(bff)
+    ## create plot of BFF
+    ## lowerInd <- which.min(abs(logORseq - quantile(x = mcmcdraws, probs = c(0.0001))))
+    ## upperInd <- which.min(abs(logORseq - quantile(x = mcmcdraws, probs = c(0.9999))))
+    plot(ORseq, bff,
+         type = "l", log = "xy", lwd = 1.5, xlim = c(min(ORseq), max(ORseq)),
          ylim = c(1/100, 100), las = 1, xlab = "Odds ratio", ylab = "Bayes factor",
          main = names(coefs)[i],
          panel.first = graphics::grid(lty = 3, nx = NA, ny = NULL, equilogs = FALSE),
          xaxt = "n", yaxt = "n")
     axis(side = 1, at = orbks, labels = orlabs)
     axis(side = 2, at = bfbks, labels = bflabs, las = 1)
+    points(exp(meesinla[i]), BFFinla(meesinla[i]), pch = 20, cex = 1.5, col = 4)
+    points(exp(glmest[i]), max(bffglm), pch = 20, cex = 1.5, col = 2)
+    points(exp(meesmcmc[i]), max(bff), pch = 20, cex = 1.5, col = 1)
     abline(v = orbks, lty = 3, col = "lightgrey")
     ## lines(ORseq, postdens2/priordens, lty = 2, col = 4,lwd = 1.5) # Gaussian approxiation of posterior
-    lines(ORseq, inla.dmarginal(x = logORseq, marginal = bglm2$marginals.fixed[[coef]])/priordens,
-          lty = 2, col = 4, lwd = 1.5)
+    lines(ORseq, BFFinla(logORseq), lty = 2, col = 4, lwd = 1.5)
+    lines(ORseq, bffglm, lty = 3, col = 2, lwd = 1.5)
     mtext(text = bquote("" %->% "Harm"), side = 1, line = 1.75, at = 2.5, cex = 0.6)
     mtext(text = bquote("Benefit" %<-% ""), side = 1, line = 1.75, at = 1/3, cex = 0.6)
 }
@@ -2260,18 +2292,19 @@ plot.new()
 plot.window(xlim = c(1/100 , 100), ylim = c(1/100, 100))
 legend("center", title = "Computational method",
        legend = c("MCMC", ## "Normal approximation",
-                  "INLA"),
-       lty = c(1, 2), col = c(1, 4) ,lwd = 1.5)
+                  "INLA",
+                  "Normal approx at MLE"),
+       lty = c(1, 2, 3), col = c(1, 4, 2), lwd = 1.5)
 @
 \caption{Multiple logistic regression BFF analysis of 2992 births with 17
-  neonatal deaths from \citet{Neutra1978}. Each plot shows the BFF related to
-  the exponential of a regression coefficient which can be interpreted as odds
-  ratio. Independent, weakly informative priors $\Nor(0, 1/2)$ are assigned to
-  the coefficients under the alternative $H_{1}$, and when the coefficient are
-  considered as nuisance parameters under the null $H_{0}$. Variables are
-  indicators except early age (0, 20 ,1 15 19, 2 under 15), gestational age
-  ($0 = \text{no}$, $1 = 36--38$ weeks, $2 = 33--36$ weeks; under 33 weeks
-  excluded), isoimmunization ($0 = \text{no}$, $1 = \text{Rh}$,
+  neonatal deaths from \citet{Neutra1978} as reanalyzed by \citet{Sullivan2012}.
+  Each plot shows the BFF related to the exponential of a regression coefficient
+  which can be interpreted as odds ratio. Independent, weakly informative priors
+  $\Nor(0, 1/2)$ are assigned to the coefficients under the alternative $H_{1}$,
+  and when the coefficient are considered as nuisance parameters under the null
+  $H_{0}$. Variables are indicators except early age (0, 20 ,1 15 19, 2 under
+  15), gestational age ($0 = \text{no}$, $1 = 36-38$ weeks, $2 = 33-36$ weeks;
+  under 33 weeks excluded), isoimmunization ($0 = \text{no}$, $1 = \text{Rh}$,
   $2 = \text{ABO}$), labour progress ($0 = \text{no}$,
   $0.33 = \text{prolonged}$, $0.67 = \text{protracted}$, $1 = \text{arrested}$)
   and past abortion ($0 = \text{none}$, $1 = 1$, $2 = 2+$).}
@@ -2281,22 +2314,49 @@ legend("center", title = "Computational method",
 Figure~\ref{fig:glm} shows the BFFs related to a logistic regression analysis of
 the data including all exposures as main effects and an intercept term. Each BFF
 relates to the exponential of a regression coefficient, which can be interpreted
-as the odds ratio to experience neonatal death when increasing the exposure by
-one unit while keeping all other exposures fixed. BFFs were computed via the
-Savage-Dickey density ratio and the posterior densities computed via Markov
-chain Monte Carlo (solid black line) as implemented in Stan
-\citep{Carpenter2017} or via intergrated nested Laplace approximation (dashed
-blue line) as implemented in INLA \citep{Rue2009}. An improper flat prior was
-assigned to the intercept under both the null and the alternative, while
-independent $p(\log OR_{i} \mid H_{1}) = \Nor(\log OR_{i} \mid 0, 1/2)$ priors
-were assigned to each coefficient. This prior represents an alternative
+as the increase in odds ratio between neonatal death when increasing the
+variable by one unit while keeping all other variables fixed. BFFs were computed
+via the Savage-Dickey density ratio where the posterior densities were computed
+from 1'000'000 Markov chain Monte Carlo (MCMC) samples (solid black line) as
+implemented in Stan \citep{Carpenter2017} or via intergrated nested Laplace
+approximation (dashed blue line) as implemented in INLA \citep{Rue2009}. An
+improper flat prior was assigned to the intercept under both the null and the
+alternative, while independent
+$p(\log OR_{i} \mid H_{1}) = \Nor(\log OR_{i} \mid 0, 1/2)$ priors were assigned
+to each coefficient under the alternative. This prior represents an alternative
 postulating that the median odds ratio is $1$ and that $95\%$ of odds ratios are
 in between $1/4$ and $4$ \citep{Greenland2006}. For the analysis of each
 coefficient, all other coefficients were considered as nuisance parameters with
-the same priors assigned to them under the null as under the alternative.
+the same priors assigned to them under the null as under the alternative. In
+addition, the BFF based on a normal approximation to the individual estimates
+and their standard errors estimated via maximum likelihood are also shown (red
+dotted lines) for comparison. This analysis ignores the multivariate structure
+of the data but produces similar results for most variables, while running much
+faster than the INLA analysis (taking several second), and which itself runs
+much faster than MCMC (taking several minutes).
 
-TODO: ADD INTERPRETATION AND DISCUSSION (DATA ARE REALLY UNINFORMATIVE, BFF can
-tell that there is absence of evidence for most MEEs, etc.)
+Due to the sparse nature of the data, most of the BFFs are relatively
+uninformative about whether or not the variables exhibit harmful or beneficial
+associations with neonatal death. For example, the BFF for the coefficient
+`Non-White' (top left panel) is peaked at
+$\widehat{\text{OR}}_{\mathrm{ME}} = \Sexpr{round(exp(meesmcmc[coefs == "nonwhite"]), 1)}$
+indicating a slightly harmful association between non-white ethnicity and
+neonatal death, yet this parameter value receives only anecdotal support over
+the alternative ($\kME = \Sexpr{round(kmcmc[coefs == "nonwhite"], 2)}$) and the
+corresponding $k = 1$ support interval spans the range from slightly beneficial
+up to harmful association.
+
+For most variables, extremely harmful or extremely beneficial associations are
+clearly ruled. However, the variables `Gestational age', `Hydramnios', and
+`Twin, triplet` are notable exceptions. In each case, the BFFs suggest small up
+to very harmful associations with neonatal death. The most extreme among them is
+`Hydramnios' for which an MEE of
+$\widehat{\text{OR}}_{\mathrm{ME}} = \Sexpr{round(exp(meesmcmc[coefs == "hydram"]), 1)}$
+is obtained. Due to the marginalization over the nuisance parameters, this
+estimate is somewhat smaller than the maximum likelihood estimate
+$\widehat{\text{OR}}_{\mathrm{ML}} = \Sexpr{round(exp(glmest[coefs == "hydram"]), 1)}$,
+yet still unrealistically large. This extreme inflation reflects the fact that
+only one death with hydramnios during pregnancy was observed.
 
 \section{Discussion}
 \label{sec:discussion}
