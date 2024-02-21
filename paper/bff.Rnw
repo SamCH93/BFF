@@ -357,7 +357,7 @@ hypotheses, the null hypothesis $H_0 \colon \theta = \theta_0$ postulating that
 $\theta$ takes a certain value $\theta_{0}$ and the alternative hypothesis
 $H_1 \colon \theta \neq \theta_0$ postulating that $\theta$ takes a different
 value. A natural measure of relative evidence for the two hypotheses is the
-Bayes factor \citep{Jeffreys1939, Good1958, Kass1995, Held2018<}, the data-based
+Bayes factor \citep{Jeffreys1939, Good1958, Kass1995}, the data-based
 updating factor of the prior odds of the hypotheses to their posterior odds
 \begin{subequations}
 \begin{align}
@@ -469,6 +469,94 @@ estimate and confidence set.
 % frequentist estimates are typically supplemented with a confidence set.
 
 
+To understand behaviour of the MEE with increasing sample size, we may look at
+an approximation of the Bayes factor. Suppose that the data
+$Y_{1:n} = \{Y_{1}, Y_{2}, \dots, Y_{n}\}$ are independent and identically
+distributed and denote by $\hat{\psi}_{0}$ the maximizer of the log likelihood
+of the data under the null and by $(\hat{\theta}_{1}$, $\hat{\psi}_{1})$ the
+maximizer under the alternative hypothesis. Denote by $n V_{0}$ and $n V_{1}$
+the modal dispersion matrices (minus the inverse of the matrix of second-order
+partial derivatives of the log likelihood evaluated at the corresponding
+maximizer). Applying a Laplace approximation to the logarithm of the BFF
+\cite[equation 7.27]{OHagan2004} gives then
+% \begin{align*}
+%   \log \BF_{01}(Y;\theta_{0}) \approx
+%   \log \frac{p(Y \mid \theta_{0}, \hat{\psi}_{\mathrm{ML}})}{
+%   p(Y \mid \hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}}^{*})} +
+%   \frac{1}{2} \log \left\{\frac{p(\hat{\psi}_{\mathrm{ML}}^{*} \mid H_{0})}{
+%   p(\hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}} \mid H_{1})}\right\}
+%   + \frac{1}{2} \log \frac{|\hat{\Sigma}_{0}|}{|\hat{\Sigma}_{1}|}
+%   + \frac{d_{1} - d_{0}}{2} \log (2 \pi)
+% \end{align*}
+% with $(\hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}})$ the joint maximum
+% likelihood estimator (MLE), $\hat{\psi}_{\mathrm{ML}}^{*}$ the MLE under
+% $H_{0}$, observed information matrices $\hat{\Sigma}_{i}$, the negative Hessian
+% matrices of the log-likelihood evaluated at the corresponding maximum likelihood
+% estimator, and $d_{i}$ the dimension of the parameters for hypothesis
+% $i \in \{0, 1\}$.
+\begin{align}
+  \log \BF_{01}(Y_{1:n};\theta_{0}) =
+  \log \frac{p(Y_{1:n} \mid \theta_{0}, \hat{\psi}_{0})}{
+  p(Y_{1:n} \mid \hat{\theta}_{1}, \hat{\psi}_{1})}
+  + \frac{\dim(\theta)}{2} \log \frac{n}{2\pi} +
+  \log \frac{p(\hat{\psi}_{0} \mid H_{0})}{
+  p(\hat{\theta}_{1}, \hat{\psi}_{1} \mid H_{1})}
+  + \frac{1}{2} \log \frac{|V_{0}|}{|V_{1}|}
+  + \mathcal{O}\left(n^{-1}\right).
+  \label{eq:bfapprox}
+\end{align}
+% The BFF thus depends on the profile likelihood at $\theta_{0}$ normalized by the
+% maximized likelihood (first term), the ratio of the prior densities evaluated at
+% the maximizers (second term), the sample size and dimension of $\theta$ (third
+% term), and the ratio of the determinants of the modal dispersion matrices
+% (fourth term).
+To obtain the MEE, the log Bayes factor~\eqref{eq:bfapprox} needs to be
+maximized with respect to $\theta_{0}$. % To understand this, we may examine
+% Equation~\eqref{eq:bfapprox} has much intuitive value:
+It is clear that as $\theta_{0}$ becomes more different from $\that_{1}$, the
+log normalized profile likelihood (first term) will decrease toward negative
+infinity, indicating evidence against the parameter value $\theta_{0}$. On the
+other hand, when $\theta_{0}$ is not too far from $\that_{1}$ the term will be
+about zero, so that an increasing sample size $n$ (second term) increases the
+log BFF toward positive infinity, indicating evidence for $\theta_{0}$. The
+relative accuracy of the priors (third term) and the relative dispersion (fourth
+term) lead to further adjustments of the BFF. For instance, when a parameter
+estimate is likely under the corresponding prior, this increases the evidence
+for corresponding hypothesis while a misspecified prior that is in conflict with
+the parameter estimates lowers the evidence for the corresponding hypothesis.
+In sum, finding the MEE  corresponds to
+maximizing the profile likelihood that is adjusted based on the accuracy of the
+prior for the nuisance parameters and the modal dispersion.
+
+% % To obtain the MEE, the log Bayes factor~\eqref{eq:bfapprox} needs to be
+% % maximized with respect to $\theta_{0}$. It is clear that this corresponds to
+% % maximizing the profile likelihood that is adjusted based on the accuracy of the
+% % prior for the nuisance parameters and the modal dispersion.
+% To conclude, maximizing  is clear that this corresponds to
+% maximizing the profile likelihood that is adjusted based on the accuracy of the
+% prior for the nuisance parameters and the modal dispersion.
+
+% It is clear that for
+% $\theta_{0} = \theta_{*}$, the first term has a chi-squared distribution with
+% $\dim(\theta)$ degrees of freedom.
+
+% The derivative with respect $\theta_{0}$ is given by
+% \begin{align}
+%   \frac{d\log \BF_{01}(Y;\theta_{0})}{d \theta_{0}} \approx
+%   \frac{d \log p(Y \mid \theta_{0}, \hat{\psi}_{0})}{d \theta_{0}} +
+%   \frac{d \log p(\hat{\psi}_{0} \mid H_{0})}{d \theta_{0}}
+%   + \frac{1}{2} \frac{d \log |V_{0}|}{d \theta_{0}}
+% \end{align}
+% The MEE is hence closely related to the profile likelihood, though this
+% criterion is adjusted based on the prior. \citet{Severini2007} studied
+
+% TODO: UNDERSTAND THIS BETTER! WHAT HAPPENS WHEN N GROWS? DOES
+% THE BFF PEAK AT THE TRUE VALUE? DOES IT GO CORRECTLY TO +-INFINITY AT THE
+% TRUE/NON-TRUE VALUE? HOW DOES THE PRIOR AFFECT IT? HOW DOES THE DIMENSIONALITY
+% AFFECT IT?
+
+
+
 << "RECOVERY-example" >>=
 ## Overall, 514 (12%) of 4148 patients allocated to baricitinib versus 546 (14%)
 ## of 4008 patients allocated to usual care died within 28 days (age-adjusted
@@ -559,6 +647,7 @@ sis <- t(sapply(X = list(si1, si1b, si2, si3), FUN = function(f) f(k)))
 
 
 \subsection{Example: Normal mean}
+\label{sec:normalmean}
 Assume we observe a single observation $y$ assumed to be sampled (at least
 approximately) from a normal distribution
 $Y \mid \theta \sim \Nor(\theta, \sigma^{2})$. Assume that $\sigma^{2}$ is known
@@ -1186,83 +1275,6 @@ lines(qseq, ecdf(bf)(qseq), lty = 2, col = 2)
 
 @
 
-
-To understand the asymptotic behaviour of the MEE, we may look at an
-approximation of the Bayes factor. Suppose that the data
-$Y = \{Y_{1}, Y_{2}, \dots, Y_{n}\}$ are independent and identically distributed
-and denote by $\hat{\psi}_{0}$ the maximizer of the log likelihood of the data
-under the null and by $(\hat{\theta}_{1}$, $\hat{\psi}_{1})$ the maximizer under
-the alternative hypothesis. Denote by $n V_{0}$ and $n V_{1}$ the modal
-dispersion matrices (minus the inverse of the matrix of second-order partial
-derivatives of the log likelihood evaluated at the corresponding maximizer).
-Applying a Laplace approximation to the logarithm of the BFF \cite[equation
-7.27]{OHagan2004} gives then
-% \begin{align*}
-%   \log \BF_{01}(Y;\theta_{0}) \approx
-%   \log \frac{p(Y \mid \theta_{0}, \hat{\psi}_{\mathrm{ML}})}{
-%   p(Y \mid \hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}}^{*})} +
-%   \frac{1}{2} \log \left\{\frac{p(\hat{\psi}_{\mathrm{ML}}^{*} \mid H_{0})}{
-%   p(\hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}} \mid H_{1})}\right\}
-%   + \frac{1}{2} \log \frac{|\hat{\Sigma}_{0}|}{|\hat{\Sigma}_{1}|}
-%   + \frac{d_{1} - d_{0}}{2} \log (2 \pi)
-% \end{align*}
-% with $(\hat{\theta}_{\mathrm{ML}}, \hat{\psi}_{\mathrm{ML}})$ the joint maximum
-% likelihood estimator (MLE), $\hat{\psi}_{\mathrm{ML}}^{*}$ the MLE under
-% $H_{0}$, observed information matrices $\hat{\Sigma}_{i}$, the negative Hessian
-% matrices of the log-likelihood evaluated at the corresponding maximum likelihood
-% estimator, and $d_{i}$ the dimension of the parameters for hypothesis
-% $i \in \{0, 1\}$.
-\begin{align}
-  \log \BF_{01}(Y;\theta_{0}) =
-  \log \frac{p(Y \mid \theta_{0}, \hat{\psi}_{0})}{
-  p(Y \mid \hat{\theta}_{1}, \hat{\psi}_{1})}
-  + \frac{\dim(\theta)}{2} \log \frac{n}{2\pi} +
-  \log \frac{p(\hat{\psi}_{0} \mid H_{0})}{
-  p(\hat{\theta}_{1}, \hat{\psi}_{1} \mid H_{1})}
-  + \frac{1}{2} \log \frac{|V_{0}|}{|V_{1}|}
-  + \mathcal{O}\left(n^{-1}\right).
-  \label{eq:bfapprox}
-\end{align}
-% The BFF thus depends on the profile likelihood at $\theta_{0}$ normalized by the
-% maximized likelihood (first term), the ratio of the prior densities evaluated at
-% the maximizers (second term), the sample size and dimension of $\theta$ (third
-% term), and the ratio of the determinants of the modal dispersion matrices
-% (fourth term).
-Equation~\eqref{eq:bfapprox} has much intuitive value: as $\theta_{0}$ becomes
-more different from $\that_{1}$, the log normalized profile likelihood (first
-term) will decrease toward negative infinity, indicating evidence against the
-parameter value $\theta_{0}$. On the other hand, when $\theta_{0}$ is not too
-far from $\that_{1}$ the term will be about zero, so that an increasing sample
-size $n$ (second term) increases the log BFF toward positive infinity,
-indicating evidence for $\theta_{0}$. The relative accuracy of the priors (third
-term) and the relative dispersion (fourth term) lead to further adjustments of
-the BFF. For instance, when a parameter estimate is likely under the
-corresponding prior, this increases the evidence for corresponding hypothesis
-while a misspecified prior that is in conflict with the parameter estimates
-lowers the evidence for the corresponding hypothesis.
-
-To obtain the MEE, the log Bayes factor~\eqref{eq:bfapprox} needs to be
-maximized with respect to $\theta_{0}$. It is clear that this corresponds to
-maximizing the profile likelihood that is adjusted based on the accuracy of the
-prior for the nuisance parameters and the modal dispersion. It is clear that for
-$\theta_{0} = \theta_{*}$, the first term has a chi-squared distribution with
-$\dim(\theta)$ degrees of freedom.
-
-% The derivative with respect $\theta_{0}$ is given by
-% \begin{align}
-%   \frac{d\log \BF_{01}(Y;\theta_{0})}{d \theta_{0}} \approx
-%   \frac{d \log p(Y \mid \theta_{0}, \hat{\psi}_{0})}{d \theta_{0}} +
-%   \frac{d \log p(\hat{\psi}_{0} \mid H_{0})}{d \theta_{0}}
-%   + \frac{1}{2} \frac{d \log |V_{0}|}{d \theta_{0}}
-% \end{align}
-% The MEE is hence closely related to the profile likelihood, though this
-% criterion is adjusted based on the prior. \citet{Severini2007} studied
-
-TODO: UNDERSTAND THIS BETTER! WHAT HAPPENS WHEN N GROWS? DOES
-THE BFF PEAK AT THE TRUE VALUE? DOES IT GO CORRECTLY TO +-INFINITY AT THE
-TRUE/NON-TRUE VALUE? HOW DOES THE PRIOR AFFECT IT? HOW DOES THE DIMENSIONALITY
-AFFECT IT?
-
 \section{Connection to other inference frameworks}
 \label{sec:connections}
 
@@ -1309,15 +1321,20 @@ and maximizing it leads to the sample variance (REML) estimate of the variance
 The same MEE is obtained when the prior $p(\mu, \sigma^{2} \mid H_{1})$ does not
 depend on the value of the variance under $H_{0}$ as the denominator of the
 Bayes factor is simply a multiplicative factor that does not change its maximum.
-It is reassuring that different methods produce the same estimate in these
-situations. However, the important difference between these methods is the
-motivation and interpretation of the resulting estimate -- the MEE represents a
-natural estimate for $\theta$ because it is the parameter value for which the
-data provide the most evidence over an alternative hypothesis, while the MLE is
-defined without reference to
-alternatives.% Moreover, the way the informativeness
-% of the MEE is quantified (with the associated evidence level and possibly a
-% support set) differs from the (integrated) MLE.
+This shows that REML estimates can be motivated from a Bayesian evidence
+perspective which complements the well-established connections between REML
+estimation and marginal posterior estimation based on flat priors for the
+nuisance parameters \citep{Harville1974, Laird1982}. It is reassuring that
+different methods produce the same estimate in these situations. However, the
+important difference between these methods is the motivation and interpretation
+of the resulting estimate -- the MEE represents a natural estimate for $\theta$
+because it is the parameter value for which the data provide the most evidence
+over an alternative hypothesis, while the MLE is defined without reference to
+alternatives.
+
+% Moreover, the way the informativeness of the MEE is quantified (with the
+% associated evidence level and possibly a support set) differs from the
+% (integrated) MLE.
 
 
 \subsection{Likelihoodist inference}
@@ -2137,9 +2154,9 @@ at $y_{r}$. % This phenomenon is perhaps best described in the words of Stephen
 To illustrate a computationally more involved application of BFFs, we consider
 the study from \citet{Neutra1978}, previously reanalyzed by
 \citet{Greenland2007, Sullivan2012}. This epidemiological study investigated the
-association between 14 exposure variables and the risk for neonatal death. Among
-the 2992 births only 17 neonatal deaths occurred, which leads to challenges in
-conducting inferences with so many exposure variables.
+association between 14 exposure variables and the neonatal death. Among the 2992
+births only 17 neonatal deaths occurred. This leads to challenges in conducting
+inferences with so many exposure variables, as we will see in the following.
 
 
 \begin{figure}[!htb]
@@ -2223,7 +2240,7 @@ p2coef <- c("Gestational age" = "gestage",
             "Malpresented" = "malpres")
 p3coef <- c("Past abortion" = "abort")
 coefs <- c(p1coef, p2coef, p3coef)
-logORseq <- seq(log(1/10), log(100), length.out = 100)
+logORseq <- seq(log(1/30), log(100), length.out = 100)
 ORseq <- exp(logORseq)
 bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
@@ -2284,7 +2301,7 @@ for (i in seq(1, length(coefs))) {
     abline(v = orbks, lty = 3, col = "lightgrey")
     ## lines(ORseq, postdens2/priordens, lty = 2, col = 4,lwd = 1.5) # Gaussian approxiation of posterior
     lines(ORseq, BFFinla(logORseq), lty = 2, col = 4, lwd = 1.5)
-    lines(ORseq, bffglm, lty = 3, col = 2, lwd = 1.5)
+    lines(ORseq, bffglm, lty = 4, col = 2, lwd = 1.5)
     mtext(text = bquote("" %->% "Harm"), side = 1, line = 1.75, at = 2.5, cex = 0.6)
     mtext(text = bquote("Benefit" %<-% ""), side = 1, line = 1.75, at = 1/3, cex = 0.6)
 }
@@ -2294,7 +2311,7 @@ legend("center", title = "Computational method",
        legend = c("MCMC", ## "Normal approximation",
                   "INLA",
                   "Normal approx at MLE"),
-       lty = c(1, 2, 3), col = c(1, 4, 2), lwd = 1.5)
+       lty = c(1, 2, 4), col = c(1, 4, 2), lwd = 1.5)
 @
 \caption{Multiple logistic regression BFF analysis of 2992 births with 17
   neonatal deaths from \citet{Neutra1978} as reanalyzed by \citet{Sullivan2012}.
@@ -2313,27 +2330,33 @@ legend("center", title = "Computational method",
 
 Figure~\ref{fig:glm} shows the BFFs related to a logistic regression analysis of
 the data including all exposures as main effects and an intercept term. Each BFF
-relates to the exponential of a regression coefficient, which can be interpreted
-as the increase in odds ratio between neonatal death when increasing the
-variable by one unit while keeping all other variables fixed. BFFs were computed
-via the Savage-Dickey density ratio where the posterior densities were computed
-from 1'000'000 Markov chain Monte Carlo (MCMC) samples (solid black line) as
-implemented in Stan \citep{Carpenter2017} or via intergrated nested Laplace
-approximation (dashed blue line) as implemented in INLA \citep{Rue2009}. An
-improper flat prior was assigned to the intercept under both the null and the
-alternative, while independent
-$p(\log OR_{i} \mid H_{1}) = \Nor(\log OR_{i} \mid 0, 1/2)$ priors were assigned
-to each coefficient under the alternative. This prior represents an alternative
-postulating that the median odds ratio is $1$ and that $95\%$ of odds ratios are
-in between $1/4$ and $4$ \citep{Greenland2006}. For the analysis of each
-coefficient, all other coefficients were considered as nuisance parameters with
-the same priors assigned to them under the null as under the alternative. In
-addition, the BFF based on a normal approximation to the individual estimates
-and their standard errors estimated via maximum likelihood are also shown (red
-dotted lines) for comparison. This analysis ignores the multivariate structure
-of the data but produces similar results for most variables, while running much
-faster than the INLA analysis (taking several second), and which itself runs
-much faster than MCMC (taking several minutes).
+relates to the exponentiated regression coefficient, which can be interpreted as
+the multiplicative change of odds of neonatal death when increasing the variable
+by one unit while keeping all other variables fixed. An improper flat prior was
+assigned to the intercept under both the null and the alternative, while
+independent
+$p(\log \mathrm{OR}_{i} \mid H_{1}) = \Nor(\log \mathrm{OR}_{i} \mid 0, 1/2)$
+priors were assigned to each coefficient under the alternative. This prior
+represents an alternative postulating that the median odds ratio is $1$ and that
+$95\%$ of odds ratios are in between $1/4$ and $4$ \citep{Greenland2006}. For
+the analysis of each coefficient, all other coefficients were considered as
+nuisance parameters with the same priors assigned to them under the null as
+under the alternative.
+
+BFFs were computed in three ways: i) By first computing the marginal posterior
+distribution for each coefficient from 1'000'000 Markov chain Monte Carlo (MCMC)
+samples (solid black line) as implemented in Stan \citep{Carpenter2017} and then
+computing the BFF via the Savage-Dickey density ratio. ii) Computing the
+marginal posterior with intergrated nested Laplace approximation (dashed blue
+line) as implemented in INLA \citep{Rue2009} and then computing the BFF via the
+Savage-Dickey density. iii) The logistic model was first estimated with maximum
+likelihood, and each estimated coefficient and its standard error were then used
+for a univariate normal analysis as explained in Section~\ref{sec:normalmean}
+ignoring the nuisance parameters. The MCMC analysis took the longest among the
+three (several minutes), folled by the INLA analysis (several seconds), and the
+univariate analysis (almost instantly). Moreover, we can see that the MCMC and
+INLA methods show inaccuracies in the tails of the BFF. The univariate normal
+analysis aligns well with the more complex MCMC and INLA analyses in most cases.
 
 Due to the sparse nature of the data, most of the BFFs are relatively
 uninformative about whether or not the variables exhibit harmful or beneficial
@@ -2374,23 +2397,29 @@ includes a natural way to deal with nuisance parameters.
 
 Like the likelihoodist and Neyman-Pearson paradigms of statistical inference,
 BFF inference requires the formulation of alternative hypotheses. For this
-reason, BFFs are particularly valuable in contexts where there are strong
-theories or prior data available to formulate alternative hypotheses. In cases
-where there are no clear alternative hypotheses, data analysts may use BFFs
-based on `weakly informative` \citep{Gelman2009} or `default` prior distribution
-\citep[e.g., unit-information priors, see][]{Kass1995b} but should acknowledge
-this limitation and report sensitivity analyses (e.g., BFFs for different prior
+reason, BFFs are particularly valuable in contexts where there are prior data
+available or strong theories to formulate alternative hypotheses. For instance,
+BFFs (under the name of `\textit{K} ratio`) have been applied by the large-scale
+NANOGrav collaboration to quantify the evidence for new physics theories against
+the established standard model \citep{Afzal2023}. In cases where there are no
+clear alternative hypotheses, data analysts may use BFFs based on `weakly
+informative` \citep{Gelman2009} or `default` prior distribution \citep[e.g.,
+unit-information priors, see][]{Kass1995b} but should acknowledge this
+limitation and report sensitivity analyses (e.g., BFFs for different prior
 distributions). Another possibility is to base BFF inferences on Bayes factor
-bounds, which give a bound on the maximum evidence against parameter values, but
-at the cost of losing the ability to quantify evidence \emph{in favour} of
-parameter values \citep{Pawel2023}. Finally, where under their control, data
-analysts should design experiments and studies so that conclusive inferences can
-be drawn from the data collected, and this is also applies to BFF
-inferences. % While some research has been done on
-% study design with support intervals \citep{Pawel2023}, f
-Future research needs to investigate how experiments need to be designed to
-enable conclusive inference with BFFs.
+bounds \citep{Berger1987, Sellke2001, Held2018}, which give a bound on the
+maximum evidence against parameter values, but at the cost of losing the ability
+to quantify evidence \emph{in favour} of parameter values \citep{Pawel2023}.
 
+Where under their control, data analysts should design experiments and studies
+so that conclusive inferences can be drawn from the data collected, and this is
+also applies to BFF inferences. Future research needs to investigate how
+experiments need to be designed to enable conclusive inference with BFFs.
+Finally, the computation of BFFs can be computationally demanding. For example,
+when a BFF is computed via the Savage-Dickey density from a posterior
+distribution computed by MCMC, the BFF at the tails of the posterior might be
+imprecise even with millions of samples. Future work may focus on developing
+more efficient techniques for computing BFFs in such settings.
 
 Bayesian, likelihoodist, or predictive reasoning may all motivate the Bayes
 factor as a natural tool for quantifying the relative evidence or support of
