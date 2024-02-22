@@ -81,7 +81,7 @@ opts_chunk$set(fig.height = 4,
                eval = TRUE)
 
 ## should sessionInfo be printed at the end?
-Reproducibility <- TRUE
+Reproducibility <- FALSE #TRUE
 
 ## packages
 library(metadat) # data set from Bartos (2023)
@@ -469,9 +469,9 @@ estimate and confidence set.
 % frequentist estimates are typically supplemented with a confidence set.
 
 
-To understand behaviour of the MEE with increasing sample size, we may look at
-an approximation of the Bayes factor. Suppose that the data
-$Y_{1:n} = \{Y_{1}, Y_{2}, \dots, Y_{n}\}$ are independent and identically
+To understand the behaviour of the MEE with increasing sample size, we may look
+at an approximation of the Bayes factor. Suppose that the data
+$y_{1:n} = \{y_{1}, y_{2}, \dots, y_{n}\}$ are independent and identically
 distributed and denote by $\hat{\psi}_{0}$ the maximizer of the log likelihood
 of the data under the null and by $(\hat{\theta}_{1}$, $\hat{\psi}_{1})$ the
 maximizer under the alternative hypothesis. Denote by $n V_{0}$ and $n V_{1}$
@@ -495,9 +495,9 @@ maximizer). Applying a Laplace approximation to the logarithm of the BFF
 % estimator, and $d_{i}$ the dimension of the parameters for hypothesis
 % $i \in \{0, 1\}$.
 \begin{align}
-  \log \BF_{01}(Y_{1:n};\theta_{0}) =
-  \log \frac{p(Y_{1:n} \mid \theta_{0}, \hat{\psi}_{0})}{
-  p(Y_{1:n} \mid \hat{\theta}_{1}, \hat{\psi}_{1})}
+  \log \BF_{01}(y_{1:n};\theta_{0}) =
+  \log \frac{p(y_{1:n} \mid \theta_{0}, \hat{\psi}_{0})}{
+  p(y_{1:n} \mid \hat{\theta}_{1}, \hat{\psi}_{1})}
   + \frac{\dim(\theta)}{2} \log \frac{n}{2\pi} +
   \log \frac{p(\hat{\psi}_{0} \mid H_{0})}{
   p(\hat{\theta}_{1}, \hat{\psi}_{1} \mid H_{1})}
@@ -523,10 +523,10 @@ relative accuracy of the priors (third term) and the relative dispersion (fourth
 term) lead to further adjustments of the BFF. For instance, when a parameter
 estimate is likely under the corresponding prior, this increases the evidence
 for corresponding hypothesis while a misspecified prior that is in conflict with
-the parameter estimates lowers the evidence for the corresponding hypothesis.
-In sum, finding the MEE  corresponds to
-maximizing the profile likelihood that is adjusted based on the accuracy of the
-prior for the nuisance parameters and the modal dispersion.
+the parameter estimates lowers the evidence for the corresponding hypothesis. In
+sum, finding the MEE corresponds approximately to maximizing the profile
+likelihood that is adjusted based on the accuracy of the prior for the nuisance
+parameters and the modal dispersion.
 
 % % To obtain the MEE, the log Bayes factor~\eqref{eq:bfapprox} needs to be
 % % maximized with respect to $\theta_{0}$. It is clear that this corresponds to
@@ -1329,8 +1329,8 @@ different methods produce the same estimate in these situations. However, the
 important difference between these methods is the motivation and interpretation
 of the resulting estimate -- the MEE represents a natural estimate for $\theta$
 because it is the parameter value for which the data provide the most evidence
-over an alternative hypothesis, while the MLE is defined without reference to
-alternatives.
+over an alternative hypothesis, while the (integrated) MLE is defined without
+reference to alternatives.
 
 % Moreover, the way the informativeness of the MEE is quantified (with the
 % associated evidence level and possibly a support set) differs from the
@@ -1397,7 +1397,7 @@ invalid.
 
 
 \subsection{Bayesian inference}
-
+\label{sec:bayesian}
 The BFF can, under certain conditions, be transformed into a Bayesian posterior
 distribution. Specifically, assuming a `global' prior under the alternative, a
 prior $p(\theta \mid H_{1})$ which does not depend on the parameter under the
@@ -1418,23 +1418,24 @@ Cauchy priors that are centered around $\theta_{0}$) cannot be transformed to a
 genuine posterior distribution in this way, but multiplication with the prior
 will result in a different posterior for every $\theta$.
 
-The relative belief inference framework is
-perhaps the closest to the one presented here. However, as with the posterior
-distribution there is only a correspondence between relative belief ratio
-inferences and BFF inference if the prior for $\theta$ is the same for every
-$\theta_{0}$, and it does not hold anymore when, for example, local priors
-centered around the value of the null $\theta_{0}$ are used, or when the prior
-for the nuisance parameters under the null differs from the prior under the
-alternative.
+% The relative belief inference framework is
+% perhaps the closest to the one presented here. However, as with the posterior
+% distribution there is only a correspondence between relative belief ratio
+% inferences and BFF inference if the prior for $\theta$ is the same for every
+% $\theta_{0}$, and it does not hold anymore when, for example, local priors
+% centered around the value of the null $\theta_{0}$ are used, or when the prior
+% for the nuisance parameters under the null differs from the prior under the
+% alternative.
 
 Since, under certain regularity conditions, the posterior is asymptotically
 normally distributed around the maximum likelihood estimate with a covariance
 matrix equal to the observed information matrix \citep[chapter
 5.3]{Bernardo2000}, we can conclude that whenever the BFF has the Savage-Dickey
-density ratio representation~\eqref{eq:posterior}, asymptotically the BFF is the
-asymptotic posterior normal density divided by the prior density, both evaluated
-at $\theta_{0}$. Hence, in contrast to the posterior distribution, the influence
-of the prior on the BFF does not `wash` out as more data are collected.
+density ratio representation~\eqref{eq:posterior}, asymptotically the BFF is
+given by the asymptotic posterior normal density divided by the prior density,
+both evaluated at $\theta_{0}$. As the sample size increases, the posterior and
+hence also the BFF will more concentrated around the true parameter
+$\theta_{*}$.
 % asymptotic normal posterior density divided by prior density?
 
 The link~\eqref{eq:posterior} also provides a convenient way to compute BFFs
@@ -2153,16 +2154,17 @@ at $y_{r}$. % This phenomenon is perhaps best described in the words of Stephen
 \subsection{Logistic regression}
 To illustrate a computationally more involved application of BFFs, we consider
 the study from \citet{Neutra1978}, previously reanalyzed by
-\citet{Greenland2007, Sullivan2012}. This epidemiological study investigated the
-association between 14 exposure variables and the neonatal death. Among the 2992
-births only 17 neonatal deaths occurred. This leads to challenges in conducting
-inferences with so many exposure variables, as we will see in the following.
+\citet{Greenland2007} and \citet{Sullivan2012}. This epidemiological study
+investigated the association between 14 exposure variables and the neonatal
+death. Among the 2992 births only 17 neonatal deaths occurred. This leads to
+challenges in conducting inferences with so many exposure variables, as we will
+see in the following.
 
 
 \begin{figure}[!htb]
 << "regression-example-mcmc", cache = TRUE >>=
 ## reanalyze the data from Sullivan and Greenland (2008)
-dat <- read.csv(file = "../sullivangreenland2013.csv")
+dat <- read.csv(file = "../data/sullivangreenland2013.csv")
 dat$dyslab <- dat$dyslab/3 # scaled like this in the paper, see caption Table 1
 glm1 <- glm(death ~ ., data = dat, family = "binomial")
 ## summary(glm1)
@@ -2180,17 +2182,20 @@ priors <- paste0("normal(", c(pm1, pm2, pm3), ", ",
 ## Bayesian logistic regression model
 set.seed(42)
 library(brms)
-bglm1 <- brm(death ~ ., data = dat,
-             prior = c(set_prior("", class = "Intercept"), # flat prior
-                       set_prior(priors[1], class = "b",
-                                 coef = c("nonwhite", "teenages", "nullip",
-                                          "isoimm", "dyslab", "placord",
-                                          "nomonit", "ward", "prerupt")),
-                       set_prior(priors[2], class = "b",
-                                 coef = c("gestage", "hydram", "twint", "malpres")),
-                       set_prior(priors[3], class = "b", coef = "abort")),
-             iter = 1000000, warmup = 1000, cores = 12,
-             family = "bernoulli")
+nmcmc <- 2000000
+## bglm1 <- brm(death ~ ., data = dat,
+##              prior = c(set_prior("", class = "Intercept"), # flat prior
+##                        set_prior(priors[1], class = "b",
+##                                  coef = c("nonwhite", "teenages", "nullip",
+##                                           "isoimm", "dyslab", "placord",
+##                                           "nomonit", "ward", "prerupt")),
+##                        set_prior(priors[2], class = "b",
+##                                  coef = c("gestage", "hydram", "twint", "malpres")),
+##                        set_prior(priors[3], class = "b", coef = "abort")),
+##              iter = nmcmc, warmup = 1000, cores = 12,
+##              family = "bernoulli")
+## save(bglm1, file = "../data/bglm1.RData")
+load(file = "../data/bglm1.RData")
 
 ## summary(bglm1)
 ## exp(fixef(bglm1))[-1,]
@@ -2223,7 +2228,7 @@ names(pprec) <- coef
 bglm2 <- inla(formula = model, data = dat, family = "binomial",
               control.fixed = list(mean = pmeans, prec = pprec))
 @
-<< "regression-analysis", fig.height = 8.8, fig.width = 8, cache = TRUE >>=
+<< "regression-analysis", fig.height = 9, fig.width = 8, cache = TRUE >>=
 par(mfrow = c(5, 3), mar = c(4, 4, 3, 1))
 p1coef <-  c("Non-White" = "nonwhite",
              "Early age" = "teenages",
@@ -2240,7 +2245,7 @@ p2coef <- c("Gestational age" = "gestage",
             "Malpresented" = "malpres")
 p3coef <- c("Past abortion" = "abort")
 coefs <- c(p1coef, p2coef, p3coef)
-logORseq <- seq(log(1/30), log(100), length.out = 100)
+logORseq <- seq(log(1/30), log(100), length.out = 500)
 ORseq <- exp(logORseq)
 bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
@@ -2284,6 +2289,18 @@ for (i in seq(1, length(coefs))) {
                      method = "Brent", lower = log(1/1000), upper = log(1000))$par
     meesmcmc[i] <- logORseq[which.max(bff)]
     kmcmc[i] <- max(bff)
+    ## HACK compute k=1 SI for selected coefficient
+    if (coef == "teenages") {
+        rootFun <- function(logOR) BFFinla(logOR) - 1
+        lowerSI <- uniroot(rootFun, lower = log(1/10), upper = meesinla[i])$root
+        upperSI <- uniroot(rootFun, lower = meesinla[i], upper = log(10))$root
+    }
+    if (coef == "hydram") {
+        ## HACK to compute the SI
+        lowerSIhyd <- logORseq[which.min(abs(log(bff[logORseq < meesmcmc[i]]) - 0))]
+        upperSIhyd <- logORseq[logORseq > meesmcmc[i]][which.min(abs(
+                                  log(bff[logORseq > meesmcmc[i]]) - 0))]
+    }
     ## create plot of BFF
     ## lowerInd <- which.min(abs(logORseq - quantile(x = mcmcdraws, probs = c(0.0001))))
     ## upperInd <- which.min(abs(logORseq - quantile(x = mcmcdraws, probs = c(0.9999))))
@@ -2309,20 +2326,20 @@ plot.new()
 plot.window(xlim = c(1/100 , 100), ylim = c(1/100, 100))
 legend("center", title = "Computational method",
        legend = c("MCMC", ## "Normal approximation",
-                  "INLA",
-                  "Normal approx at MLE"),
+                  "INLA", "Univariate normal analysis"),
        lty = c(1, 2, 4), col = c(1, 4, 2), lwd = 1.5)
 @
 \caption{Multiple logistic regression BFF analysis of 2992 births with 17
-  neonatal deaths from \citet{Neutra1978} as reanalyzed by \citet{Sullivan2012}.
-  Each plot shows the BFF related to the exponential of a regression coefficient
-  which can be interpreted as odds ratio. Independent, weakly informative priors
-  $\Nor(0, 1/2)$ are assigned to the coefficients under the alternative $H_{1}$,
-  and when the coefficient are considered as nuisance parameters under the null
-  $H_{0}$. Variables are indicators except early age (0, 20 ,1 15 19, 2 under
-  15), gestational age ($0 = \text{no}$, $1 = 36-38$ weeks, $2 = 33-36$ weeks;
-  under 33 weeks excluded), isoimmunization ($0 = \text{no}$, $1 = \text{Rh}$,
-  $2 = \text{ABO}$), labour progress ($0 = \text{no}$,
+  neonatal deaths from \citet{Neutra1978} as reanalyzed and shared by
+  \citet{Sullivan2012}. Each plot shows the BFF related to the exponentiated
+  regression coefficient which can be interpreted as odds ratio. Independent,
+  weakly informative $\Nor(0, 1/2)$ priors are assigned to the coefficients
+  under the alternative $H_{1}$. All other coefficients were considered as
+  nuisance parameters and the same priors assigned to them as under the
+  alternative. Variables are binary indicators, except early age (0, 20 ,1 15
+  19, 2 under 15), gestational age ($0 = \text{no}$, $1 = 36-38$ weeks,
+  $2 = 33-36$ weeks; under 33 weeks excluded), isoimmunization ($0 = \text{no}$,
+  $1 = \text{Rh}$, $2 = \text{ABO}$), labour progress ($0 = \text{no}$,
   $0.33 = \text{prolonged}$, $0.67 = \text{protracted}$, $1 = \text{arrested}$)
   and past abortion ($0 = \text{none}$, $1 = 1$, $2 = 2+$).}
 \label{fig:glm}
@@ -2334,52 +2351,67 @@ relates to the exponentiated regression coefficient, which can be interpreted as
 the multiplicative change of odds of neonatal death when increasing the variable
 by one unit while keeping all other variables fixed. An improper flat prior was
 assigned to the intercept under both the null and the alternative, while
-independent
-$p(\log \mathrm{OR}_{i} \mid H_{1}) = \Nor(\log \mathrm{OR}_{i} \mid 0, 1/2)$
-priors were assigned to each coefficient under the alternative. This prior
-represents an alternative postulating that the median odds ratio is $1$ and that
-$95\%$ of odds ratios are in between $1/4$ and $4$ \citep{Greenland2006}. For
-the analysis of each coefficient, all other coefficients were considered as
-nuisance parameters with the same priors assigned to them under the null as
-under the alternative.
+independent $\Nor(0, 1/2)$ priors were assigned to the coefficients under the
+alternative. This prior represents an alternative postulating that the median
+odds ratio is $1$ and that $95\%$ of odds ratios are in between $1/4$ and $4$,
+representing a plausible range of odds ratios in epidemiology
+\citep{Greenland2006}. For the analysis of each coefficient, all other
+coefficients were considered as nuisance parameters with the same priors
+assigned to them under the null as under the alternative.
 
 BFFs were computed in three ways: i) By first computing the marginal posterior
-distribution for each coefficient from 1'000'000 Markov chain Monte Carlo (MCMC)
-samples (solid black line) as implemented in Stan \citep{Carpenter2017} and then
-computing the BFF via the Savage-Dickey density ratio. ii) Computing the
-marginal posterior with intergrated nested Laplace approximation (dashed blue
-line) as implemented in INLA \citep{Rue2009} and then computing the BFF via the
-Savage-Dickey density. iii) The logistic model was first estimated with maximum
-likelihood, and each estimated coefficient and its standard error were then used
-for a univariate normal analysis as explained in Section~\ref{sec:normalmean}
-ignoring the nuisance parameters. The MCMC analysis took the longest among the
-three (several minutes), folled by the INLA analysis (several seconds), and the
-univariate analysis (almost instantly). Moreover, we can see that the MCMC and
-INLA methods show inaccuracies in the tails of the BFF. The univariate normal
-analysis aligns well with the more complex MCMC and INLA analyses in most cases.
+distribution for each coefficient from kernel smoothing of
+$\Sexpr{format(nmcmc, big.interval = 3, scientific = FALSE, big.mark = "'")}$
+Markov chain Monte Carlo (MCMC) samples (solid black lines) as implemented in
+Stan \citep{Carpenter2017} and then computing the BFF via the Savage-Dickey
+density ratio as explained in Section~\ref{sec:bayesian}. ii) By computing the
+marginal posterior with integrated nested Laplace approximation (dashed blue
+lines) as implemented in INLA \citep{Rue2009} and then computing the BFF via the
+Savage-Dickey density. iii) By estimating the logistic model first with maximum
+likelihood, and then using each estimated coefficient and its standard error for
+a univariate normal analysis as explained in Section~\ref{sec:normalmean},
+ignoring the nuisance parameters (red dot-dashed line). As a result, the MEEs
+from the univariate normal analysis correspond to the MLEs, while the MEE from
+the MCMC and INLA analyses correspond to the integrated MLEs. The MCMC analysis
+took the longest of the three (several minutes to run), followed by the INLA
+analysis (about a second to run), followed by the univariate analysis (almost
+instantaneous). We can also see that the MCMC and INLA methods can have
+inaccuracies in the tails of the BFF as these represent regions where the
+posterior density is nearly zero. Finally, the univariate normal analysis agrees
+well with the MCMC and INLA analyses in most cases, with a few exceptions where
+the BFFs are skewed (e.g., for the `Hydramnios' variable).
 
-Due to the sparse nature of the data, most of the BFFs are relatively
-uninformative about whether or not the variables exhibit harmful or beneficial
-associations with neonatal death. For example, the BFF for the coefficient
-`Non-White' (top left panel) is peaked at
-$\widehat{\text{OR}}_{\mathrm{ME}} = \Sexpr{round(exp(meesmcmc[coefs == "nonwhite"]), 1)}$
-indicating a slightly harmful association between non-white ethnicity and
+Due to the sparse nature of the data, most of the BFFs are undiagnostic about
+whether or not the variables exhibit harmful or beneficial associations with
+neonatal death. For example, the BFF for the variable `Early age' (top middle
+panel) is peaked at
+$\widehat{\text{OR}}_{\mathrm{ME}} = \Sexpr{round(exp(meesmcmc[coefs == "teenages"]), 1)}$
+indicating a slightly harmful association between early age pregnancy and
 neonatal death, yet this parameter value receives only anecdotal support over
-the alternative ($\kME = \Sexpr{round(kmcmc[coefs == "nonwhite"], 2)}$) and the
-corresponding $k = 1$ support interval spans the range from slightly beneficial
-up to harmful association.
+the alternative ($\kME = \Sexpr{round(kmcmc[coefs == "teenages"], 1)}$) and the
+corresponding $k = 1$ support interval spans the range from beneficial
+($\text{OR} = 1/\Sexpr{round(1/exp(lowerSI), 1)}$) up to harmful associations
+($\text{OR} = \Sexpr{round(exp(upperSI), 1)}$).
 
-For most variables, extremely harmful or extremely beneficial associations are
-clearly ruled. However, the variables `Gestational age', `Hydramnios', and
-`Twin, triplet` are notable exceptions. In each case, the BFFs suggest small up
-to very harmful associations with neonatal death. The most extreme among them is
-`Hydramnios' for which an MEE of
+For most variables, the BFFs indicate that strongly harmful ($\text{OR} > 10$)
+or strongly beneficial ($\text{OR} < 1/10$) associations are disfavoured by the
+data. However, the variables `Premature rupture of membranes', `Gestational
+age', `Hydramnios', `Twin, triplet`, and `Malpresented' are notable exceptions.
+In each case, the BFFs suggest small up to very harmful associations with
+neonatal death. The most extreme among them is `Hydramnios' for which an MEE of
 $\widehat{\text{OR}}_{\mathrm{ME}} = \Sexpr{round(exp(meesmcmc[coefs == "hydram"]), 1)}$
 is obtained. Due to the marginalization over the nuisance parameters, this
 estimate is somewhat smaller than the maximum likelihood estimate
 $\widehat{\text{OR}}_{\mathrm{ML}} = \Sexpr{round(exp(glmest[coefs == "hydram"]), 1)}$,
-yet still unrealistically large. This extreme inflation reflects the fact that
-only one death with hydramnios during pregnancy was observed.
+but still unrealistically large ($k = 1$ support interval from
+$\Sexpr{round(exp(lowerSIhyd), 1)}$ to $\Sexpr{round(exp(upperSIhyd), 1)}$).
+This extreme inflation reflects the fact that only one death was observed with
+hydramnios during pregnancy. The example illustrates that just as non-Bayesian
+methods, BFFs, support intervals, and MEEs can suffer from small-data artifacts.
+These could be avoided with a posterior distribution based on a weakly
+informative prior that shrinks the posterior toward more realistic values
+\citep{Greenland2006}, with the caveat that a poorly chosen prior may also mask
+genuine signals from the data.
 
 \section{Discussion}
 \label{sec:discussion}
@@ -2433,6 +2465,8 @@ hypothesis to making gradual and quantitative inferences.
 
 
 \section*{Acknowledgments}
+We thank \citet{Sullivan2012} for openly sharing the data from
+\citet{Neutra1978}. We thank \citet{Bartos2023} for openly sharing their data.
 We thank František Bartoš, Andrew Fowlie, Małgorzata Roos, Leonhard Held, and
 Eric-Jan Wagenmakers for valuable comments on drafts of the manuscript. The
 acknowledgment of these individuals does not imply their endorsement of the
@@ -2442,12 +2476,16 @@ paper.
 We declare no conflict of interest.
 
 \section*{Software and data}
-The code and data to reproduce our analyses is openly available
-at \url{https://github.com/SamCH93/BFF}. A snapshot of the repository at the
-time of writing is available
+The data from \citet{Neutra1978} where obtained from the `\texttt{Supplementary
+  Data.zip}' file available at \url{https://doi.org/10.1093/ije/dys213}. The
+data from \citet{Bartos2023} were obtained from the \texttt{metadat} R package
+\citep{White2023}. The code and data to reproduce our analyses is openly
+available at \url{https://github.com/SamCH93/BFF}. A snapshot of the repository
+at the time of writing is available
 at \url{https://zenodo.org/doi/10.5281/zenodo.XXXXXX}. We used the statistical
 programming language \Sexpr{R.Version()[["version.string"]]} for analyses
-\citep{R}.
+\citep{R} along with the \texttt{brms} \citep{Burkner2021} and \texttt{INLA}
+\citep{Rue2009} packages for posterior estimation.
 
 
 \bibliographystyle{apalikedoiurl}
