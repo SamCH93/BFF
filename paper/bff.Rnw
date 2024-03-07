@@ -32,7 +32,7 @@
 %% title, authors, affiliations, mail
 %% ----------------------------------------------------------------------------
 \newcommand\mail{samuel.pawel@uzh.ch}
-\title{
+\title{\vspace{-2em}
   \textbf{\textsf{A Bayes Factor Framework for Unified Parameter Estimation and Hypothesis Testing}}
 }
 \author{
@@ -94,14 +94,14 @@ library(metabf) # BFFs for meta-analysis
 \maketitle
 
 \begin{abstract}
-  The Bayes factor -- the relative likelihood of the data under two competing
-  hypotheses -- is a natural measure of statistical evidence or support for one
-  hypothesis over the other. Here we show how Bayes factors can also be used for
-  parameter estimation. The key idea is to consider the Bayes factor as a
-  function of the parameter value under the null hypothesis. This `Bayes factor
-  function' is then inverted to obtain point estimates (`maximum evidence
-  estimates') and interval estimates (`support intervals'), similar to how
-  \textit{P}-value functions are inverted to obtain point estimates and
+  The Bayes factor -- the relative marginal likelihood of the data under two
+  competing hypotheses -- is a natural measure of statistical evidence or
+  support for one hypothesis over the other. Here we show how Bayes factors can
+  also be used for parameter estimation. The key idea is to consider the Bayes
+  factor as a function of the parameter value under the null hypothesis. This
+  `Bayes factor function' is then inverted to obtain point estimates (`maximum
+  evidence estimates') and interval estimates (`support intervals'), similar to
+  how \textit{P}-value functions are inverted to obtain point estimates and
   confidence intervals. This provides data analysts with a unified inference
   framework for hypothesis testing and parameter estimation, as Bayes factors
   (for any tested parameter), support intervals (at any level of interest), and
@@ -109,10 +109,10 @@ library(metabf) # BFFs for meta-analysis
   function. This approach shares similarities but is also distinct from
   conventional Bayesian and frequentist inference approaches. For instance, it
   uses the Bayesian evidence calculus, but without synthesizing data and prior,
-  or it defines statistical evidence in terms of relative likelihoods, but also
-  includes a natural way to deal with nuisance parameters. Applications to
-  several real-world examples illustrate how our framework is of practical value
-  to data analysts who aim to make quantitative inferences.
+  or it defines statistical evidence in terms of (integrated) likelihood ratios,
+  but also includes a natural way to deal with nuisance parameters. Applications
+  to several real-world examples illustrate how our framework is of practical
+  value to data analysts who aim to make quantitative inferences.
   \\[1ex]
   \emph{Keywords}: Bayesian inference, integrated likelihood, meta-analysis,
   nuisance parameters, replication studies, support interval
@@ -240,18 +240,6 @@ lines(null, bf, lwd = 2)
 \label{fig:pvalfun}
 \end{figure}
 
-% - Many scientific inference problems revolve around unknown parameters of statistical models
-% - in practice, researchers are often interested both in estimating the parameter and testing hypotheses related to it
-% - in frequentist statistics there is a unifying concept for these problems, the p-value function
-% - while giving a unified self-consistent framework, the PF also addresses several practical problems with traditional p-values, it promotes quantitative gradual inferences over dichotomous black-and-white thinking which is often argued to be a big problem in the misuse of statistics, by some described as posterior without priors
-% - in Bayesian inference the posterior distribution of a parameter serves a similar role, though the posterior synthesizes the data with a prior distribution and the choice can be challenging/controversial
-% - nevertheless the posterior allows to deduce credible intervals and point estimates, as well as posterior tail probabilities for one-sided testing
-% - however, for testing of point/simple hypotheses, data analysts rarely report the posterior distribution but more often an intermediate step -- the Bayes factor -- the updating factor of ...
-% - this is perhaps because it is even more controversial /challenging to specify prior probabilities for point hypotheses
-% - data analysts prefer BFs over posterior probabilities because the latter depend on the prior probabilities, for the same reason they may not want to report a model-averaged posterior for a parameter, despite that it represents the Bayesian answer to the problem
-% - however, analysts who use BFs are then often in a dilemma, should they report the BF for testing but then point and interval estimates based on a posterior that assumes that the hypothesis tested is false from the start, or model average where they need to specify prior probabilities for the null and the alternative? in practice this is rarely done
-% - in this paper I introduce a methodology that helps analysts who use BFs by also giving them a way to get interval and point estimates via the analogous concept to a p-value function, the BFF
-% - .....
 
 In Bayesian statistics, the posterior distribution of the unknown parameter
 plays a similar role to the \textit{P}-value function, since point estimates
@@ -386,8 +374,8 @@ alternative hypothesis $H_{1}$ in predicting the data $y$, and vice versa
 \citep{Good1952, Gneiting2007}. Finally, the last
 equation~\eqref{eq:bf01compute} shows how the Bayes factor can be calculated,
 i.e., by dividing the likelihood of $y$ under the null value $\theta_0$
-(possibly marginalized over the prior of $\psi$ under $H_0$) by the likelihood
-of $y$ marginalized over the prior of $\theta$ (and possibly $\psi$)
+(possibly integrated over the prior of $\psi$ under $H_0$) by the likelihood
+of $y$ integrated over the prior of $\theta$ (and possibly $\psi$)
 under~$H_1$. The priors for $\theta$ and $\psi$ may also be point priors, in
 which case the Bayes factor reduces to a likelihood ratio.
 
@@ -895,6 +883,23 @@ behavior of the resulting BFF.
 % evidence about $\mu$.
 
 
+<< "distribution-k" >>=
+## ## generate data under H1, what is the distribution of k?
+## ## the theoretical density
+## fk <- function(k, v, se) sqrt(2/pi*(1 + v/se^2)/k^4/log(k^2/(1 + v/se^2)))
+
+## set.seed(42)
+## ysim <- rnorm(n = 100000, mean = m, sd = sqrt(v + se^2))
+## ksim <- bffun(yi = ysim, sei = se, muPrior = m, sdPrior = sqrt(v), null = ysim)
+
+## hist(ksim, probability = TRUE, xlim = c(1, 20),
+##      breaks = seq(0, 100000, 0.1))
+
+## kseq <- seq(0, 100, 0.01)
+## lines(kseq, fk(kseq), lty = 2, lwd = 2)
+
+
+@
 
 \subsection{Choice of the prior}
 
@@ -2201,11 +2206,12 @@ nmcmc <- 2000000
 ## save(bglm1, file = "../data/bglm1.RData")
 load(file = "../data/bglm1.RData")
 
+## ## MCMC diagnostics
 ## summary(bglm1)
 ## exp(fixef(bglm1))[-1,]
 ## plot(bglm1, N = 15)
 @
-<< "regression-example-inla" >>=
+<< "regression-example-inla", cache = TRUE >>=
 library(INLA)
 model <- death ~ 1 + nonwhite + teenages + nullip + gestage + isoimm + abort +
     hydram + dyslab + placord + nomonit + twint + ward + prerupt + malpres
@@ -2233,7 +2239,6 @@ bglm2 <- inla(formula = model, data = dat, family = "binomial",
               control.fixed = list(mean = pmeans, prec = pprec))
 @
 << "regression-analysis", fig.height = 9, fig.width = 8, cache = TRUE >>=
-par(mfrow = c(5, 3), mar = c(4, 4, 3, 1))
 p1coef <-  c("Non-White" = "nonwhite",
              "Early age" = "teenages",
              "Nulliparity" = "nullip",
@@ -2249,27 +2254,24 @@ p2coef <- c("Gestational age" = "gestage",
             "Malpresented" = "malpres")
 p3coef <- c("Past abortion" = "abort")
 coefs <- c(p1coef, p2coef, p3coef)
-logORseq <- seq(log(1/30), log(100), length.out = 500)
+logORseq <- seq(log(1/30), log(100), length.out = 100)
 ORseq <- exp(logORseq)
 bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
-orbks <- c(bfbks, 1/3, 3, 30)
-orlabs <- c(bflabs, "1/3", "3", "30")
-meesinla <- numeric(length = length(coefs))
-meesmcmc <- numeric(length = length(coefs))
-glmest <- numeric(length = length(coefs))
-kmcmc <- numeric(length = length(coefs))
+orbks <- c(bfbks, 1/30, 1/3, 3, 30)
+orlabs <- c(bflabs, "1/30", "1/3", "3", "30")
 glmdat <- summary(glm1)$coefficients
-for (i in seq(1, length(coefs))) {
+
+
+bffres <- lapply(X = seq(1, length(coefs)), FUN = function(i) {
     coef <- coefs[i]
     ## glm conjugate analysis
-    glmest[i] <- glmdat[rownames(glmdat) == coef, 1]
+    glmest <- glmdat[rownames(glmdat) == coef, 1]
     glmse <- glmdat[rownames(glmdat) == coef, 2]
     ## mcmc analysis
     mcmcdraws <- brms::as_draws_matrix(bglm1, variable = paste0("b_", coef))
     postdens <- density(mcmcdraws,  from = min(logORseq), to = max(logORseq),
                         n = length(logORseq))
-    postdens2 <- dnorm(x = logORseq, mean = mean(mcmcdraws), sd = sd(mcmcdraws))
     if (coef %in% p1coef) {
         pm <- pm1
         psd <- psd1
@@ -2280,58 +2282,82 @@ for (i in seq(1, length(coefs))) {
         pm <- pm3
         psd <- psd3
     }
+
+    ## compute BFFs
     priordens <- dnorm(x = logORseq, mean = pm, sd = psd)
-    bff <- postdens$y/priordens
-    bffglm <- dnorm(x = glmest[i], mean = logORseq, sd = glmse) /
-        dnorm(x = glmest[i], mean = pm, sd = sqrt(psd^2 + glmse^2))
-    ## compute MEE
+    bffmcmc <- postdens$y/priordens
+    bffglm <- dnorm(x = glmest, mean = logORseq, sd = glmse) /
+        dnorm(x = glmest, mean = pm, sd = sqrt(psd^2 + glmse^2))
     BFFinla <- function(logOR) {
         inla.dmarginal(x = logOR, marginal = bglm2$marginals.fixed[[coef]])/
             dnorm(x = logOR, mean = pm, sd = psd)
     }
-    meesinla[i] <- optim(par = 0, fn = function(logOR) -log(BFFinla(logOR)),
-                     method = "Brent", lower = log(1/1000), upper = log(1000))$par
-    meesmcmc[i] <- logORseq[which.max(bff)]
-    kmcmc[i] <- max(bff)
+    bffinla <- BFFinla(logORseq)
+    bffDF <- rbind(data.frame(logOR = logORseq, bff = bffmcmc, method = "MCMC"),
+                   data.frame(logOR = logORseq, bff = bffinla, method = "INLA"),
+                   data.frame(logOR = logORseq, bff = bffglm,
+                              method = "Univariate normal"))
+    bffDF$coef <- names(coefs)[i]
+
+    ## compute MEEs
+    meeinla <- optim(par = 0, fn = function(logOR) -log(BFFinla(logOR)),
+                     method = "Brent", lower = log(1/100), upper = log(100))$par
+    kinla <- BFFinla(meeinla)
+    meemcmc <- logORseq[which.max(bffmcmc)]
+    kmcmc <- max(bffmcmc)
+    meeglm <- glmest
+    kglm <- max(bffglm)
+
     ## HACK compute k=1 SI for selected coefficient
     if (coef == "teenages") {
         rootFun <- function(logOR) BFFinla(logOR) - 1
-        lowerSI <- uniroot(rootFun, lower = log(1/10), upper = meesinla[i])$root
-        upperSI <- uniroot(rootFun, lower = meesinla[i], upper = log(10))$root
-    }
-    if (coef == "hydram") {
+        lowerSI <- uniroot(rootFun, lower = log(1/10), upper = meeinla)$root
+        upperSI <- uniroot(rootFun, lower = meeinla, upper = log(10))$root
+    } else if (coef == "hydram") {
         ## HACK to compute the SI
-        lowerSIhyd <- logORseq[which.min(abs(log(bff[logORseq < meesmcmc[i]]) - 0))]
-        upperSIhyd <- logORseq[logORseq > meesmcmc[i]][which.min(abs(
-                                  log(bff[logORseq > meesmcmc[i]]) - 0))]
+        lowerSI <- logORseq[which.min(abs(log(bffmcmc[logORseq < meemcmc]) - 0))]
+        upperSI <- logORseq[logORseq > meemcmc][
+            which.min(abs(log(bffmcmc[logORseq > meemcmc]) - 0))]
+    } else {
+        lowerSI <- NaN
+        upperSI <- NaN
     }
-    ## create plot of BFF
-    ## lowerInd <- which.min(abs(logORseq - quantile(x = mcmcdraws, probs = c(0.0001))))
-    ## upperInd <- which.min(abs(logORseq - quantile(x = mcmcdraws, probs = c(0.9999))))
-    plot(ORseq, bff,
-         type = "l", log = "xy", lwd = 1.5, xlim = c(min(ORseq), max(ORseq)),
-         ylim = c(1/100, 100), las = 1, xlab = "Odds ratio", ylab = "Bayes factor",
-         main = names(coefs)[i],
-         panel.first = graphics::grid(lty = 3, nx = NA, ny = NULL, equilogs = FALSE),
-         xaxt = "n", yaxt = "n")
-    axis(side = 1, at = orbks, labels = orlabs)
-    axis(side = 2, at = bfbks, labels = bflabs, las = 1)
-    points(exp(meesinla[i]), BFFinla(meesinla[i]), pch = 20, cex = 1.5, col = 4)
-    points(exp(glmest[i]), max(bffglm), pch = 20, cex = 1.5, col = 2)
-    points(exp(meesmcmc[i]), max(bff), pch = 20, cex = 1.5, col = 1)
-    abline(v = orbks, lty = 3, col = "lightgrey")
-    ## lines(ORseq, postdens2/priordens, lty = 2, col = 4,lwd = 1.5) # Gaussian approxiation of posterior
-    lines(ORseq, BFFinla(logORseq), lty = 2, col = 4, lwd = 1.5)
-    lines(ORseq, bffglm, lty = 4, col = 2, lwd = 1.5)
-    mtext(text = bquote("" %->% "Harm"), side = 1, line = 1.75, at = 2.5, cex = 0.6)
-    mtext(text = bquote("Benefit" %<-% ""), side = 1, line = 1.75, at = 1/3, cex = 0.6)
-}
-plot.new()
-plot.window(xlim = c(1/100 , 100), ylim = c(1/100, 100))
-legend("center", title = "Computational method",
-       legend = c("MCMC", ## "Normal approximation",
-                  "INLA", "Univariate normal analysis"),
-       lty = c(1, 2, 4), col = c(1, 4, 2), lwd = 1.5)
+
+    out <- list(bffDF,
+                rbind(data.frame(coef = names(coefs)[i], lowerSI, upperSI,
+                                 mee = meemcmc, k = kmcmc, method = "MCMC"),
+                      data.frame(coef = names(coefs)[i], lowerSI, upperSI,
+                                 mee = meeinla, k = kinla, method = "INLA"),
+                      data.frame(coef = names(coefs)[i], lowerSI, upperSI,
+                                 mee = meeglm, k = kglm, method = "Univariate normal"))
+                )
+    return(out)
+})
+
+meeDF <- do.call("rbind", lapply(X = bffres, FUN = function(x) x[[2]]))
+bffDF <- do.call("rbind", lapply(X = bffres, FUN = function(x) x[[1]]))
+cols <- palette.colors(n = 4, palette = "Okabe-Ito")[2:4]
+names(cols) <- c("MCMC", "INLA", "Univariate normal")
+bffDF$method <- factor(bffDF$method, levels = c("MCMC", "INLA", "Univariate normal"))
+bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
+bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
+orbks <- c(bfbks, 1/3, 3, 30)
+orlabs <- c(bflabs, "1/3", "3", "30")
+library(ggplot2)
+ggplot(data = bffDF, aes(x = exp(logOR), y = bff, color = method)) +
+    facet_wrap(~ coef, ncol = 3) +
+    geom_line(aes(linetype = method), linewidth = 0.8, alpha = 0.8) +
+    geom_point(data = meeDF, aes(x = exp(mee), y = k), show.legend = FALSE, alpha = 0.8) +
+    coord_cartesian(xlim = c(1/30, 100), ylim = c(1/100, 100)) +
+    scale_x_log10(breaks = orbks, labels = orlabs) +
+    scale_y_log10(breaks = bfbks, labels = bflabs) +
+    scale_color_manual(values = cols) +
+    labs(x = "Odds ratio", y = "Bayes factor",
+         color = "Computational method", linetype = "Computational method") +
+    theme_bw() +
+    theme(panel.grid.minor = element_blank(),
+          panel.grid.major = element_line(linetype = "dotted"),
+          legend.position = c(0.85, 0.075))
 @
 \caption{Multiple logistic regression BFF analysis of 2992 births with 17
   neonatal deaths from \citet{Neutra1978} as reanalyzed and shared by
@@ -2380,42 +2406,46 @@ the MLEs, while the MEE from the MCMC and INLA analyses correspond to the
 integrated MLEs. The MCMC analysis took the longest of the three (several
 minutes to run), followed by the INLA analysis (about a second to run), followed
 by the univariate analysis (almost instantaneous). We can also see that the MCMC
-and INLA methods can have inaccuracies in the tails of the BFF as these
-represent regions where the posterior density is nearly zero. Finally, the
-univariate normal analysis agrees well with the MCMC and INLA analyses in most
-cases, with a few exceptions where the BFFs are skewed (e.g., for the
-`Hydramnios' variable).
+and INLA methods can have inaccuracies or cannot be computed in the tails of the
+BFF as these represent regions where the posterior density is nearly zero.
+Finally, the univariate normal analysis agrees well with the MCMC and INLA
+analyses in most cases, with a few exceptions where the BFFs are skewed (e.g.,
+for the `Hydramnios' variable).
 
 Due to the sparse nature of the data, most of the BFFs are undiagnostic about
 whether or not the variables exhibit harmful or beneficial associations with
-neonatal death. For example, the BFF for the variable `Early age' (top middle
+neonatal death. For example, the BFF for the variable `Early age' (top left
 panel) has its mode at
-$\widehat{\text{OR}}_{\mathrm{ME}} = \Sexpr{round(exp(meesmcmc[coefs == "teenages"]), 1)}$
+$\widehat{\text{OR}}_{\mathrm{ME}} = \Sexpr{round(exp(subset(meeDF, coef == "Early age" & method == "MCMC")["mee"]), 1)}$
 indicating a slightly harmful association between early age pregnancy and
 neonatal death, yet this parameter value receives only anecdotal support over
-the alternative ($\kME = \Sexpr{round(kmcmc[coefs == "teenages"], 1)}$) and the
-corresponding $k = 1$ support interval spans the range from beneficial
-($\text{OR} = 1/\Sexpr{round(1/exp(lowerSI), 1)}$) up to harmful associations
-($\text{OR} = \Sexpr{round(exp(upperSI), 1)}$).
+the alternative
+($\kME = \Sexpr{round(subset(meeDF, coef == "Early age" & method == "MCMC")["k"], 1)}$)
+and the corresponding $k = 1$ support interval spans the range from beneficial
+($\text{OR} = 1/\Sexpr{round(1/exp(subset(meeDF, coef == "Early age" & method == "MCMC")["lowerSI"]), 1)}$)
+up to harmful associations
+($\text{OR} = \Sexpr{round(exp(subset(meeDF, coef == "Early age" & method == "MCMC")["upperSI"]), 1)}$).
 
 For most variables, the BFFs indicate that strongly harmful ($\text{OR} > 10$)
 associations are disfavoured by the data. However, the variables `Gestational
 age', `Hydramnios', `Twin, triplet`, and `Malpresented' are notable exceptions.
 In each case, the BFFs suggest small up to very harmful associations with
 neonatal death. The most extreme among them is `Hydramnios' for which an MEE of
-$\widehat{\text{OR}}_{\mathrm{ME}} = \Sexpr{round(exp(meesmcmc[coefs == "hydram"]), 1)}$
+$\widehat{\text{OR}}_{\mathrm{ME}} = \Sexpr{round(exp(subset(meeDF, coef == "Hydramnios" & method == "MCMC")["mee"]), 1)}$
+($k = 1$ support interval from
+$\Sexpr{round(exp(subset(meeDF, coef == "Hydramnios" & method == "MCMC")["lowerSI"]), 1)}$
+to
+$\Sexpr{round(exp(subset(meeDF, coef == "Hydramnios" & method == "MCMC")["upperSI"]), 1)}$)
 is obtained. Due to the marginalization over the nuisance parameters, this
 estimate is somewhat smaller than the maximum likelihood estimate
-$\widehat{\text{OR}}_{\mathrm{ML}} = \Sexpr{round(exp(glmest[coefs == "hydram"]), 1)}$,
-but still unrealistically large ($k = 1$ support interval from
-$\Sexpr{round(exp(lowerSIhyd), 1)}$ to $\Sexpr{round(exp(upperSIhyd), 1)}$).
-This extreme inflation reflects the fact that only one death was observed with
-hydramnios during pregnancy. The example illustrates that just as non-Bayesian
-methods, BFFs, support intervals, and MEEs can suffer from small-data artifacts.
-These could be avoided with a posterior distribution based on a weakly
-informative prior that shrinks the posterior toward more realistic values
-\citep{Greenland2006}, with the caveat that a poorly chosen prior may also mask
-genuine signals from the data.
+$\widehat{\text{OR}}_{\mathrm{ML}} = \Sexpr{round(exp(subset(meeDF, coef == "Hydramnios" & method == "Univariate normal")["mee"]), 1)}$,
+but still unrealistically large. This extreme inflation reflects the fact that
+only one death was observed with hydramnios during pregnancy. The example
+illustrates that just as non-Bayesian methods, BFFs, support intervals, and MEEs
+can suffer from small-data artifacts. These could be avoided with a posterior
+distribution based on a weakly informative prior that shrinks the posterior
+toward more realistic values \citep{Greenland2006}, with the caveat that a
+poorly chosen prior may also mask genuine signals from the data.
 
 \section{Discussion}
 \label{sec:discussion}
@@ -2425,11 +2455,13 @@ linked these ideas to the overarching concept of Bayes factor functions (BFFs),
 which are Bayes factor analogues of \textit{P}-value functions, and are likewise
 particularly useful for reporting of analysis results. This provides data
 analysts with a unified framework for statistical inference that is distinct
-from conventional frequentist and Bayesian approaches: BFF inference uses the
-Bayesian evidence calculus, but without synthesizing data and prior. At the same
-time, BFF inference is closely related to likelihood-based inference, but also
-includes a natural way to deal with nuisance parameters.
-
+from conventional frequentist and Bayesian approaches: While a \textit{P}-value
+function can only quantify against the parameter values \citep{Greenland2023},
+BFFs allow us to quantify evidence \emph{in favour} of parameter values over the
+alternative. As ordinary Bayesian inference, BFF inference uses the Bayesian
+evidence calculus, but without synthesizing data and prior. BFF inference is
+also closely related to likelihood-based inference, but includes a natural way
+to deal with nuisance parameters.
 
 Like the likelihoodist and Neyman-Pearson paradigms of statistical inference,
 BFF inference requires the formulation of alternative hypotheses. For this
@@ -2460,9 +2492,13 @@ more efficient techniques for computing BFFs in such settings.
 Bayesian, likelihoodist, or predictive reasoning may all motivate the Bayes
 factor as a natural tool for quantifying the relative evidence or support of
 competing hypotheses. Nevertheless, neither the Bayes factor nor any other
-measure of statistical evidence is infallible or suitable for all purposes. Any
-type of statistical inference can lead to distorted scientific inferences when
-used in a bright-line fashion without consideration of contextual factors
+measure of statistical evidence is infallible or suitable for all purposes. For
+example, Bayes factors by construction do not take into account the prior
+probabilities of their contrasted hypotheses, so they may indicate strong
+support for a hypothesis even though this hypothesis would still remain unlikely
+when combined with its prior probability \citep{Lavine1999, Good2001}. Any type
+of statistical inference can lead to distorted scientific inferences if used in
+a bright-line fashion without consideration of contextual factors
 \citep{Goodman2016, Greenland2023}. We believe that BFFs are useful in this
 regard because they shift the focus from finding evidence against a single null
 hypothesis to making gradual and quantitative inferences.
@@ -2471,10 +2507,10 @@ hypothesis to making gradual and quantitative inferences.
 \section*{Acknowledgments}
 We thank \citet{Sullivan2012} for openly sharing the data from
 \citet{Neutra1978}. We thank \citet{Bartos2023} for openly sharing their data.
-We thank František Bartoš, Andrew Fowlie, Małgorzata Roos, Leonhard Held, and
-Eric-Jan Wagenmakers for valuable comments on drafts of the manuscript. The
-acknowledgment of these individuals does not imply their endorsement of the
-paper.
+We thank Andrew Fowlie, Eric-Jan Wagenmakers, František Bartoš, Leonhard Held,
+Małgorzata Roos, and Sander Greenland for valuable comments on drafts of the
+manuscript. The acknowledgment of these individuals does not imply their
+endorsement of the paper.
 
 \section*{Conflict of interest}
 We declare no conflict of interest.
@@ -2489,7 +2525,7 @@ at the time of writing is available
 at \url{https://zenodo.org/doi/10.5281/zenodo.TODOADD}. We used the statistical
 programming language \Sexpr{R.Version()[["version.string"]]} for analyses
 \citep{R} along with the \texttt{brms} \citep{Burkner2021} and \texttt{INLA}
-\citep{Rue2009} packages for posterior estimation.
+\citep{Rue2009} packages for the computation of posterior distributions.
 
 
 \bibliographystyle{apalikedoiurl}
