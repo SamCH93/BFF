@@ -52,3 +52,5 @@ old/
 cache/
 figure/
 .auctex-auto/
+misc/
+data/bglm1.RData

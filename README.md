@@ -1,11 +1,23 @@
-# A Bayes Factor Framework for Unified Parameter Estimation and Hypothesis Testing
+## A Bayes Factor Framework for Unified Parameter Estimation and Hypothesis Testing
 
 This repository contains code and data related to the working paper
 
   Pawel, S. (2024). A Bayes Factor Framework for Unified Parameter Estimation
-  and Hypothesis Testing.
+  and Hypothesis Testing. <https://github.com/SamCH93/BFF>
+  
+A BibTeX entry is given by
 
-## Reproducibility
+```BibTeX
+@article{Pawel2024,
+  year = {2024},
+  author = {Samuel Pawel},
+  title = {A Bayes Factor Framework for Unified Parameter Estimation and Hypothesis Testing},
+  url = {https://github.com/SamCH93/BFF},
+  note = {Working paper}
+}
+```
+
+### Reproducibility
 
 Our results can be reproduced by
 
