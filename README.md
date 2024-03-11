@@ -11,7 +11,7 @@ A BibTeX entry is given by
 @article{Pawel2024,
   year = {2024},
   author = {Samuel Pawel},
-  title = {A Bayes Factor Framework for Unified Parameter Estimation and Hypothesis Testing},
+  title = {A {Bayes} Factor Framework for Unified Parameter Estimation and Hypothesis Testing},
   url = {https://github.com/SamCH93/BFF},
   note = {Working paper}
 }

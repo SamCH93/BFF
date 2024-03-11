@@ -158,7 +158,7 @@ and confidence intervals \citep[among others]{Greenland2016, Infanger2019,
   Rafi2020, Marschner2024}.
 
 
-\begin{figure}
+\begin{figure}[!htb]
 << "pFun-and-BFFun", echo = FALSE, fig.height = 3.25, fig.align = "center" >>=
 ## Create cartoon that shows p-value function and Bayes factor function
 par("mar" = c(2.75, 3.5, 1.5, 0.5), mfrow = c(1, 2))
@@ -275,10 +275,11 @@ being true (e.g., the posterior of a treatment effect, assuming the effect is
 indeed present), which can lead to contradictory conclusions with the Bayes
 factor \citep[for examples, see][]{Stone1997, Wagenmakers2020}, or they can
 assign prior probabilities to the tested hypotheses and report a posterior
-averaged over both hypotheses \citep{Campbell2022}, but this requires
-specification of prior probabilities which is highly controversial and the
-reason why the Bayes factor was reported in the first place rather than the
-posterior probabilities of the hypotheses.
+averaged over both hypotheses \citep[known as Bayesian model averaging, see
+e.g.,][]{Hoeting1999,Campbell2022}, but this requires specification of prior
+probabilities which is highly controversial and the reason why the Bayes factor
+was reported in the first place rather than the posterior probabilities of the
+hypotheses.
 
 Our goal is therefore to propose a unifying framework for estimation and
 hypothesis testing based on Bayes factors, building on ideas already hinted at
@@ -383,11 +384,11 @@ we discuss in the following.
 
 
 \subsection{Support sets}
-The BFF can be used to obtain \emph{support sets} \citep{Wagenmakers2020,
-  Pawel2023} which are set-valued estimates for $\theta$ based on inverting the
-Bayes factor~\eqref{eq:bf01} similar to how \textit{P}-value functions are
-inverted to obtain confidence sets. Specifically, a support set at support
-level~$k > 0$ is defined by
+The BFF can be used to obtain \emph{support sets} \citep{Wagenmakers2020} which
+are set-valued estimates for $\theta$ based on inverting the Bayes
+factor~\eqref{eq:bf01} similar to how \textit{P}-value functions are inverted to
+obtain confidence sets. Specifically, a support set at support level~$k > 0$ is
+defined by
 \begin{align*}
     S_k = \left\{\theta_0 : \BF_{01}(y;\theta_0) \geq k\right\}
 \end{align*}
@@ -539,7 +540,7 @@ Table~\ref{tab:normalinference}.
 
 \begingroup
 \renewcommand{\arraystretch}{2.25}
-\begin{table}[!bt]
+\begin{table}[!b]
   \centering
   \caption{Bayes factor function $\BF_{01}$, maximum evidence estimate
     $\thatME$, evidence value $\kME$, and $k$ support interval (SI) for a normal
@@ -587,53 +588,7 @@ wide range from $\Sexpr{round(sis[1,1], 2)}$ to $\Sexpr{round(sis[1,2], 2)}$,
 indicating that very beneficial up to slightly harmful treatment effects are
 supported by the data over the alternative.
 
-The formulae in Table~\ref{tab:normalinference} (left column) show that as the
-prior mean $m$ becomes closer to the observed data $y$, the evidence level
-$\kME$ decreases and the support interval becomes narrower. This is because an
-alternative closer to the data clearly has better predictive accuracy of the
-data than an alternative further away, and thus fewer point null hypotheses can
-outpredict it. Figure~\ref{fig:normal} illustrates this phenomenon with another
-prior distributions (one with mean at the observed log hazard ratio
-$y = \Sexpr{round(y, 2)}$, the blue BFF). The BFF has its mode still at the
-observed log hazard ratio estimate but shows a far narrower $k = 1$ support
-interval from $\Sexpr{round(sis[2,1], 2)}$ to $\Sexpr{round(sis[2,2], 2)}$ than
-the orange BFF with the mean $m = \Sexpr{round(m, 2)}$ based on the eight
-previous trials.
-
-% Compared to the prior mean $m$, the effect of the prior variance $v$ on the
-% resulting inference is more nuanced: Increasing $v$ will initially increase
-% $\kME$ and decrease the width of the support interval, but at a certain point it
-% will decrease $\kME$ and increase the width of the support interval again. In
-% the limit -- when a completely diffuse prior is chosen ($v \to \infty$) -- the
-% evidence level~$\kME$ goes to infinity and the support interval extends to the
-% entire real number line, indicating that the data contribute overwhelming
-% support for any parameter value over the diffuse alternative. This phenomenon
-% illustrates that for diffuse priors, BFF inferences conflict with posterior
-% inferences based on the conditional posterior obtained by updating the diffuse
-% prior, thus representing the well-known Jeffreys-Lindley paradox from a
-% different perspective \citep{Robert2014, Wagenmakers2021a}.
-
-% From~\eqref{eq:kfe} we see that the evidence value $\kME$ monotonically
-% increases as the absolute difference between the MEE $\hat{\mu}_{\mathrm{ME}}$
-% and the prior mean $m$ increases. Similarly, the width of the support
-% interval~\eqref{eq:sifixed} increases with increasing difference between
-% $\hat{\mu}_{\mathrm{ME}}$ and $m$. In contrast, the prior variance $v$ is
-% non-monotonically related to $\kME$ and the width of the support interval:
-% Depending on the difference between the prior mean $m$ and the MEE
-% $\hat{\mu}_{\mathrm{ME}}$, the evidence level~$\kME$ and the width of the
-% support interval will first decrease but then increase again with increasing
-% prior variance $v$. On the one side of the extremes -- when a point prior is
-% chosen at the observed MEE ($m = \that$ and $v \downarrow 0$) under $H_1$ -- the
-% data contribute no new evidence about $\mu$ and the evidence level is therefore
-% $\kME =1$ and the support interval is equal to the usual relative likelihood
-% interval $\hat{\mu}_{\mathrm{ME}} \pm \sigma \sqrt{-2\log k}$ \citep[see
-% e.g.,][]{Royall1997}. On the other side of the extremes -- when a completely
-% diffuse prior is chosen ($v \to \infty$) -- the evidence level~$\kME$ goes to
-% infinity and the support interval extends to the entire real number line,
-% indicating that the data contribute overwhelming new evidence about $\mu$.
-
-
-\begin{figure}[!tb]
+\begin{figure}[!htb]
 << "normal-mean-example", fig.height = 4 >>=
 colors <- palette.colors(n = 5, palette = "Okabe-Ito", alpha = 0.9)[2:5]
 bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
@@ -697,6 +652,51 @@ text(x = min(t0seq), y = c(2, 1/2),
   $Y \mid \theta \sim \Nor(\theta, \sigma^{2}_{i})$ is assumed for the data.}
 \label{fig:normal}
 \end{figure}
+
+The formulae in Table~\ref{tab:normalinference} (left column) show that as the
+prior mean $m$ becomes closer to the observed data $y$, the evidence level
+$\kME$ decreases and the support interval becomes narrower. This is because an
+alternative closer to the data clearly has better predictive accuracy of the
+data than an alternative further away, and thus fewer point null hypotheses can
+outpredict it. Figure~\ref{fig:normal} illustrates this phenomenon with another
+prior distributions (one with mean at the observed log hazard ratio
+$y = \Sexpr{round(y, 2)}$, the blue BFF). The BFF has its mode still at the
+observed log hazard ratio estimate but shows a far narrower $k = 1$ support
+interval from $\Sexpr{round(sis[2,1], 2)}$ to $\Sexpr{round(sis[2,2], 2)}$ than
+the orange BFF with the mean $m = \Sexpr{round(m, 2)}$ based on the eight
+previous trials.
+
+% Compared to the prior mean $m$, the effect of the prior variance $v$ on the
+% resulting inference is more nuanced: Increasing $v$ will initially increase
+% $\kME$ and decrease the width of the support interval, but at a certain point it
+% will decrease $\kME$ and increase the width of the support interval again. In
+% the limit -- when a completely diffuse prior is chosen ($v \to \infty$) -- the
+% evidence level~$\kME$ goes to infinity and the support interval extends to the
+% entire real number line, indicating that the data contribute overwhelming
+% support for any parameter value over the diffuse alternative. This phenomenon
+% illustrates that for diffuse priors, BFF inferences conflict with posterior
+% inferences based on the conditional posterior obtained by updating the diffuse
+% prior, thus representing the well-known Jeffreys-Lindley paradox from a
+% different perspective \citep{Robert2014, Wagenmakers2021a}.
+
+% From~\eqref{eq:kfe} we see that the evidence value $\kME$ monotonically
+% increases as the absolute difference between the MEE $\hat{\mu}_{\mathrm{ME}}$
+% and the prior mean $m$ increases. Similarly, the width of the support
+% interval~\eqref{eq:sifixed} increases with increasing difference between
+% $\hat{\mu}_{\mathrm{ME}}$ and $m$. In contrast, the prior variance $v$ is
+% non-monotonically related to $\kME$ and the width of the support interval:
+% Depending on the difference between the prior mean $m$ and the MEE
+% $\hat{\mu}_{\mathrm{ME}}$, the evidence level~$\kME$ and the width of the
+% support interval will first decrease but then increase again with increasing
+% prior variance $v$. On the one side of the extremes -- when a point prior is
+% chosen at the observed MEE ($m = \that$ and $v \downarrow 0$) under $H_1$ -- the
+% data contribute no new evidence about $\mu$ and the evidence level is therefore
+% $\kME =1$ and the support interval is equal to the usual relative likelihood
+% interval $\hat{\mu}_{\mathrm{ME}} \pm \sigma \sqrt{-2\log k}$ \citep[see
+% e.g.,][]{Royall1997}. On the other side of the extremes -- when a completely
+% diffuse prior is chosen ($v \to \infty$) -- the evidence level~$\kME$ goes to
+% infinity and the support interval extends to the entire real number line,
+% indicating that the data contribute overwhelming new evidence about $\mu$.
 
 Another approach to formulating a prior distribution for $\theta$ under the
 alternative commonly suggested in `objective' Bayes theories is to center the
@@ -877,7 +877,7 @@ infinity, depending on the orientation of the Bayes factor \citep[see
 e.g.,][]{Kass1992, Gelfand1994, Dawid2011}. Since the BFF is nothing else than
 the Bayes factor evaluated for various null hypotheses, this consistency
 property carries over to the BFF. That is, as more data are generated from the
-model with true parameter $\theta_{*}$, the BFF at $\theta_{0} = \theta_{*}$
+true model with parameter $\theta_{*}$, the BFF at $\theta_{0} = \theta_{*}$
 will go to infinity, while the BFF at $\theta_{0} \neq \theta_{*}$ will go to
 zero.
 
@@ -1408,7 +1408,7 @@ $a = \Sexpr{a}, b = \Sexpr{b}, l = \Sexpr{l}, u = \Sexpr{u}$ to instantiate an
 alternative hypothesis that closely aligns with the theoretical prediction from
 \citet{Diaconis2007} of a 0.51 probability with slight uncertainty around it.
 
-\begin{figure}[!tb]
+\begin{figure}[!htb]
 << "Bartos-analysis", fig.height = 4 >>=
 ## BFF for binomial proportion based on truncated beta prior under the alternative
 BFFbinomial <- function(p, y, n, a, b, l = 0.5, u = 1, log = FALSE) {
@@ -1837,6 +1837,23 @@ and $k$ support interval
   \frac{(y_{r} - y_{0})^{2}}{\sigma^{2}_{r} + \sigma^{2}_{o}} - \log k^{2}}.
 \end{align*}
 
+We will now demonstrate application of the replication BFF by reanalyzing data
+from three replication studies that were part of the large-scale replication
+project in the social-behavioral sciences \citep{Protzko2023}. The original
+experiment termed ``Labels'' found the following central result:
+\begin{quote}
+  ``\emph{When a researcher uses a label to describe people who hold a certain
+    opinion, he or she is interpreted as disagreeing with that opinion when a
+    negative label is used and agreeing with that opinion when a positive label
+    is used.}'' \citet[p. 312]{Protzko2023}
+\end{quote}
+which was based on an estimated standardized mean difference
+$y_{o} = \Sexpr{yo}$ with standard error $\sigma_{o} = \Sexpr{round(so, 3)}$.
+The replication studies conducted in three other labs found a smaller, a
+similar, and a much larger effect estimate ($y_{ri} \in \{\Sexpr{yr[lab]}\}$
+with standard errors $\sigma_{ri} \in \{\Sexpr{round(sr, 3)[lab]}\}$,
+respectively).
+
 \begin{figure}[!tb]
 << "replication-analysis", fig.height = 6.5 >>=
 
@@ -1942,22 +1959,8 @@ legend("topright", lty = 2, col = 1,
 \label{fig:replication}
 \end{figure}
 
-We will now demonstrate application of the replication BFF by reanalyzing data
-from three replication studies that were part of the large-scale replication
-project in the social-behavioral sciences \citep{Protzko2023}. The original
-experiment termed ``Labels'' found the following central result:
-\begin{quote}
-  ``\emph{When a researcher uses a label to describe people who hold a certain
-    opinion, he or she is interpreted as disagreeing with that opinion when a
-    negative label is used and agreeing with that opinion when a positive label
-    is used.}'' \citet[p. 312]{Protzko2023}
-\end{quote}
-which was based on an estimated standardized mean difference
-$y_{o} = \Sexpr{yo}$ with standard error $\sigma_{o} = \Sexpr{round(so, 3)}$.
-The replication studies conducted in three other labs found a smaller, a
-similar, and a much larger effect estimate ($y_{ri} \in \{\Sexpr{yr[lab]}\}$
-with standard errors $\sigma_{ri} \in \{\Sexpr{round(sr, 3)[lab]}\}$,
-respectively). The top plot in Figure~\ref{fig:replication} shows the associated
+
+The top plot in Figure~\ref{fig:replication} shows the associated
 BFFs, MEEs, and $k=1$ support intervals. We see that, the BFFs peak at the
 corresponding replication estimate, but the height of these peaks differs
 between replications. The replication from lab 2 produced an effect estimate
