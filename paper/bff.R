@@ -171,31 +171,6 @@ text(x = min(t0seq), y = c(2, 1/2),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
 
-## ## analytical
-## bf1 <- function(t0) {
-##     sqrt(1 + v/se2)*exp(-0.5*((t0 - y - delta*se2/v)^2/se2/(1 + se2/v) - delta^2/v))
-## }
-## ## should be the same as
-## bf2 <- function(t0) {
-##     dnorm(x = y, mean = t0, sd = sqrt(se2))/
-##         dnorm(x = y, mean = t0 + delta, sd = sqrt(se2 + v))
-## }
-
-## plot(t0seq, bf2(t0seq), type = "l")
-## abline(v = y, lty = 2)
-## lines(t0seq, bf1(t0seq), col = 2, lty = 2)
-
-## ## LR weirdo case
-## v <- 0
-## k <- 3 ## support interval k = 3
-## plot(t0seq, bf2(t0seq), type = "l")
-## lines(t0seq, exp((-delta*(y - t0seq) + delta^2*0.5)/se2), col = 2, lty = 2)
-## abline(v = se2*log(k)/delta - 0.5*delta + y, lty = 3)
-
-## t0 <- 3
-## (y - t0)^2 - (y - t0 - delta)^2
-## 2*delta*(y - t0) - delta^2
-
 
 ## ----"distribution-k"---------------------------------------------------------
 ## ## generate data under H1, what is the distribution of k?
@@ -313,125 +288,6 @@ text(x = min(t0seq), y = c(2.5, 1/2.5),
      labels = c(expression("Support for" ~ theta),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
-
-
-## ----eval = FALSE-------------------------------------------------------------
-## ## ## simulate BFFs
-## ## set.seed(44)
-## ## kappa <- 2
-## ## m <- 0.5
-## ## v <- 4
-## ## n <- 50
-## ## t0seq <- seq(-0.5, 0.75, length.out = 200)
-## ## tstar <- 0.2 # true value
-## ## bff <- function(t0, y, kappa, n, m, v) {
-## ##     sqrt(1 + v*n/kappa^2)*
-## ##         exp(-0.5*((y - t0)^2*n/kappa^2 - (y - m)^2/(kappa^2/n + v)))
-## ## }
-## ## y <- rnorm(n = 10000, mean = tstar, sd = kappa/sqrt(n))
-## ## bffs <- sapply(X = y, FUN = function(y) {
-## ##     bff(t0 = t0seq, y = y, kappa = kappa, n = n, m = m, v = v)
-## ## })
-## ## col <- adjustcolor(col = "black", alpha.f = 0.005)
-## ## matplot(x = t0seq, y = log(bffs), type = "l", col = col, lty = 1)
-## ## lines(x = t0seq, y = rowMeans(log(bffs)))
-## ## abline(v = tstar, lty = 2, col = 2)
-## ## lines(t0seq, y = log(bff(t0seq, y = tstar, kappa, n, m, v)),
-## ##       lty = 2, col = 4)
-## 
-## ## CDF of the BF
-## bff <- function(t0, y, kappa, n, m, v) {
-##     sqrt(1 + v*n/kappa^2)*
-##         exp(-0.5*((y - t0)^2*n/kappa^2 - (y - m)^2/(kappa^2/n + v)))
-## }
-## kappa <- 4
-## m <- -0.5
-## v <- 3
-## n <- 1000
-## t0 <- -0.5
-## tstar <- -0.5
-## y <- rnorm(n = 10000000, mean = tstar, sd = kappa/sqrt(n))
-## bf <- bff(t0, y, kappa, n, m, v)
-## 
-## lbf2x <- function(lbf, t0, kappa, n, m, v) {
-##     (-2*lbf + log(1 + n*v/kappa^2) + (t0 - m)^2/v)*(1 + kappa^2/v/n)
-## }
-## x2lbf <- function(x, t0, kappa, n, m, v) {
-##     -0.5*(x/(1 + kappa^2/v/n)) - log(1 + n*v/kappa^2) - (t0 - m)^2/v
-## }
-## 
-## pbf. <- function(q, t0, kappa, n, m, v, tstar) {
-##     lambda <- (tstar - (t0 - m)*kappa^2/n/v - t0)^2*n/kappa^2
-##     A <- log(1 + n*v/kappa^2) + (t0 - m)^2/v - 2*log(q)
-##     if (A <= 0) p <- 1
-##     else {
-##         p <- pchisq(q = A*(1 + kappa^2/v/n), df = 1,
-##                     ncp = lambda, lower.tail = FALSE)
-##     }
-##     return(p)
-## }
-## pbf <- Vectorize(FUN = pbf.)
-## 
-## qseq <- exp(seq(log(1/1000), log(100000), length.out = 200))
-## plot(qseq, pbf(q = qseq, t0, kappa, n, m, v, tstar), type = "l", log = "x",
-##      ylim = c(0, 1))
-## lines(qseq, ecdf(bf)(qseq), lty = 2, col = 2)
-## 
-## ## ## verify results
-## ## A <- n/kappa^2
-## ## B <- -1/(kappa^2/n + v)
-## ## a <- t0
-## ## b <- m
-## ## C <- A + B
-## ## y <- 0.3
-## ## ## C == v*n/kappa^2/(kappa^2/n + v)
-## ## c <- (A*a + B*b)/C
-## ## c == (n*t0*(kappa^2/n + v) - m*kappa^2)/v/n
-## ## kappa^2/n/v*(t0 - m) + t0
-## ## A*B/C == -1/v
-## ## A*(y - a)^2 + B*(y - b)^2
-## ## (y - kappa^2/n/v*(t0 - m) - t0)^2*v*n/kappa^2/(kappa^2/n + v) - (t0 - m)^2/v
-## 
-## ## log(dnorm(y, t0, kappa/sqrt(n))/dnorm(y, m, sqrt(v + kappa^2/n)))
-## 
-## ## 0.5*(log(1 + n*v/kappa^2) -
-## ##      (y - (t0 - m)*kappa^2/n/v - t0)^2*v*n/kappa^2/(v + kappa^2/n) +
-## ##      (t0 - m)^2/v)
-## 
-## 
-## ## logbf <- log(dnorm(y, t0, kappa/sqrt(n))/dnorm(y, m, sqrt(v + kappa^2/n)))
-## 
-## ## X <- (y - (t0 - m)*kappa^2/n/v - t0)^2*n/kappa^2
-## ## (-2*logbf + log(1 + n*v/kappa^2) + (t0 - m)^2/v)*(1 + kappa^2/v/n)
-## 
-## ## flogbf <- function(logbf, t0, kappa, n, m, v) {
-## ##     X <- lbf2x(lbf = logbf, t0 = t0, kappa = kappa, n = n, m = m, v = v)
-## ##     lambda <- (tstar - (t0 - m)^2*kappa^2/n/v - t0)^2
-## ##     dchisq(x = X, df = 1, ncp = lambda)*2*(1 + kappa^2/v/n)
-## ## }
-## ## logbfseq <- seq(-10, 10, 0.01)
-## ## plot(logbfseq, flogbf(logbfseq, t0 = t0, kappa = kappa, n = n, m = m, v = v), type = "l")
-
-
-## ----"posterior-BFF-connection", eval = FALSE---------------------------------
-## ## ## verify that posterior BFF correspondonce correct
-## ## m <- 3
-## ## v <- 1
-## ## y <- 2
-## ## se <- 0.1
-## ## vpost <- 1/(1/se^2 + 1/v)
-## ## mpost <- (y/se^2 + m/v)*vpost
-## ## tseq <- seq(0, 5, 0.01)
-## ## bff <- dnorm(x = y, mean = tseq, sd = se)/
-## ##     dnorm(x = y, mean = m, sd = sqrt(se^2 + v))
-## ## posterior <- dnorm(x = tseq, mean = mpost, sd = sqrt(vpost))
-## ## prior <- dnorm(x = tseq, mean = m, sd = sqrt(v))
-## ## par(mfrow = c(1, 2))
-## ## plot(tseq, posterior, type = "l", las = 1, ylab = "posterior density")
-## ## lines(tseq, prior, lty = 2)
-## ## lines(tseq, bff*prior, lty = 2, col = 2)
-## ## plot(tseq, bff, type = "l", ylab = "BFF", las = 1)
-## ## lines(tseq, posterior/prior, lty = 2, col = 2)
 
 
 ## ----"Bartos-data"------------------------------------------------------------
@@ -785,80 +641,23 @@ prior <- paste0("normal(", pm, ", ", psd, ")")
 set.seed(1234)
 nmcmc <- 10000000
 nchain <- 12
-## bglm1 <- brm(death ~ ., data = dat,
-##              prior = c(set_prior("", class = "Intercept"), # flat prior
-##                        set_prior(prior, class = "b", coef = colnames(dat)[-1])),
-##                        iter = nmcmc/nchain, chains = nchain, warmup = 1000, cores = 12,
-##                        seed = 1234, family = "bernoulli")
-## save(bglm1, file = "../data/stanmcmc.RData")
-load(file = "../data/stanmcmc.RData")
+if ("stanmcmc.RData" %in% list.files(path = "../data/")) {
+    load(file = "../data/stanmcmc.RData")
+} else {
+    bglm1 <- brm(death ~ ., data = dat,
+                 prior = c(set_prior("", class = "Intercept"), # flat prior
+                           set_prior(prior, class = "b",
+                                     coef = colnames(dat)[-1])),
+                 iter = nmcmc/nchain, chains = nchain,
+                 warmup = 1000, cores = 12,
+                 seed = 1234, family = "bernoulli")
+    save(bglm1, file = "../data/stanmcmc.RData")
+}
 ## ## MCMC diagnostics
 ## summary(bglm1)
 ## exp(fixef(bglm1))[-1,]
 ## plot(bglm1, N = 15)
 
-## ----"regression-example-mcmc-jags", eval = FALSE-----------------------------
-## ## ## fit with alternative MCMC software (conclusion: stan works better)
-## ## library(runjags)
-## ## jagsmod <- "
-## ## model {
-## ## for(i in 1:n) {
-## ##    death[i] ~ dbern(p[i])
-## ##    logit(p[i]) <- b0 + b_nonwhite*nonwhite[i] + b_teenages*teenages[i] +
-## ##                   b_nullip*nullip[i] + b_gestage*gestage[i] +
-## ##                   b_isoimm*isoimm[i] +  b_abort*abort[i] + b_hydram*hydram[i] +
-## ##                   b_dyslab*dyslab[i] + b_placord*placord[i] + b_nomonit*nomonit[i] +
-## ##                   b_twint*twint[i] + b_ward*ward[i] + b_prerupt*prerupt[i] +
-## ##                   b_malpres*malpres[i]
-## ## }
-## 
-## ## ## priors
-## ## b0 ~ dnorm(0, 0.0001)
-## ## b_nonwhite ~ dnorm(priormean, priorprec)
-## ## b_teenages ~ dnorm(priormean, priorprec)
-## ## b_nullip ~ dnorm(priormean, priorprec)
-## ## b_gestage ~ dnorm(priormean, priorprec)
-## ## b_isoimm ~ dnorm(priormean, priorprec)
-## ## b_abort ~ dnorm(priormean, priorprec)
-## ## b_hydram ~ dnorm(priormean, priorprec)
-## ## b_dyslab ~ dnorm(priormean, priorprec)
-## ## b_placord ~ dnorm(priormean, priorprec)
-## ## b_nomonit ~ dnorm(priormean, priorprec)
-## ## b_twint ~ dnorm(priormean, priorprec)
-## ## b_ward ~ dnorm(priormean, priorprec)
-## ## b_prerupt ~ dnorm(priormean, priorprec)
-## ## b_malpres ~ dnorm(priormean, priorprec)
-## ## }
-## ## "
-## ## jagsdat <- lapply(dat, function(x) x)
-## ## jagsdat[["n"]] <- nrow(dat)
-## ## jagsdat[["priormean"]] <- 0
-## ## jagsdat[["priorprec"]] <- 2
-## 
-## ## set.seed(42)
-## ## nmcmc2 <- 1000000
-## ## nchains <- 8
-## ## jagsfit <- run.jags(model = jagsmod, data = jagsdat,
-## ##                     monitor = c("b_nonwhite", "b_teenages", "b_nullip",
-## ##                                 "b_gestage", "b_isoimm", "b_abort", "b_hydram",
-## ##                                 "b_dyslab", "b_placord", "b_nomonit", "b_twint",
-## ##                                 "b_ward", "b_prerupt", "b_malpres", "b0"),
-## ##                     adapt = 1000,
-## ##                     burnin = 5000, sample = nmcmc2/nchains, n.chains = nchains,
-## ##                     method = "parallel")
-## ## save(jagsfit, file = "../data/jagsmcmc.RData")
-## ## load(file = "../data/jagsmcmc.RData")
-
-## ----"regression-example-mcmcpack", eval = FALSE------------------------------
-## ## ## fit with alternative MCMC software (conclusion: stan works better)
-## ## library(MCMCpack)
-## ## nmcmc3 <- 1000000
-## ## model <- death ~ 1 + nonwhite + teenages + nullip + gestage + isoimm + abort +
-## ##     hydram + dyslab + placord + nomonit + twint + ward + prerupt + malpres
-## ## mcmcpackfit  <- MCMClogit(formula = model, data = dat, seed = 1002, b0 = 0, B0 = 2,
-## ##                           mcmc = nmcmc3, verbose = TRUE)
-## ## save(mcmcpackfit, file = "../data/mcmcpack.RData")
-## ## load(file = "../data/mcmcpack.RData")
 
 ## ----"regression-example-inla", cache = TRUE----------------------------------
 ## define priors for INLA
@@ -875,6 +674,7 @@ model <- death ~ 1 + nonwhite + teenages + nullip + gestage + isoimm + abort +
     hydram + dyslab + placord + nomonit + twint + ward + prerupt + malpres
 bglm2 <- inla(formula = model, data = dat, family = "binomial",
               control.fixed = list(mean = pmeans, prec = pprec))
+
 
 ## ----"regression-analysis", fig.height = 9, fig.width = 8, cache = TRUE-------
 coefs <- c("Non-White" = "nonwhite",
@@ -981,7 +781,6 @@ bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
 orbks <- c(bfbks, 1/30, 1/3, 3, 30)
 orlabs <- c(bflabs, "1/30", "1/3", "3", "30")
-## bffDF$bff[which(bffDF$bff == 0)] <- NA
 ggplot(data = bffDF, aes(x = exp(logOR), y = bff, color = method)) +
     facet_wrap(~ coef, ncol = 3) +
     geom_hline(yintercept = 1, col = 1, linetype = "dashed", alpha = 0.1) +

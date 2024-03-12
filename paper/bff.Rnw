@@ -618,31 +618,6 @@ text(x = min(t0seq), y = c(2, 1/2),
      labels = c(expression("Support for" ~ theta),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
-
-## ## analytical
-## bf1 <- function(t0) {
-##     sqrt(1 + v/se2)*exp(-0.5*((t0 - y - delta*se2/v)^2/se2/(1 + se2/v) - delta^2/v))
-## }
-## ## should be the same as
-## bf2 <- function(t0) {
-##     dnorm(x = y, mean = t0, sd = sqrt(se2))/
-##         dnorm(x = y, mean = t0 + delta, sd = sqrt(se2 + v))
-## }
-
-## plot(t0seq, bf2(t0seq), type = "l")
-## abline(v = y, lty = 2)
-## lines(t0seq, bf1(t0seq), col = 2, lty = 2)
-
-## ## LR weirdo case
-## v <- 0
-## k <- 3 ## support interval k = 3
-## plot(t0seq, bf2(t0seq), type = "l")
-## lines(t0seq, exp((-delta*(y - t0seq) + delta^2*0.5)/se2), col = 2, lty = 2)
-## abline(v = se2*log(k)/delta - 0.5*delta + y, lty = 3)
-
-## t0 <- 3
-## (y - t0)^2 - (y - t0 - delta)^2
-## 2*delta*(y - t0) - delta^2
 @
 \caption{Bayes factor function, MEE, and $k = \Sexpr{k}$ support interval for a
   log hazard ratio $\theta$ based on estimated log hazard ratio
@@ -665,38 +640,6 @@ observed log hazard ratio estimate but shows a far narrower $k = 1$ support
 interval from $\Sexpr{round(sis[2,1], 2)}$ to $\Sexpr{round(sis[2,2], 2)}$ than
 the orange BFF with the mean $m = \Sexpr{round(m, 2)}$ based on the eight
 previous trials.
-
-% Compared to the prior mean $m$, the effect of the prior variance $v$ on the
-% resulting inference is more nuanced: Increasing $v$ will initially increase
-% $\kME$ and decrease the width of the support interval, but at a certain point it
-% will decrease $\kME$ and increase the width of the support interval again. In
-% the limit -- when a completely diffuse prior is chosen ($v \to \infty$) -- the
-% evidence level~$\kME$ goes to infinity and the support interval extends to the
-% entire real number line, indicating that the data contribute overwhelming
-% support for any parameter value over the diffuse alternative. This phenomenon
-% illustrates that for diffuse priors, BFF inferences conflict with posterior
-% inferences based on the conditional posterior obtained by updating the diffuse
-% prior, thus representing the well-known Jeffreys-Lindley paradox from a
-% different perspective \citep{Robert2014, Wagenmakers2021a}.
-
-% From~\eqref{eq:kfe} we see that the evidence value $\kME$ monotonically
-% increases as the absolute difference between the MEE $\hat{\mu}_{\mathrm{ME}}$
-% and the prior mean $m$ increases. Similarly, the width of the support
-% interval~\eqref{eq:sifixed} increases with increasing difference between
-% $\hat{\mu}_{\mathrm{ME}}$ and $m$. In contrast, the prior variance $v$ is
-% non-monotonically related to $\kME$ and the width of the support interval:
-% Depending on the difference between the prior mean $m$ and the MEE
-% $\hat{\mu}_{\mathrm{ME}}$, the evidence level~$\kME$ and the width of the
-% support interval will first decrease but then increase again with increasing
-% prior variance $v$. On the one side of the extremes -- when a point prior is
-% chosen at the observed MEE ($m = \that$ and $v \downarrow 0$) under $H_1$ -- the
-% data contribute no new evidence about $\mu$ and the evidence level is therefore
-% $\kME =1$ and the support interval is equal to the usual relative likelihood
-% interval $\hat{\mu}_{\mathrm{ME}} \pm \sigma \sqrt{-2\log k}$ \citep[see
-% e.g.,][]{Royall1997}. On the other side of the extremes -- when a completely
-% diffuse prior is chosen ($v \to \infty$) -- the evidence level~$\kME$ goes to
-% infinity and the support interval extends to the entire real number line,
-% indicating that the data contribute overwhelming new evidence about $\mu$.
 
 Another approach to formulating a prior distribution for $\theta$ under the
 alternative commonly suggested in `objective' Bayes theories is to center the
@@ -731,37 +674,6 @@ its evidence level do not exist, while the support interval still exists but its
 right limit extends to infinity. Although such a prior seems unrealistic, the
 example demonstrates that a poorly chosen prior can lead to pathological
 behavior of the resulting BFF.
-
-% the evidence level and support interval turn out to be
-% \begin{align}
-%     \kME =\sqrt{1 + \frac{v}{\sigma^2}} \, \exp\left\{\frac{(\hat{\mu}_{\mathrm{ME}} - m)^2}{2(\sigma^2 + v)}\right\}
-%     \label{eq:kfe}
-% \end{align}
-% and
-% \begin{align}
-%     \hat{\mu}_{\mathrm{ME}} \pm \sigma \, \sqrt{ \log\left(1 + \frac{v}{\sigma^2}\right) +
-%     \frac{(\hat{\mu}_{\mathrm{ME}} - m)^2}{v + \sigma^2} - 2 \log k}.
-%     \label{eq:sifixed}
-% \end{align}
-% From~\eqref{eq:kfe} we see that the evidence value $\kME$ monotonically
-% increases as the absolute difference between the MEE $\hat{\mu}_{\mathrm{ME}}$
-% and the prior mean $m$ increases. Similarly, the width of the support
-% interval~\eqref{eq:sifixed} increases with increasing difference between
-% $\hat{\mu}_{\mathrm{ME}}$ and $m$. In contrast, the prior variance $v$ is
-% non-monotonically related to $\kME$ and the width of the support interval:
-% Depending on the difference between the prior mean $m$ and the MEE
-% $\hat{\mu}_{\mathrm{ME}}$, the evidence level~$\kME$ and the width of the
-% support interval will first decrease but then increase again with increasing
-% prior variance $v$. On the one side of the extremes -- when a point prior is
-% chosen at the observed MEE ($m = \that$ and $v \downarrow 0$) under $H_1$ --
-% the data contribute no new evidence about $\mu$ and the evidence level is
-% therefore $\kME =1$ and the support interval is equal to the usual relative
-% likelihood interval $\hat{\mu}_{\mathrm{ME}} \pm \sigma \sqrt{-2\log k}$
-% \citep[see e.g.,][]{Royall1997}. On the other side of the extremes -- when a
-% completely diffuse prior is chosen ($v \to \infty$) -- the evidence
-% level~$\kME$ goes to infinity and the support interval extends to the entire
-% real number line, indicating that the data contribute overwhelming new
-% evidence about $\mu$.
 
 
 << "distribution-k" >>=
@@ -800,15 +712,6 @@ priors for focus parameters are proper under the alternative $H_1$ (i.e.,
 integrate to one), whereas priors for nuisance parameters may be improper as
 long as the same prior is assigned under both the null $H_0$ and the alternative
 $H_1$ so that arbitrary constants cancel out.
-% However, compared to traditional Bayesian posterior estimation approaches, the
-% prior serves a different purpose and affects inference in a different way, since
-% the resulting inferences are not a synthesis of prior and data (e.g., the MEE is
-% not a weighted average of data and prior means), but rather the prior encodes
-% plausible parameter values. As such, improper priors, for instance, uniform
-% priors over the real number line are discouraged, and analysts should instead
-% aim to specify at least `weakly informative priors' that span a wide range of
-% parameter values but exclude values that are physically impossible
-% \citep{Gelman2009}.
 A general distinction can be made between \emph{global} priors, which do not
 depend on the value of $\theta_{0}$ under the null hypothesis and \emph{local}
 priors, which do. In the latter case, the interpretation of the BFF is more
@@ -1045,103 +948,6 @@ the true mean, as it should. On the other hand, the further away the BFF is
 evaluated from the true mean, the more its distribution shifts toward smaller
 values, indicating increasing evidence for the alternative, as it should.
 
-<< eval = FALSE >>=
-## ## simulate BFFs
-## set.seed(44)
-## kappa <- 2
-## m <- 0.5
-## v <- 4
-## n <- 50
-## t0seq <- seq(-0.5, 0.75, length.out = 200)
-## tstar <- 0.2 # true value
-## bff <- function(t0, y, kappa, n, m, v) {
-##     sqrt(1 + v*n/kappa^2)*
-##         exp(-0.5*((y - t0)^2*n/kappa^2 - (y - m)^2/(kappa^2/n + v)))
-## }
-## y <- rnorm(n = 10000, mean = tstar, sd = kappa/sqrt(n))
-## bffs <- sapply(X = y, FUN = function(y) {
-##     bff(t0 = t0seq, y = y, kappa = kappa, n = n, m = m, v = v)
-## })
-## col <- adjustcolor(col = "black", alpha.f = 0.005)
-## matplot(x = t0seq, y = log(bffs), type = "l", col = col, lty = 1)
-## lines(x = t0seq, y = rowMeans(log(bffs)))
-## abline(v = tstar, lty = 2, col = 2)
-## lines(t0seq, y = log(bff(t0seq, y = tstar, kappa, n, m, v)),
-##       lty = 2, col = 4)
-
-## CDF of the BF
-bff <- function(t0, y, kappa, n, m, v) {
-    sqrt(1 + v*n/kappa^2)*
-        exp(-0.5*((y - t0)^2*n/kappa^2 - (y - m)^2/(kappa^2/n + v)))
-}
-kappa <- 4
-m <- -0.5
-v <- 3
-n <- 1000
-t0 <- -0.5
-tstar <- -0.5
-y <- rnorm(n = 10000000, mean = tstar, sd = kappa/sqrt(n))
-bf <- bff(t0, y, kappa, n, m, v)
-
-lbf2x <- function(lbf, t0, kappa, n, m, v) {
-    (-2*lbf + log(1 + n*v/kappa^2) + (t0 - m)^2/v)*(1 + kappa^2/v/n)
-}
-x2lbf <- function(x, t0, kappa, n, m, v) {
-    -0.5*(x/(1 + kappa^2/v/n)) - log(1 + n*v/kappa^2) - (t0 - m)^2/v
-}
-
-pbf. <- function(q, t0, kappa, n, m, v, tstar) {
-    lambda <- (tstar - (t0 - m)*kappa^2/n/v - t0)^2*n/kappa^2
-    A <- log(1 + n*v/kappa^2) + (t0 - m)^2/v - 2*log(q)
-    if (A <= 0) p <- 1
-    else {
-        p <- pchisq(q = A*(1 + kappa^2/v/n), df = 1,
-                    ncp = lambda, lower.tail = FALSE)
-    }
-    return(p)
-}
-pbf <- Vectorize(FUN = pbf.)
-
-qseq <- exp(seq(log(1/1000), log(100000), length.out = 200))
-plot(qseq, pbf(q = qseq, t0, kappa, n, m, v, tstar), type = "l", log = "x",
-     ylim = c(0, 1))
-lines(qseq, ecdf(bf)(qseq), lty = 2, col = 2)
-
-## ## verify results
-## A <- n/kappa^2
-## B <- -1/(kappa^2/n + v)
-## a <- t0
-## b <- m
-## C <- A + B
-## y <- 0.3
-## ## C == v*n/kappa^2/(kappa^2/n + v)
-## c <- (A*a + B*b)/C
-## c == (n*t0*(kappa^2/n + v) - m*kappa^2)/v/n
-## kappa^2/n/v*(t0 - m) + t0
-## A*B/C == -1/v
-## A*(y - a)^2 + B*(y - b)^2
-## (y - kappa^2/n/v*(t0 - m) - t0)^2*v*n/kappa^2/(kappa^2/n + v) - (t0 - m)^2/v
-
-## log(dnorm(y, t0, kappa/sqrt(n))/dnorm(y, m, sqrt(v + kappa^2/n)))
-
-## 0.5*(log(1 + n*v/kappa^2) -
-##      (y - (t0 - m)*kappa^2/n/v - t0)^2*v*n/kappa^2/(v + kappa^2/n) +
-##      (t0 - m)^2/v)
-
-
-## logbf <- log(dnorm(y, t0, kappa/sqrt(n))/dnorm(y, m, sqrt(v + kappa^2/n)))
-
-## X <- (y - (t0 - m)*kappa^2/n/v - t0)^2*n/kappa^2
-## (-2*logbf + log(1 + n*v/kappa^2) + (t0 - m)^2/v)*(1 + kappa^2/v/n)
-
-## flogbf <- function(logbf, t0, kappa, n, m, v) {
-##     X <- lbf2x(lbf = logbf, t0 = t0, kappa = kappa, n = n, m = m, v = v)
-##     lambda <- (tstar - (t0 - m)^2*kappa^2/n/v - t0)^2
-##     dchisq(x = X, df = 1, ncp = lambda)*2*(1 + kappa^2/v/n)
-## }
-## logbfseq <- seq(-10, 10, 0.01)
-## plot(logbfseq, flogbf(logbfseq, t0 = t0, kappa = kappa, n = n, m = m, v = v), type = "l")
-@
 
 \section{Connection to other inference frameworks}
 \label{sec:connections}
@@ -1150,12 +956,6 @@ We will now explore connections of BFF inference to other inference frameworks.
 
 \subsection{Maximum integrated likelihood}
 
-% The BFF, evidence level~$\kME$ and support sets associated with the MEE are
-% inherently relative notions that can only be defined with reference to an
-% alternative $H_1$. On the other hand, there are situations
-
-% There are situations when the MEE is equivalent to other types of point
-% estimates. That is, i
 In typical situation where a division of the null's marginal likelihood
 $p(y \given H_0)$ by the alternative's marginal likelihood $p(y \given H_1)$
 does not change the maximizer of null marginal likelihood $p(y \given H_0)$, the
@@ -1306,27 +1106,6 @@ posterior density, which can then be divided by the prior density to obtain a
 BFF. The caveat is again that this only works for global priors under the
 alternative and with the same prior assigned to the nuisance parameters under
 the null and alternative.
-
-<< "posterior-BFF-connection", eval = FALSE >>=
-## ## verify that posterior BFF correspondonce correct
-## m <- 3
-## v <- 1
-## y <- 2
-## se <- 0.1
-## vpost <- 1/(1/se^2 + 1/v)
-## mpost <- (y/se^2 + m/v)*vpost
-## tseq <- seq(0, 5, 0.01)
-## bff <- dnorm(x = y, mean = tseq, sd = se)/
-##     dnorm(x = y, mean = m, sd = sqrt(se^2 + v))
-## posterior <- dnorm(x = tseq, mean = mpost, sd = sqrt(vpost))
-## prior <- dnorm(x = tseq, mean = m, sd = sqrt(v))
-## par(mfrow = c(1, 2))
-## plot(tseq, posterior, type = "l", las = 1, ylab = "posterior density")
-## lines(tseq, prior, lty = 2)
-## lines(tseq, bff*prior, lty = 2, col = 2)
-## plot(tseq, bff, type = "l", ylab = "BFF", las = 1)
-## lines(tseq, posterior/prior, lty = 2, col = 2)
-@
 
 The relationship between the posterior and the BFF also exposes its connection
 to another Bayesian inference quantity -- the \emph{relative belief ratio}
@@ -1705,11 +1484,6 @@ with $\Nor(x \mid m, v)$ denoting the normal density with mean $m$ and variance
 $v$ evaluated at $x$.
 
 
-% Each could potentially be a focus or nuisance parameter. We will investigate
-% the three possible combinations in the following.
-
-
-
 << "prior-for-tau" >>=
 tauseq <- seq(0, 0.1, 0.001)
 ## CDF of the halfnormal distribution
@@ -1997,9 +1771,7 @@ different conclusion from the BFF, which indicates decisive evidence for the MEE
 %   46]{Senn2008}
 % \end{quote}
 % It raises the question of whether a synthesis of prior and likelihood is
-% appropriate in this situation. % The BFF, on the other hand, seems to be more
-% % robust to such prior-data conflicts because it relies only on the data-based
-% % core of Bayesian inference.
+% appropriate in this situation.
 
 
 
@@ -2034,81 +1806,24 @@ prior <- paste0("normal(", pm, ", ", psd, ")")
 set.seed(1234)
 nmcmc <- 10000000
 nchain <- 12
-## bglm1 <- brm(death ~ ., data = dat,
-##              prior = c(set_prior("", class = "Intercept"), # flat prior
-##                        set_prior(prior, class = "b", coef = colnames(dat)[-1])),
-##                        iter = nmcmc/nchain, chains = nchain, warmup = 1000, cores = 12,
-##                        seed = 1234, family = "bernoulli")
-## save(bglm1, file = "../data/stanmcmc.RData")
-load(file = "../data/stanmcmc.RData")
+if ("stanmcmc.RData" %in% list.files(path = "../data/")) {
+    load(file = "../data/stanmcmc.RData")
+} else {
+    bglm1 <- brm(death ~ ., data = dat,
+                 prior = c(set_prior("", class = "Intercept"), # flat prior
+                           set_prior(prior, class = "b",
+                                     coef = colnames(dat)[-1])),
+                 iter = nmcmc/nchain, chains = nchain,
+                 warmup = 1000, cores = 12,
+                 seed = 1234, family = "bernoulli")
+    save(bglm1, file = "../data/stanmcmc.RData")
+}
 ## ## MCMC diagnostics
 ## summary(bglm1)
 ## exp(fixef(bglm1))[-1,]
 ## plot(bglm1, N = 15)
 @
-<< "regression-example-mcmc-jags", eval = FALSE >>=
-## ## fit with alternative MCMC software (conclusion: stan works better)
-## library(runjags)
-## jagsmod <- "
-## model {
-## for(i in 1:n) {
-##    death[i] ~ dbern(p[i])
-##    logit(p[i]) <- b0 + b_nonwhite*nonwhite[i] + b_teenages*teenages[i] +
-##                   b_nullip*nullip[i] + b_gestage*gestage[i] +
-##                   b_isoimm*isoimm[i] +  b_abort*abort[i] + b_hydram*hydram[i] +
-##                   b_dyslab*dyslab[i] + b_placord*placord[i] + b_nomonit*nomonit[i] +
-##                   b_twint*twint[i] + b_ward*ward[i] + b_prerupt*prerupt[i] +
-##                   b_malpres*malpres[i]
-## }
 
-## ## priors
-## b0 ~ dnorm(0, 0.0001)
-## b_nonwhite ~ dnorm(priormean, priorprec)
-## b_teenages ~ dnorm(priormean, priorprec)
-## b_nullip ~ dnorm(priormean, priorprec)
-## b_gestage ~ dnorm(priormean, priorprec)
-## b_isoimm ~ dnorm(priormean, priorprec)
-## b_abort ~ dnorm(priormean, priorprec)
-## b_hydram ~ dnorm(priormean, priorprec)
-## b_dyslab ~ dnorm(priormean, priorprec)
-## b_placord ~ dnorm(priormean, priorprec)
-## b_nomonit ~ dnorm(priormean, priorprec)
-## b_twint ~ dnorm(priormean, priorprec)
-## b_ward ~ dnorm(priormean, priorprec)
-## b_prerupt ~ dnorm(priormean, priorprec)
-## b_malpres ~ dnorm(priormean, priorprec)
-## }
-## "
-## jagsdat <- lapply(dat, function(x) x)
-## jagsdat[["n"]] <- nrow(dat)
-## jagsdat[["priormean"]] <- 0
-## jagsdat[["priorprec"]] <- 2
-
-## set.seed(42)
-## nmcmc2 <- 1000000
-## nchains <- 8
-## jagsfit <- run.jags(model = jagsmod, data = jagsdat,
-##                     monitor = c("b_nonwhite", "b_teenages", "b_nullip",
-##                                 "b_gestage", "b_isoimm", "b_abort", "b_hydram",
-##                                 "b_dyslab", "b_placord", "b_nomonit", "b_twint",
-##                                 "b_ward", "b_prerupt", "b_malpres", "b0"),
-##                     adapt = 1000,
-##                     burnin = 5000, sample = nmcmc2/nchains, n.chains = nchains,
-##                     method = "parallel")
-## save(jagsfit, file = "../data/jagsmcmc.RData")
-## load(file = "../data/jagsmcmc.RData")
-@
-<< "regression-example-mcmcpack", eval = FALSE >>=
-## ## fit with alternative MCMC software (conclusion: stan works better)
-## library(MCMCpack)
-## nmcmc3 <- 1000000
-## model <- death ~ 1 + nonwhite + teenages + nullip + gestage + isoimm + abort +
-##     hydram + dyslab + placord + nomonit + twint + ward + prerupt + malpres
-## mcmcpackfit  <- MCMClogit(formula = model, data = dat, seed = 1002, b0 = 0, B0 = 2,
-##                           mcmc = nmcmc3, verbose = TRUE)
-## save(mcmcpackfit, file = "../data/mcmcpack.RData")
-## load(file = "../data/mcmcpack.RData")
-@
 << "regression-example-inla", cache = TRUE >>=
 ## define priors for INLA
 pm <- 0
@@ -2125,6 +1840,7 @@ model <- death ~ 1 + nonwhite + teenages + nullip + gestage + isoimm + abort +
 bglm2 <- inla(formula = model, data = dat, family = "binomial",
               control.fixed = list(mean = pmeans, prec = pprec))
 @
+
 << "regression-analysis", fig.height = 9, fig.width = 8, cache = TRUE >>=
 coefs <- c("Non-White" = "nonwhite",
            "Early age" = "teenages",
@@ -2230,7 +1946,6 @@ bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
 orbks <- c(bfbks, 1/30, 1/3, 3, 30)
 orlabs <- c(bflabs, "1/30", "1/3", "3", "30")
-## bffDF$bff[which(bffDF$bff == 0)] <- NA
 ggplot(data = bffDF, aes(x = exp(logOR), y = bff, color = method)) +
     facet_wrap(~ coef, ncol = 3) +
     geom_hline(yintercept = 1, col = 1, linetype = "dashed", alpha = 0.1) +
