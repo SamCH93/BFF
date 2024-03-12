@@ -1,4 +1,4 @@
-all: pdf
+all: pdf code
 
 # names of .Rnw .bib. and .bst files
 FILE=bff
@@ -32,4 +32,3 @@ clean:
 	-rm $(FILE).aux  $(FILE).blg  $(FILE).log  $(FILE).tex  $(FILE).bbl \
 	$(FILE).out $(FILE).brf $(FILE).tex $(FILE).synctex.gz
 	-rm -r ./figure/
-#	-rm -r ./cache
