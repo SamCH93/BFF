@@ -49,11 +49,13 @@ arrows(x0 = yi + 0.6, x1 = yi + 0.1, y1 = 1, y0 = 1, length = 0.05)
 points(x = yi, y = 1, col = "darkgrey", pch = 20)
 text(x = yi + 0.45, y = 1, label = "Point estimate", cex = 0.7, pos = 4)
 arrows(x0 = yi,  y1 = alpha - 0.02, y0 = alpha - 0.13, length = 0.05)
-text(x = yi, y = alpha - 0.17, label = bquote((1 - alpha) * 100 * "% confidence interval"), cex = 0.7)
+text(x = yi, y = alpha - 0.17, label = bquote((1 - alpha) * 100 * "% confidence interval"),
+     cex = 0.7)
 segments(x0 = t0, y0 = -1, y1 = p0, col = "darkgrey", lty = 3, lwd = 1.5)
 segments(x0 = -100, x1 = t0, y0 = p0, col = "darkgrey", lty = 3, lwd = 1.5)
 arrows(x0 = -2.6 + 0.4, x1 = -2.6 + 0.05, y1 = p0 + 0.05, y0 = p0 + 0.15, length = 0.05)
-text(x = -2.8, y = p0 + 0.18, label = bquote(italic(P) * "-value for" ~ theta[0]), cex = 0.7, pos = 4)
+text(x = -2.8, y = p0 + 0.18, label = bquote(italic(P) * "-value for" ~ theta[0]),
+     cex = 0.7, pos = 4)
 lines(null, p, lwd = 2)
 
 ## Bayes factor function
@@ -69,13 +71,15 @@ bfloglabs <- c("1/100", "1/30", "1/10", "1/3", "1", "3", "10")
 bf0 <- bffun(yi, sei, muPrior, sdPrior, t0)
 k <- 0.5
 kMEE <- bffun(yi, sei, muPrior, sdPrior, yi)
-si <- yi + c(-1, 1)*sei*sqrt(log(1 + sdPrior^2/sei^2) + (yi - muPrior)^2/(sei^2 + sdPrior^2) - 2*log(k))
+si <- yi + c(-1, 1)*sei*sqrt(log(1 + sdPrior^2/sei^2) +
+                             (yi - muPrior)^2/(sei^2 + sdPrior^2) - 2*log(k))
 plot(null, bf, xaxt = "n", yaxt = "n", las = 1, type = "n", bty = "n",
 xlab = "", ylab = "",
 main = bquote("Bayes factor function" * " "))
 axis(side = 1, at = c(-3, 3, t0), labels = c("", "", ""))
 axis(side = 2, at = c(0, 100, k), labels = c(0, "", expression(italic(k))), las = 1)
-mtext(text = expression(atop(atop(infinity, " "  %up%  " "), atop(" ", " "))), las = 1, side = 2, at = kMEE*0.95, line = 0, cex = 1.5)
+mtext(text = expression(atop(atop(infinity, " "  %up%  " "), atop(" ", " "))),
+      las = 1, side = 2, at = kMEE*0.95, line = 0, cex = 1.5)
 mtext(text = expression(theta[0]), side = 1, at = t0, line = 0.5, cex = 0.8)
 mtext(text = "Tested parameter value", side = 1, line = 1.5)
 mtext(text = "Bayes factor", side = 2, line = 1.5)
@@ -90,7 +94,8 @@ text(x = yi, y = k - 0.4, label = bquote(italic(k) ~ "support interval"), cex = 
 segments(x0 = t0, y0 = -1, y1 = bf0, col = "darkgrey", lty = 3, lwd = 1.5)
 segments(x0 = -100, x1 = t0, y0 = bf0, col = "darkgrey", lty = 3, lwd = 1.5)
 arrows(x0 = -2.6 + 0.4, x1 = -2.6 + 0.05, y1 = bf0 - 0.1, y0 = bf0 - 0.3, length = 0.05)
-text(x = -2.8, y = bf0 - 0.4, label = bquote("Bayes factor for" ~ theta[0]), cex = 0.7, pos = 4)
+text(x = -2.8, y = bf0 - 0.4, label = bquote("Bayes factor for" ~ theta[0]),
+     cex = 0.7, pos = 4)
 lines(null, bf, lwd = 2)
 
 

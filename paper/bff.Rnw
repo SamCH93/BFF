@@ -101,25 +101,7 @@ library(ggplot2) # plotting
 \maketitle
 
 \begin{abstract}
-  The Bayes factor -- the relative marginal likelihood of the data under two
-  competing hypotheses -- is a natural measure of statistical evidence or
-  support for one hypothesis over the other. Here we show how Bayes factors can
-  also be used for parameter estimation. The key idea is to consider the Bayes
-  factor as a function of the parameter value under the null hypothesis. This
-  `Bayes factor function' is then inverted to obtain point estimates (`maximum
-  evidence estimates') and interval estimates (`support intervals'), similar to
-  how \textit{P}-value functions are inverted to obtain point estimates and
-  confidence intervals. This provides data analysts with a unified inference
-  framework for hypothesis testing and parameter estimation, as Bayes factors
-  (for any tested parameter), support intervals (at any level of interest), and
-  point estimates can be easily read off from a plot of the Bayes factor
-  function. This approach shares similarities but is also distinct from
-  conventional Bayesian and frequentist inference approaches. For instance, it
-  uses the Bayesian evidence calculus, but without synthesizing data and prior,
-  or it defines statistical evidence in terms of (integrated) likelihood ratios,
-  but also includes a natural way to deal with nuisance parameters. Applications
-  to several real-world examples illustrate how our framework is of practical
-  value to data analysts who aim to make quantitative inferences.
+  The Bayes factor, the data-based updating factor of the prior to posterior odds of two hypotheses, is a natural measure of statistical evidence for one hypothesis over the other. We show how Bayes factors can also be used for parameter estimation. The key idea is to consider the Bayes factor as a function of the parameter value under the null hypothesis. This `Bayes factor function' is inverted to obtain point estimates (`maximum evidence estimates') and interval estimates (`support intervals'), similar to how \textit{P}-value functions are inverted to obtain point estimates and confidence intervals. This provides data analysts with a unified inference framework as Bayes factors (for any tested parameter value), support intervals (at any level), and point estimates can be easily read off from a plot of the Bayes factor function. This approach shares similarities but is also distinct from conventional Bayesian and frequentist approaches: It uses the Bayesian evidence calculus, but without synthesizing data and prior, and it defines statistical evidence in terms of (integrated) likelihood ratios, but also includes a natural way for dealing with nuisance parameters. Applications to real-world examples illustrate how our framework is of practical value for making make quantitative inferences.
   \\[1ex]
   \emph{Keywords}: Bayesian inference, integrated likelihood, meta-analysis,
   nuisance parameters, replication studies, support interval
@@ -192,11 +174,13 @@ arrows(x0 = yi + 0.6, x1 = yi + 0.1, y1 = 1, y0 = 1, length = 0.05)
 points(x = yi, y = 1, col = "darkgrey", pch = 20)
 text(x = yi + 0.45, y = 1, label = "Point estimate", cex = 0.7, pos = 4)
 arrows(x0 = yi,  y1 = alpha - 0.02, y0 = alpha - 0.13, length = 0.05)
-text(x = yi, y = alpha - 0.17, label = bquote((1 - alpha) * 100 * "% confidence interval"), cex = 0.7)
+text(x = yi, y = alpha - 0.17, label = bquote((1 - alpha) * 100 * "% confidence interval"),
+     cex = 0.7)
 segments(x0 = t0, y0 = -1, y1 = p0, col = "darkgrey", lty = 3, lwd = 1.5)
 segments(x0 = -100, x1 = t0, y0 = p0, col = "darkgrey", lty = 3, lwd = 1.5)
 arrows(x0 = -2.6 + 0.4, x1 = -2.6 + 0.05, y1 = p0 + 0.05, y0 = p0 + 0.15, length = 0.05)
-text(x = -2.8, y = p0 + 0.18, label = bquote(italic(P) * "-value for" ~ theta[0]), cex = 0.7, pos = 4)
+text(x = -2.8, y = p0 + 0.18, label = bquote(italic(P) * "-value for" ~ theta[0]),
+     cex = 0.7, pos = 4)
 lines(null, p, lwd = 2)
 
 ## Bayes factor function
@@ -212,13 +196,15 @@ bfloglabs <- c("1/100", "1/30", "1/10", "1/3", "1", "3", "10")
 bf0 <- bffun(yi, sei, muPrior, sdPrior, t0)
 k <- 0.5
 kMEE <- bffun(yi, sei, muPrior, sdPrior, yi)
-si <- yi + c(-1, 1)*sei*sqrt(log(1 + sdPrior^2/sei^2) + (yi - muPrior)^2/(sei^2 + sdPrior^2) - 2*log(k))
+si <- yi + c(-1, 1)*sei*sqrt(log(1 + sdPrior^2/sei^2) +
+                             (yi - muPrior)^2/(sei^2 + sdPrior^2) - 2*log(k))
 plot(null, bf, xaxt = "n", yaxt = "n", las = 1, type = "n", bty = "n",
 xlab = "", ylab = "",
 main = bquote("Bayes factor function" * " "))
 axis(side = 1, at = c(-3, 3, t0), labels = c("", "", ""))
 axis(side = 2, at = c(0, 100, k), labels = c(0, "", expression(italic(k))), las = 1)
-mtext(text = expression(atop(atop(infinity, " "  %up%  " "), atop(" ", " "))), las = 1, side = 2, at = kMEE*0.95, line = 0, cex = 1.5)
+mtext(text = expression(atop(atop(infinity, " "  %up%  " "), atop(" ", " "))),
+      las = 1, side = 2, at = kMEE*0.95, line = 0, cex = 1.5)
 mtext(text = expression(theta[0]), side = 1, at = t0, line = 0.5, cex = 0.8)
 mtext(text = "Tested parameter value", side = 1, line = 1.5)
 mtext(text = "Bayes factor", side = 2, line = 1.5)
@@ -233,7 +219,8 @@ text(x = yi, y = k - 0.4, label = bquote(italic(k) ~ "support interval"), cex = 
 segments(x0 = t0, y0 = -1, y1 = bf0, col = "darkgrey", lty = 3, lwd = 1.5)
 segments(x0 = -100, x1 = t0, y0 = bf0, col = "darkgrey", lty = 3, lwd = 1.5)
 arrows(x0 = -2.6 + 0.4, x1 = -2.6 + 0.05, y1 = bf0 - 0.1, y0 = bf0 - 0.3, length = 0.05)
-text(x = -2.8, y = bf0 - 0.4, label = bquote("Bayes factor for" ~ theta[0]), cex = 0.7, pos = 4)
+text(x = -2.8, y = bf0 - 0.4, label = bquote("Bayes factor for" ~ theta[0]),
+     cex = 0.7, pos = 4)
 lines(null, bf, lwd = 2)
 @
 \caption{Examples of \textit{P}-value functions and Bayes factor functions.
@@ -253,9 +240,11 @@ synthesis of the data and the prior distribution, which can be seen as an
 advantage but also as a challenge in the absence of prior knowledge. In
 particular, for testing of hypotheses, it can be difficult to specify prior
 probabilities such as `$\Pr(\text{the treatment effect is absent})$' and
-`$\Pr(\text{the treatment effect is present})$'. One approach to address this,
-is to report the \emph{Bayes factor} \citep{Jeffreys1939, Good1958, Kass1995},
-i.e., the updating factor of the prior to posterior odds of two hypotheses.
+`$\Pr(\text{the treatment effect is present})$'.
+
+One approach to address this issue is to report the \emph{Bayes factor}
+\citep{Jeffreys1939, Good1958, Kass1995}, i.e., the updating factor of the prior
+to posterior odds of two hypotheses.
 % However, the posterior However, for
 % testing of point hypotheses and model comparisons, Bayes factors
 %  are often considered to be a principled
@@ -759,10 +748,10 @@ where
   &= \frac{\int_{\Psi} p(y_{2} \mid \theta_{0}, \psi) \, p(\psi \mid y_{1}, H_{0}) \, \mathrm{d}\psi}{\int_{\Theta} \int_{\Psi} p(y_{2} \mid \theta, \psi) \, p(\theta, \psi \mid y_{1}, H_{1}) \, \mathrm{d}\psi  \, \mathrm{d}\theta}
 \end{align*}
 is the \emph{partial Bayes factor} obtained from using the posterior
-distributions $p(\psi \mid y_{1}, H_{0})$ and
-$p(\theta, \psi \mid y_{1}, H_{1})$ based on the first batch $y_{1}$ to compute
-the Bayes factor based on the second batch $y_{2}$ \citep[p.186]{OHagan2004}.
-This result generalizes to more than two batches by
+distributions under the null $p(\psi \mid y_{1}, H_{0})$ and under the
+alternative $p(\theta, \psi \mid y_{1}, H_{1})$ based on the first batch $y_{1}$
+to compute the Bayes factor based on the second batch $y_{2}$
+\citep[p.186]{OHagan2004}. This result generalizes to more than two batches by
 \begin{align*}
   \BF_{01}(y_{1}, y_{2}, \dots, y_{n} ; \theta_{0})
   &= \BF_{01}(y_{1} ; \theta_{0}) \times \prod_{i=2}^{n} \BF_{01}(y_{i} \mid y_{1}, y_{2}, \dots, y_{i-1} ; \theta_{0}),
@@ -1002,8 +991,8 @@ different methods produce the same estimate in these situations. However, the
 important difference between these methods is the motivation and interpretation
 of the resulting estimate -- the MEE represents a natural estimate for $\theta$
 because it is the parameter value for which the data provide the most evidence
-over an alternative hypothesis, while the (integrated) MLE is defined without
-reference to alternatives.
+over an alternative hypothesis, while the (integrated) maximum likelihood
+estimate is defined without reference to alternatives.
 
 
 \subsection{Likelihoodist inference}
@@ -1020,16 +1009,17 @@ However, there is disagreement when it comes to the use of support sets. When
 there are no nuisance parameters, likelihoodists define their support sets based
 on the relative likelihood
 \begin{align}
-  L(\theta) = \frac{p(y \mid \theta)}{p(y \mid \that_{\textrm{ML}})}.
+  L(\theta) = \frac{p(y \mid \theta)}{p(y \mid \that_{\textrm{ML}})}
   \label{eq:relLik}
 \end{align}
-For example, \citet{Royall1997} recommended reporting the set of parameter
-values with relative likelihood greater than $k = 1/8$ (at most `strong'
-evidence against them) or $k = 1/32$ (at most `quite strong' evidence against
-them). From a Bayesian perspective, using the observed MLE as a prior under the
-alternative seems to hardly represent genuine prior knowledge or an alternative
-theory, but rather a cherry-picked alternative that gives to the most biased
-assessment of support for the alternative \citep{Berger1987}.
+where $\that_{\textrm{ML}}$ is the maximum likelihood estimate. For example,
+\citet{Royall1997} recommended reporting the set of parameter values with
+relative likelihood greater than $k = 1/8$ (at most `strong' evidence against
+them) or $k = 1/32$ (at most `quite strong' evidence against them). From a
+Bayesian perspective, using the observed maximum likelihood estimate as a prior
+under the alternative seems to hardly represent genuine prior knowledge or an
+alternative theory, but rather a cherry-picked alternative that gives to the
+most biased assessment of support for the alternative \citep{Berger1987}.
 % When there are nuisance parameters, there is no
 % general likelihoodist solution for eliminating them \citep[chapter
 % 7]{Royall1997}.
@@ -1114,28 +1104,28 @@ to another Bayesian inference quantity -- the \emph{relative belief ratio}
   \mathrm{RB}(\theta \mid H_{1}) = \underbrace{\frac{p(\theta \mid y, H_{1})}{p(\theta \mid H_{1})}}_{= \BF_{01}(y; \theta)},
 \end{align}
 see e.g., \citet{Evans2015}. This quantity is the updating factor of the prior
-to the posterior density/probability mass function, and is related to the Bayes
-factor via the aforementioned mentioned Savage-Dickey density ratio. An
-estimation and testing framework centred on the relative belief ratio was
-developed by \citet{Evans1997}. The parameter value that maximizes the relative
-belief ratio was termed the \emph{least relative surprisal estimate}, later also
-referred to as \emph{maximum relative belief estimate} \citep{Evans2015}.
-Clearly this estimate is equivalent to the MEE whenever the BFF and relative
-belief ratio coincide. \citet{Evans1997} also defined a $\gamma$ \emph{relative
-  surprise region}, which is the set of parameter values with $\gamma$ posterior
-probability and with highest relative belief ratios among all such sets.
-Similarly, \citet{Shalloway2014} defined an \emph{evidentiary credible region}
-which is equivalent to the relative surprise region, but motivated by
-information theory. While both are closely related to the support set via the
-Savage-Dickey density ratio, they differ from the support set in that they are
-defined by posterior probabilities, the relative evidence that the included
-parameter values receive merely provides the rule to chose among all credible
-sets \citep{Wagenmakers2020}. Thus, a relative surprise region may contain
-parameter values that are not supported by the data. For this reason,
-\citet{Evans2015} defined yet another type of region, a $q$ \emph{plausible
-  region} which contains parameter values with a relative belief ratio of at
-least $q$ and as such coincides with the $k$ support set whenever the
-Savage-Dickey density representation applies to the BFF.
+to the posterior density/mass function, and is related to the Bayes factor via
+the aforementioned mentioned Savage-Dickey density ratio. An estimation and
+testing framework centred on the relative belief ratio was developed by
+\citet{Evans1997}. The parameter value that maximizes the relative belief ratio
+was termed the \emph{least relative surprisal estimate}, later also referred to
+as \emph{maximum relative belief estimate} \citep{Evans2015}. Clearly this
+estimate is equivalent to the MEE whenever the BFF and relative belief ratio
+coincide. \citet{Evans1997} also defined a $\delta \times 100\%$ \emph{relative
+  surprise region}, which is the set of parameter values with
+$\delta \times 100\%$ posterior probability and with highest relative belief
+ratios among all such sets. Similarly, \citet{Shalloway2014} defined an
+\emph{evidentiary credible region} which is equivalent to the relative surprise
+region, but motivated by information theory. While both are closely related to
+the support set via the Savage-Dickey density ratio, they differ from the
+support set in that they are defined by posterior probabilities and not by
+evidence, the ordering induced by the relative belief ratio merely provides a
+rule to chose among all credible sets \citep{Wagenmakers2020}. Thus, a relative
+surprise region may contain parameter values that are not supported by the data.
+For this reason, \citet{Evans2015} defined yet another type of region, a $k$
+\emph{plausible region} which contains parameter values with a relative belief
+ratio of at least $k$ and as such coincides with the $k$ support set whenever
+the Savage-Dickey density representation applies to the BFF.
 
 %% should I also mention that relative belief makes no sense when we have point
 %% hypotheses while BF makes complete sense?
@@ -2011,8 +2001,8 @@ maximum likelihood, and then using each estimated coefficient and its standard
 error for a univariate normal analysis as explained in
 Section~\ref{sec:normalmean}, ignoring the nuisance parameters (long-dashed
 green lines). As a result, the MEEs from the univariate normal analysis
-correspond to the MLEs, while the MEE from the MCMC and INLA analyses correspond
-to the integrated MLEs.
+correspond to the maximum likelihood estimates, while the MEE from the MCMC and
+INLA analyses correspond to the integrated maximum likelihood estimates.
 
 The MCMC analysis took the longest of the three (several minutes to run),
 followed by the INLA analysis (about a second to run), followed by the
