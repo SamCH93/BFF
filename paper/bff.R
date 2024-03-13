@@ -783,7 +783,7 @@ orbks <- c(bfbks, 1/30, 1/3, 3, 30)
 orlabs <- c(bflabs, "1/30", "1/3", "3", "30")
 ggplot(data = bffDF, aes(x = exp(logOR), y = bff, color = method)) +
     facet_wrap(~ coef, ncol = 3) +
-    geom_hline(yintercept = 1, col = 1, linetype = "dashed", alpha = 0.1) +
+    geom_hline(yintercept = 1, col = 1, linetype = "dashed", alpha = 0.05) +
     geom_line(aes(linetype = method), linewidth = 0.8, alpha = 0.8) +
     geom_point(data = meeDF, aes(x = exp(mee), y = k), show.legend = FALSE, alpha = 0.8) +
     coord_cartesian(xlim = c(1/30, 100), ylim = c(1/100, 100)) +
@@ -795,6 +795,7 @@ ggplot(data = bffDF, aes(x = exp(logOR), y = bff, color = method)) +
     theme_bw() +
     theme(panel.grid.minor = element_blank(),
           panel.grid.major = element_line(linetype = "dotted"),
+          strip.background = element_rect(fill = "white"),
           legend.position = c(0.85, 0.075),
           legend.key.size = unit(1.5, "lines"))
 
