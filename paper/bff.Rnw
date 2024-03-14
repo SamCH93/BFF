@@ -1034,10 +1034,11 @@ statistic.
 Another connection between frequentist and BFF inference is given by the
 `universal bound' \citep{Kerridge1963, Robbins1970, Royall1997}, which bounds
 the frequentist probability of obtaining misleading Bayesian evidence. That is,
-for $0 < k < 1$ the probability of obtaining a Bayes factor against $H_{0}$ less
-than $k$ is at most $k$ for any prior under the alternative
+when data are generated under $H_{0}: \theta = \theta_{0}$, the probability of
+obtaining a Bayes factor $\BF_{01}$ less than $k < 1$ is at most $k$ for any
+prior under the alternative
 \begin{align*}
-  \Pr\{\BF_{01}(y; H_{0}) \leq k \mid H_{0}\} \leq k.
+  \Pr\{\BF_{01}(y) \leq k \mid H_{0}\} \leq k.
 \end{align*}
 If there are nuisance parameters, the bound holds only marginalized over the
 prior of the nuisance parameters. For the bound to hold in a strict sense (i.e.,
