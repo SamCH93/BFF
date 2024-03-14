@@ -277,27 +277,26 @@ hypotheses.
 Our goal is therefore to resolve this dilemma and provide a unified framework
 for estimation and hypothesis testing based on Bayes factors. The idea is the
 same as for the \textit{P}-value function; we consider the Bayes factor as a
-function of the tested parameter. We then use this \emph{Bayes factor
-  function}\footnote{Our conception of Bayes factor functions differs from the
-  Bayes factor functions introduced by \citet{Johnson2023}. The latter are Bayes
-  factors viewed as a function of a hyperparameter of the prior \emph{under the
-    alternative hypothesis} but for a fixed null hypothesis. We acknowledge that
-  introducing another concept with the same name may be confusing, but we think
-  that Bayes factor function is the most appropriate name, in analogy to
-  \textit{P}-value function. An alternative might be to call our concept
-  `support curve' in analogy to the confidence curve, but we think Bayes factor
-  function is more appropriate.} to derive point estimates, interval estimates,
-and Bayes factors (as shown in the right plot in Figure~\ref{fig:pvalfun}),
-establishing a duality between hypothesis testing and parameter estimation. Our
-framework builds on the recently proposed Bayesian support interval
-\citep{Wagenmakers2020, Pawel2023} and extends it with the novel concept of
-point estimation based on Bayes factors. We call the resulting estimate the
-\emph{maximum evidence estimate} (MEE) -- the parameter value that receives the
-most evidential support from the data over a specified alternative hypothesis.
-This provides data analysts with a unified framework for statistical inference
-centred around the Bayes factor. Related ideas have recently been proposed in
-the physics community under the name of `Bayes factor surface'
-\citep{Fowlie2024} and `\textit{K} ratio` \citep{Afzal2023}.
+function of the tested parameter. We then use this \emph{Bayes factor function}
+to derive point estimates, interval estimates, and Bayes factors (as shown in
+the right plot in Figure~\ref{fig:pvalfun}), establishing a duality between
+hypothesis testing and parameter estimation. Our framework builds on the
+recently proposed Bayesian support interval \citep{Wagenmakers2020, Pawel2023}
+and extends it with the novel concept of point estimation based on Bayes
+factors. We call the resulting estimate the \emph{maximum evidence estimate}
+(MEE) -- the parameter value that receives the most evidential support from the
+data over a specified alternative hypothesis. This provides data analysts with a
+unified framework for statistical inference centred around the Bayes factor.
+
+Approaches related to the Bayes factor function have recently been proposed in
+the physics community under the names of `Bayes factor surface'
+\citep{Fowlie2024} and `\textit{K} ratio' \citep{Afzal2023}. Another method
+called `Bayes factor function' has recently been proposed by
+\citet{Johnson2023}. In this approach, Bayes factors are viewed as a function of
+a hyperparameter of the prior \emph{under the alternative hypothesis} but for a
+fixed null hypothesis. We acknowledge that introducing another concept with the
+same name may be confusing, but we think that Bayes factor function is the most
+appropriate name, in analogy to \textit{P}-value function.
 
 This paper is structured as follows. In the following
 (Section~\ref{sec:BFtheory}), we introduce the general theory of Bayes factors,
@@ -533,7 +532,7 @@ Table~\ref{tab:normalinference}.
 
 \begingroup
 \renewcommand{\arraystretch}{2.25}
-\begin{table}[!b]
+\begin{table}[!htb]
   \centering
   \caption{Bayes factor function $\BF_{01}$, maximum evidence estimate
     $\thatME$, evidence value $\kME$, and $k$ support interval (SI) for a normal
@@ -581,6 +580,21 @@ wide range from $\Sexpr{round(sis[1,1], 2)}$ to $\Sexpr{round(sis[1,2], 2)}$,
 indicating that very beneficial up to slightly harmful treatment effects are
 supported by the data over the alternative.
 
+
+The formulae in Table~\ref{tab:normalinference} (left column) show that as the
+prior mean $m$ becomes closer to the observed data $y$, the evidence level
+$\kME$ decreases and the support interval becomes narrower. This is because an
+alternative closer to the data clearly has better predictive accuracy of the
+data than an alternative further away, and thus fewer point null hypotheses can
+outpredict it. Figure~\ref{fig:normal} illustrates this phenomenon with another
+prior distributions (one with mean at the observed log hazard ratio
+$y = \Sexpr{round(y, 2)}$, the blue BFF). The BFF has its mode still at the
+observed log hazard ratio estimate but shows a far narrower $k = 1$ support
+interval from $\Sexpr{round(sis[2,1], 2)}$ to $\Sexpr{round(sis[2,2], 2)}$ than
+the orange BFF with the mean $m = \Sexpr{round(m, 2)}$ based on the eight
+previous trials.
+
+
 \begin{figure}[!htb]
 << "normal-mean-example", fig.height = 4 >>=
 colors <- palette.colors(n = 5, palette = "Okabe-Ito", alpha = 0.9)[2:5]
@@ -620,19 +634,6 @@ text(x = min(t0seq), y = c(2, 1/2),
   $Y \mid \theta \sim \Nor(\theta, \sigma^{2}_{i})$ is assumed for the data.}
 \label{fig:normal}
 \end{figure}
-
-The formulae in Table~\ref{tab:normalinference} (left column) show that as the
-prior mean $m$ becomes closer to the observed data $y$, the evidence level
-$\kME$ decreases and the support interval becomes narrower. This is because an
-alternative closer to the data clearly has better predictive accuracy of the
-data than an alternative further away, and thus fewer point null hypotheses can
-outpredict it. Figure~\ref{fig:normal} illustrates this phenomenon with another
-prior distributions (one with mean at the observed log hazard ratio
-$y = \Sexpr{round(y, 2)}$, the blue BFF). The BFF has its mode still at the
-observed log hazard ratio estimate but shows a far narrower $k = 1$ support
-interval from $\Sexpr{round(sis[2,1], 2)}$ to $\Sexpr{round(sis[2,2], 2)}$ than
-the orange BFF with the mean $m = \Sexpr{round(m, 2)}$ based on the eight
-previous trials.
 
 Another approach to formulating a prior distribution for $\theta$ under the
 alternative commonly suggested in `objective' Bayes theories is to center the
@@ -873,7 +874,6 @@ cols3 <- adjustcolor(col = cols, alpha.f = 0.1)
 t0seq <- seq(-1, 1, length.out = 500)
 tstar <- 0
 kappa <- 2
-m <- 1
 v <- 4
 p <- 0.5
 plower <- 0.05
@@ -1125,7 +1125,8 @@ surprise region may contain parameter values that are not supported by the data.
 For this reason, \citet{Evans2015} defined yet another type of region, a $k$
 \emph{plausible region} which contains parameter values with a relative belief
 ratio of at least $k$ and as such coincides with the $k$ support set whenever
-the Savage-Dickey density representation applies to the BFF.
+the Savage-Dickey density representation applies to the BFF and when a global
+prior is chosen for $\theta$ under the alternative.
 
 %% should I also mention that relative belief makes no sense when we have point
 %% hypotheses while BF makes complete sense?
@@ -1792,8 +1793,8 @@ glm1 <- glm(death ~ ., data = dat, family = "binomial")
 ## summary(glm1)
 
 ## create prior for brms
-pm <- 0 # mean
-psd <- sqrt(1/2) # variance
+pm <- 0 # prior mean
+psd <- sqrt(1/2) # prior standard deviation
 prior <- paste0("normal(", pm, ", ", psd, ")")
 
 ## Bayesian logistic regression model
@@ -1820,8 +1821,8 @@ if ("stanmcmc.RData" %in% list.files(path = "../data/")) {
 
 << "regression-example-inla", cache = TRUE >>=
 ## define priors for INLA
-pm <- 0
-prec <- 2
+pm <- 0 # prior mean
+prec <- 2 # prior precision
 coefs <- colnames(dat)[-1]
 pmeans <- as.list(rep(pm, length(coefs)))
 names(pmeans) <- coefs
@@ -1850,7 +1851,7 @@ coefs <- c("Non-White" = "nonwhite",
            "Twin, triplet" = "twint",
            "Malpresented" = "malpres",
            "Past abortion" = "abort")
-logORseq <- seq(log(1/30), log(100), length.out = 100)
+logORseq <- seq(log(1/30), log(100), length.out = 2^10)
 ORseq <- exp(logORseq)
 bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
@@ -1902,28 +1903,22 @@ bffres <- lapply(X = seq(1, length(coefs)), FUN = function(i) {
         lowerSImcmc <- logORseq[which.min(abs(log(bffmcmc[logORseq < meemcmc]) - log(k)))]
         upperSImcmc <- logORseq[logORseq > meemcmc][
             which.min(abs(log(bffmcmc[logORseq > meemcmc]) - log(k)))]
-        lowerSIinla <- NaN
-        upperSIinla <- NaN
     } else if (coef == "hydram") {
         lowerSImcmc <- logORseq[which.min(abs(log(bffmcmc[logORseq < meemcmc]) - log(k)))]
         upperSImcmc <- logORseq[logORseq > meemcmc][
             which.min(abs(log(bffmcmc[logORseq > meemcmc]) - log(k)))]
-        lowerSIinla <- NaN
-        upperSIinla <- NaN
     } else {
         lowerSImcmc <- NaN
         upperSImcmc <- NaN
-        lowerSIinla <- NaN
-        upperSIinla <- NaN
     }
 
     out <- list(bffDF,
                 rbind(data.frame(coef = names(coefs)[i], lowerSI = lowerSImcmc,
                                  upperSI = upperSImcmc,
                                  mee = meemcmc, k = kmcmc, method = "MCMC"),
-                      data.frame(coef = names(coefs)[i], lowerSI = lowerSIinla,
-                                 upperSI = upperSIinla,
-                                 mee = meeinla, k = kinla, method = "INLA"),
+                      data.frame(coef = names(coefs)[i], lowerSI = NaN,
+                                 upperSI = NaN, mee = meeinla, k = kinla,
+                                 method = "INLA"),
                       data.frame(coef = names(coefs)[i], lowerSI = lowerSInorm,
                                  upperSI = upperSInorm,
                                  mee = meeglm, k = kglm, method = "Univariate normal"))
@@ -1959,16 +1954,16 @@ ggplot(data = bffDF, aes(x = exp(logOR), y = bff, color = method)) +
           legend.key.size = unit(1.5, "lines"))
 @
 \caption{Multiple logistic regression BFF analysis of 2992 births with 17
-  neonatal deaths from \citet{Neutra1978} as reanalyzed and shared by
-  \citet{Sullivan2012}. Each plot shows the BFF related to the exponentiated
-  regression coefficient which can be interpreted as odds ratio. Independent,
-  weakly informative $\Nor(0, 1/2)$ priors are assigned to the coefficients
-  under the alternative $H_{1}$. All other coefficients were considered as
-  nuisance parameters and the same priors assigned to them as under the
-  alternative. Variables are binary indicators, except early age (0, 20 ,1 15
-  19, 2 under 15), gestational age ($0 = \text{no}$, $1 = 36-38$ weeks,
-  $2 = 33-36$ weeks; under 33 weeks excluded), isoimmunization ($0 = \text{no}$,
-  $1 = \text{Rh}$, $2 = \text{ABO}$), labour progress ($0 = \text{no}$,
+  neonatal deaths from \citet{Neutra1978} as reanalyzed by \citet{Sullivan2012}.
+  Each plot shows the BFF related to the exponentiated regression coefficient
+  which can be interpreted as odds ratio. Independent, weakly informative
+  $\Nor(0, 1/2)$ priors are assigned to the coefficients under the alternative
+  $H_{1}$. All other coefficients were considered as nuisance parameters and the
+  same priors assigned to them as under the alternative. Variables are binary
+  indicators, except early age (0, 20 ,1 15 19, 2 under 15), gestational age
+  ($0 = \text{no}$, $1 = 36-38$ weeks, $2 = 33-36$ weeks; under 33 weeks
+  excluded), isoimmunization ($0 = \text{no}$, $1 = \text{Rh}$,
+  $2 = \text{ABO}$), labour progress ($0 = \text{no}$,
   $0.33 = \text{prolonged}$, $0.67 = \text{protracted}$, $1 = \text{arrested}$)
   and past abortion ($0 = \text{none}$, $1 = 1$, $2 = 2+$).}
 \label{fig:glm}
@@ -2001,10 +1996,10 @@ maximum likelihood, and then using each estimated coefficient and its standard
 error for a univariate normal analysis as explained in
 Section~\ref{sec:normalmean}, ignoring the nuisance parameters (long-dashed
 green lines). As a result, the MEEs from the univariate normal analysis
-correspond to the maximum likelihood estimates, while the MEE from the MCMC and
-INLA analyses correspond to the integrated maximum likelihood estimates.
+correspond to maximum likelihood estimates, while the MEEs from the MCMC and
+INLA analyses correspond to integrated maximum likelihood estimates.
 
-The MCMC analysis took the longest of the three (several minutes to run),
+The MCMC analysis took the longest of the three (around 30 minutes to run),
 followed by the INLA analysis (about a second to run), followed by the
 univariate analysis (almost instantaneous). We can see that the BFFs based on
 MCMC and INLA (with default settings) may have inaccuracies or cannot be
@@ -2012,12 +2007,12 @@ computed in the outer regions of the BFF, since these are regions where the
 posterior density is close to zero. We can also see that the univariate normal
 BFF agrees reasonably well with the MCMC and INLA BFFs in most cases, with the
 exception of the 'Hydramnios' variable. In this case, the MCMC and INLA BFFs
-increase monotonically but end abruptly around OR = 30 because no larger MCMC
-samples were observed or because the INLA algorithm returned a posterior density
-of zero. However, the shapes of the BFFs suggest that their maxima lie outside
-the range shown, possibly close to the maxima of the univariate normal BFF.
-Because of these computational issues, the `Hydramnios' BFF should be
-interpreted with caution.
+increase monotonically but end abruptly around OR = 50 and OR = 30,
+respectively, because no larger MCMC samples were observed or because the INLA
+algorithm returned a posterior density of zero. However, the shapes of the BFFs
+suggest that their maxima lie outside the range shown, and may even be larger
+than the maximum of the univariate normal BFF. Because of these computational
+issues, the `Hydramnios' BFF should be interpreted with caution.
 
 Due to the sparse nature of the data, most of the BFFs are undiagnostic about
 whether or not the variables exhibit harmful or beneficial associations with

@@ -245,7 +245,6 @@ cols3 <- adjustcolor(col = cols, alpha.f = 0.1)
 t0seq <- seq(-1, 1, length.out = 500)
 tstar <- 0
 kappa <- 2
-m <- 1
 v <- 4
 p <- 0.5
 plower <- 0.05
@@ -638,8 +637,8 @@ glm1 <- glm(death ~ ., data = dat, family = "binomial")
 ## summary(glm1)
 
 ## create prior for brms
-pm <- 0 # mean
-psd <- sqrt(1/2) # variance
+pm <- 0 # prior mean
+psd <- sqrt(1/2) # prior standard deviation
 prior <- paste0("normal(", pm, ", ", psd, ")")
 
 ## Bayesian logistic regression model
@@ -666,8 +665,8 @@ if ("stanmcmc.RData" %in% list.files(path = "../data/")) {
 
 ## ----"regression-example-inla", cache = TRUE----------------------------------
 ## define priors for INLA
-pm <- 0
-prec <- 2
+pm <- 0 # prior mean
+prec <- 2 # prior precision
 coefs <- colnames(dat)[-1]
 pmeans <- as.list(rep(pm, length(coefs)))
 names(pmeans) <- coefs
@@ -696,7 +695,7 @@ coefs <- c("Non-White" = "nonwhite",
            "Twin, triplet" = "twint",
            "Malpresented" = "malpres",
            "Past abortion" = "abort")
-logORseq <- seq(log(1/30), log(100), length.out = 100)
+logORseq <- seq(log(1/30), log(100), length.out = 2^10)
 ORseq <- exp(logORseq)
 bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
@@ -748,28 +747,22 @@ bffres <- lapply(X = seq(1, length(coefs)), FUN = function(i) {
         lowerSImcmc <- logORseq[which.min(abs(log(bffmcmc[logORseq < meemcmc]) - log(k)))]
         upperSImcmc <- logORseq[logORseq > meemcmc][
             which.min(abs(log(bffmcmc[logORseq > meemcmc]) - log(k)))]
-        lowerSIinla <- NaN
-        upperSIinla <- NaN
     } else if (coef == "hydram") {
         lowerSImcmc <- logORseq[which.min(abs(log(bffmcmc[logORseq < meemcmc]) - log(k)))]
         upperSImcmc <- logORseq[logORseq > meemcmc][
             which.min(abs(log(bffmcmc[logORseq > meemcmc]) - log(k)))]
-        lowerSIinla <- NaN
-        upperSIinla <- NaN
     } else {
         lowerSImcmc <- NaN
         upperSImcmc <- NaN
-        lowerSIinla <- NaN
-        upperSIinla <- NaN
     }
 
     out <- list(bffDF,
                 rbind(data.frame(coef = names(coefs)[i], lowerSI = lowerSImcmc,
                                  upperSI = upperSImcmc,
                                  mee = meemcmc, k = kmcmc, method = "MCMC"),
-                      data.frame(coef = names(coefs)[i], lowerSI = lowerSIinla,
-                                 upperSI = upperSIinla,
-                                 mee = meeinla, k = kinla, method = "INLA"),
+                      data.frame(coef = names(coefs)[i], lowerSI = NaN,
+                                 upperSI = NaN, mee = meeinla, k = kinla,
+                                 method = "INLA"),
                       data.frame(coef = names(coefs)[i], lowerSI = lowerSInorm,
                                  upperSI = upperSInorm,
                                  mee = meeglm, k = kglm, method = "Univariate normal"))
