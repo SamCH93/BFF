@@ -2130,7 +2130,7 @@ were obtained from the \texttt{dat.bartos2023} data set included in the
 \texttt{metadat} R package \citep{White2023}. The code and data to reproduce our
 analyses is openly available at \url{https://github.com/SamCH93/BFF}. A snapshot
 of the repository at the time of writing is available
-at \url{https://zenodo.org/doi/10.5281/zenodo.TODOADD}. We used the statistical
+at \url{https://doi.org/10.5281/zenodo.10817311}. We used the statistical
 programming language \Sexpr{R.Version()[["version.string"]]} for analyses
 \citep{R} along with the \texttt{brms} \citep{Burkner2021} and \texttt{INLA}
 \citep{Rue2009} packages for the computation of posterior distributions.
