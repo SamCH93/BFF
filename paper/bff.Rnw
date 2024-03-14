@@ -39,7 +39,7 @@
   Center for Reproducible Science (CRS) \\
   University of Zurich \\
   E-mail: \href{mailto:\mail}{\mail} \\[2ex]
-  {\color{blue} Preprint version March 13, 2024}
+  {\color{blue} Preprint version March 14, 2024}
 }
 \date{}
 
