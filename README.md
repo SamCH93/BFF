@@ -3,7 +3,7 @@
 This repository contains code and data related to the preprint
 
   Pawel, S. (2024). A Bayes Factor Framework for Unified Parameter Estimation
-  and Hypothesis Testing. <https://github.com/SamCH93/BFF>
+  and Hypothesis Testing. <https://doi.org/10.48550/arxiv.2403.09350>
   
 A BibTeX entry is given by
 
@@ -12,7 +12,7 @@ A BibTeX entry is given by
   year = {2024},
   author = {Samuel Pawel},
   title = {A {Bayes} Factor Framework for Unified Parameter Estimation and Hypothesis Testing},
-  url = {https://github.com/SamCH93/BFF},
+  url = {https://doi.org/10.48550/arxiv.2403.09350},
   note = {Preprint}
 }
 ```

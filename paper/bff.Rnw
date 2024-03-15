@@ -735,7 +735,7 @@ posterior distribution based on one batch is used as the prior for the other.
 
 If we have two batches $y_{1}$ and $y_{2}$, the BFF based on both batches is
 \begin{align*}
-  \BF_{01}(y_{1}, y_{2} ; \theta_{0})
+  \BF_{01}(y_{1:2} ; \theta_{0})
   % &= \frac{p(y_{1}, y_{2} \mid H_{0})}{p(y_{1}, y_{2} \mid H_{1})} \\
   % &= \frac{p(y_{2} \mid y_{1}, H_{0})}{p(y_{2} \mid y_{1}, H_{1})}
   %   \times \frac{p(y_{1} \mid H_{0})}{p(y_{1} \mid H_{1})}\\
@@ -754,8 +754,8 @@ alternative $p(\theta, \psi \mid y_{1}, H_{1})$ based on the first batch $y_{1}$
 to compute the Bayes factor based on the second batch $y_{2}$
 \citep[p.186]{OHagan2004}. This result generalizes to more than two batches by
 \begin{align*}
-  \BF_{01}(y_{1}, y_{2}, \dots, y_{n} ; \theta_{0})
-  &= \BF_{01}(y_{1} ; \theta_{0}) \times \prod_{i=2}^{n} \BF_{01}(y_{i} \mid y_{1}, y_{2}, \dots, y_{i-1} ; \theta_{0}),
+  \BF_{01}(y_{1:n} ; \theta_{0})
+  &= \BF_{01}(y_{1} ; \theta_{0}) \times \prod_{i=2}^{n} \BF_{01}(y_{i} \mid y_{1:(i-1)} ; \theta_{0}),
 \end{align*}
 that is, a BFF based on all the available data can be obtained by multiplying
 the BFF based on the previous batches by the partial Bayes factor based on the
