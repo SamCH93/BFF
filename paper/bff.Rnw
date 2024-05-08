@@ -1961,9 +1961,9 @@ ggplot(data = bffDF, aes(x = exp(logOR), y = bff, color = method)) +
   $\Nor(0, 1/2)$ priors are assigned to the coefficients under the alternative
   $H_{1}$. All other coefficients were considered as nuisance parameters and the
   same priors assigned to them as under the alternative. Variables are binary
-  indicators, except early age (0, 20 ,1 15 19, 2 under 15), gestational age
-  ($0 = \text{no}$, $1 = 36-38$ weeks, $2 = 33-36$ weeks; under 33 weeks
-  excluded), isoimmunization ($0 = \text{no}$, $1 = \text{Rh}$,
+  indicators, except early age ($0 = 20+$, $1 = 15-19$, $2 = \text{under}~15$),
+  gestational age ($0 = \text{no}$, $1 = 36-38$ weeks, $2 = 33-36$ weeks; under
+  33 weeks excluded), isoimmunization ($0 = \text{no}$, $1 = \text{Rh}$,
   $2 = \text{ABO}$), labour progress ($0 = \text{no}$,
   $0.33 = \text{prolonged}$, $0.67 = \text{protracted}$, $1 = \text{arrested}$)
   and past abortion ($0 = \text{none}$, $1 = 1$, $2 = 2+$).}
