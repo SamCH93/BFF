@@ -5,7 +5,7 @@ opts_chunk$set(fig.height = 4,
                echo = FALSE,
                warning = FALSE,
                message = FALSE,
-               cache = FALSE,
+               cache = TRUE,
                eval = TRUE)
 
 ## should sessionInfo be printed at the end?
@@ -13,15 +13,15 @@ Reproducibility <- TRUE
 
 ## packages
 library(metadat) # data set from Bartos (2023)
-library(ReplicationSuccess) # data from Protzko (2023)
 library(metabf) # BFFs for meta-analysis (not on CRAN, install from GitHub repo)
 library(brms) # Bayesian regression models with MCMC
 library(INLA) # Bayesian regression models with INLA
 library(ggplot2) # plotting
+library(haven)
 
 
 ## ----"pFun-and-BFFun", echo = FALSE, fig.height = 3.25, fig.align = "center"----
-## Create cartoon that shows p-value function and Bayes factor function
+## Create cartoon that shows p-value function and support curve
 par("mar" = c(2.75, 3.5, 1.5, 0.5), mfrow = c(1, 2))
 null <- seq(-2.5, 2.5, length.out = 500)
 yi <- 0
@@ -58,7 +58,7 @@ text(x = -2.8, y = p0 + 0.18, label = bquote(italic(P) * "-value for" ~ theta[0]
      cex = 0.7, pos = 4)
 lines(null, p, lwd = 2)
 
-## Bayes factor function
+## support curve
 bffun <- function(yi, sei, muPrior, sdPrior, null) {
     sqrt(1 +sdPrior^2/sei^2)*
         exp(-0.5*((yi - null)^2/sei^2 - (yi - muPrior)^2/(sdPrior^2 + sei^2)))
@@ -75,7 +75,7 @@ si <- yi + c(-1, 1)*sei*sqrt(log(1 + sdPrior^2/sei^2) +
                              (yi - muPrior)^2/(sei^2 + sdPrior^2) - 2*log(k))
 plot(null, bf, xaxt = "n", yaxt = "n", las = 1, type = "n", bty = "n",
 xlab = "", ylab = "",
-main = bquote("Bayes factor function" * " "))
+main = bquote("Support curve" * " "))
 axis(side = 1, at = c(-3, 3, t0), labels = c("", "", ""))
 axis(side = 2, at = c(0, 100, k), labels = c(0, "", expression(italic(k))), las = 1)
 mtext(text = expression(atop(atop(infinity, " "  %up%  " "), atop(" ", " "))),
@@ -268,7 +268,7 @@ bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100")
 matplot(t0seq, y = bfupper, type = "l", lty = 2,
         col = cols2, log = "y", ylim = c(1/1000, 120),
         las = 1, xlab = bquote("Mean" ~ theta),
-        ylab = bquote("BFF distribution (" *
+        ylab = bquote("SC distribution (" *
                       .(round(plower*100, 1)) * "/" * .(round(p*100, 1)) * "/" *
                           .(round(pupper*100, 1)) * "% quantiles)"),
         yaxt = "n",
@@ -296,7 +296,7 @@ text(x = min(t0seq), y = c(2.5, 1/2.5),
 
 ## ----"Bartos-data"------------------------------------------------------------
 ## data from Bartos
-y <- 178078
+y <- 178079
 n <- 350757
 a <- 5100
 b <- 4900
@@ -524,19 +524,44 @@ phn <- Vectorize(FUN = phn.)
 ## phn(x = 0.05, s = scale)
 
 
-## ----"data-protzko"-----------------------------------------------------------
-## load data from Protzko et al. (2023)
-protzko <- protzko2020
-labels <- subset(protzko, experiment == "Labels")
-yo <- subset(labels, type == "original")$smd
-so <- subset(labels, type == "original")$se
-yr <- subset(labels, type == "external-replication")$smd
-sr <- subset(labels, type == "external-replication")$se
-lab <- as.numeric(as.character(subset(labels, type == "external-replication")$lab))
+## ----"data-protzko", eval = FALSE---------------------------------------------
+## ## load data from Protzko et al. (2023)
+## protzko <- protzko2020
+## labels <- subset(protzko, experiment == "Labels")
+## yo <- subset(labels, type == "original")$smd
+## so <- subset(labels, type == "original")$se
+## yr <- subset(labels, type == "external-replication")$smd
+## sr <- subset(labels, type == "external-replication")$se
+## lab <- as.numeric(as.character(subset(labels, type == "external-replication")$lab))
+
+
+## ----"data-wagenmakers"-------------------------------------------------------
+## Data from 10.1177/1745691616674458
+lower <- c(-0.05, -0.4, -0.45, -0.52, -0.43, -0.69, -0.65, -0.35, -0.73, -0.65,
+           -0.19, -0.76, -1.41, -0.76, -0.51, -0.27, -0.74, -0.18)
+upper <- c(1.69, 0.67, 0.75, 0.49, 0.67, 0.46, 0.54, 0.75, 0.35, 0.69, 0.92,
+           0.28, 0.26, 0.49, 0.56, 0.57, 0.34, 0.88)
+mdRecalc <- rowMeans(x = cbind(lower, upper))
+se <- apply(X = cbind(lower, upper), MARGIN = 1,
+            FUN = function(x) diff(x)/(2*qnorm(p = 0.975)))
+md <- c(0.82, 0.14, 0.16, -0.02, 0.12, -0.11, -0.05, 0.2, -0.19, 0.02, 0.37,
+        -0.24, -0.58, -0.13, 0.02, 0.15, -0.2, 0.35)
+site <- c("Original", "Albohn", "Allard", "Benning", "Bulnes", "Capaldi",
+          "Chasten", "Holmes", "Koch", "Korb", "Lynott", "Oosterwijk",
+          "Ozdogru", "Pacheco-Unguetti", "Talarico", "Wagenmakers", "Wayand",
+          "Zeelenberg")
+wagenmakers2016 <- data.frame(site, md, se)
+yo <- md[1]
+so <- se[1]
+yr <- md[-1]
+sr <- se[-1]
+srpool <- sqrt(1/sum(1/sr^2))
+yrpool <- sum(yr/sr^2)*srpool^2
+cipool <- yrpool + c(-1, 1)*srpool*qnorm(p = 0.975)
+smallest <- which.min(yr)
 
 
 ## ----"replication-analysis", fig.height = 6.5---------------------------------
-
 ## replication BF
 repBFF <- function(null, yr, sr, yo, so, log = FALSE) {
     logbf <- dnorm(x = yr, mean = null, sd = sr, log = TRUE) -
@@ -556,49 +581,60 @@ SIrep <- function(k, yr, sr, yo, so, log = FALSE) {
 
 
 ## compute BFF, k=1 support interval, and MEE
-smdseq <- seq(-0.2, 0.7, length.out = 500)
+mdseq <- c(seq(-2, 0, length.out = 500), seq(0.001, 2, length.out = 500))
 bff <- sapply(X = seq(1, length(yr)), FUN = function(i) {
-    repBFF(null = smdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)
+    repBFF(null = mdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)
 })
+bffpool <- repBFF(null = mdseq, yr = yrpool, sr = srpool, yo = yo, so = so)
 si <- t(sapply(X = seq(1, length(yr)), FUN = function(i) {
     SIrep(k = 1, yr = yr[i], sr = sr[i], yo = yo, so = so)
 }))
+sipool <- SIrep(k = 1, yr = yrpool, sr = srpool, yo = yo, so = so)
 kme <- sapply(X = seq(1, length(yr)), FUN = function(i) {
     repBFF(null = yr[i], yr = yr[i], sr = sr[i], yo = yo, so = so)
 })
+kmepool <- repBFF(null = yrpool, yr = yrpool, sr = srpool, yo = yo, so = so)
 
 ## plot inferences
 par(mar = c(4, 4, 1, 1), mfrow = c(2, 1))
-cols <- palette.colors(n = 4, palette = "Okabe-Ito", alpha = 0.9)[2:4]
+cols <- adjustcolor(col = 1, alpha.f = 0.2)
 bks <- 10^seq(-6, 3, 1)
 labs <- c(expression(10^-6), expression(10^-5), expression(10^-4),
           expression(10^-3), expression(10^-2), expression(10^-1), "1",
           expression(10^1), expression(10^2), expression(10^3))
-matplot(smdseq, bff, type = "l", lty = 1, ylim = c(1/10^5, 10^3),
+matplot(mdseq, bff, type = "l", lty = 1, ylim = c(1/10^5, 10^3),
         lwd = 1.5, col = cols, las = 1, log = "y",
-        xlab = bquote("Standardized mean difference" ~ theta),
+        xlab = bquote("Mean difference" ~ theta),
         ylab = "Bayes factor",
         panel.first = graphics::grid(lty = 3, equilogs = FALSE),
         yaxt = "n")
 axis(side = 2, at = bks, labels = labs, las = 1)
 abline(h = 1, lty = 2, col = adjustcolor(col = 1, alpha = 0.3))
-arrows(x0 = si[,1], x1 = si[,3], y0 = kme, col = cols, code = 3,
-       angle = 90, length = 0, lty = 1)
+## arrows(x0 = si[,1], x1 = si[,3], y0 = kme, col = cols, code = 3,
+##        angle = 90, length = 0, lty = 1)
 points(x = si[,2], y = kme, col = cols, pch = 20)
-legend("bottomright", legend = paste("Lab", lab)[lab], col = cols[lab], lty = 1,
-       bg = "white", lwd = 1.5, cex = 0.7)
-arrows(x0 = min(smdseq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
+lines(mdseq, bffpool, col = 2, lwd = 1.5)
+arrows(x0 = sipool[1], x1 = sipool[3], y0 = kmepool, col = 2, code = 3,
+       angle = 90, length = 0, lty = 1)
+points(x = sipool[2], y = kmepool, col = 2, pch = 20)
+arrows(x0 = min(mdseq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
-text(x = min(smdseq), y = c(3, 1/3),
+text(x = min(mdseq), y = c(3, 1/3),
      labels = c(expression("Support for" ~ theta),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.7, col = adjustcolor("black", alpha.f = 0.8))
+legend("topright", lty = c(1, 1), col = c(cols, 2),
+       legend = c("Support curves based on individual replications",
+                  "Support curve based on pooled replications"),
+       ## legend = expression(theta ~ "|" ~ italic(H)[1] ~ "~ N(" * italic(y)["o"] * "," ~ sigma["o"]^2 *")"),
+       bg = "white", cex = 0.6, lwd = c(1, 1.5))
 
 ## plot posterior
-prior <- function(smd) dnorm(x = smd, mean = yo, sd = so)
+prior <- function(md) dnorm(x = md, mean = yo, sd = so)
 posterior <- sapply(X = seq(1, length(yr)), FUN = function(i) {
-    repBFF(null = smdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)*prior(smdseq)
+    repBFF(null = mdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)*prior(mdseq)
 })
+posteriorpool <- repBFF(null = mdseq, yr = yrpool, sr = srpool, yo = yo, so = so)*prior(mdseq)
 cri <- t(sapply(X = seq(1, length(yr)), FUN = function(i) {
     vpost <- 1/(1/so^2 + 1/sr[i]^2)
     mpost <- (yr[i]/sr[i]^2 + yo/so^2)*vpost
@@ -608,32 +644,139 @@ cri <- t(sapply(X = seq(1, length(yr)), FUN = function(i) {
     names(res) <- c("lower", "mee", "upper", "height")
     return(res)
 }))
-matplot(smdseq, posterior, type = "l", lty = 1,
+vpostpool <- 1/(1/so^2 + 1/srpool^2)
+mpostpool <- (yrpool/srpool^2 + yo/so^2)*vpostpool
+cripool <- mpostpool + c(-1, 1)*sqrt(vpostpool)*qnorm(p = 0.975)
+height <- dnorm(mpostpool, mpostpool, sqrt(vpostpool))
+res <- c(cripool[1], mpostpool, cripool[2], height)
+names(res) <- c("lower", "mee", "upper", "height")
+matplot(mdseq, posterior, type = "l", lty = 1,
         lwd = 1.5, col = cols, las = 1,
-        xlab = bquote("Standardized mean difference" ~ theta),
+        xlab = bquote("Mean difference" ~ theta),
         ylab = "Posterior density",
-        panel.first = graphics::grid(lty = 3, equilogs = FALSE))
-lines(smdseq, prior(smdseq), lty = 2, col = adjustcolor("black", alpha.f = 0.8),
+        panel.first = graphics::grid(lty = 3, equilogs = FALSE), ylim = c(0, height))
+lines(mdseq, prior(mdseq), lty = 2, col = adjustcolor("black", alpha.f = 0.8),
       lwd = 1.5)
-arrows(x0 = cri[,1], x1 = cri[,3], y0 = cri[,4], col = cols, code = 3,
-       angle = 90, length = 0, lty = 1)
+lines(mdseq, posteriorpool, lwd = 1.5, col = 2)
+## arrows(x0 = cri[,1], x1 = cri[,3], y0 = cri[,4], col = cols, code = 3,
+##        angle = 90, length = 0, lty = 1)
 points(x = cri[,2], y = cri[,4], col = cols, pch = 20)
-legend("topright", lty = 2, col = 1,
-       legend = "Prior based on original study",
+arrows(x0 = res[1], x1 = res[3], y0 = res[4], col = 2, code = 3, lwd = 1.5,
+       angle = 90, length = 0, lty = 1)
+points(x = res[2], y = res[4], col = 2, pch = 20)
+legend("topright", lty = c(2, 1, 1), col = c(1, cols, 2),
+       legend = c("Prior based on original study",
+                  "Posteriors based on individual replications",
+                  "Posterior based on pooled replications"),
        ## legend = expression(theta ~ "|" ~ italic(H)[1] ~ "~ N(" * italic(y)["o"] * "," ~ sigma["o"]^2 *")"),
-       bg = "white", cex = 0.7, lwd = 1.5)
+       bg = "white", cex = 0.6, lwd = c(1.5, 1, 1.5))
 
 
-## ----"regression-example-mcmc", cache = TRUE----------------------------------
-## reanalyze the data from Sullivan and Greenland (2008)
-dat <- read.table(file = "../data/fm0.asc", header = FALSE)
-colnames(dat) <- c("death", "nonwhite", "teenages", "nullip", "gestage",
-                   "isoimm", "abort", "hydram", "dyslab", "placord", "nomonit",
-                   "twint", "ward", "prerupt", "malpres")
-dat$dyslab <- dat$dyslab/3 # scaled like this in the paper, see caption Table 1
+## ----"replication-analysis-protzko", fig.height = 6.5, eval = FALSE-----------
+## 
+## ## replication BF
+## repBFF <- function(null, yr, sr, yo, so, log = FALSE) {
+##     logbf <- dnorm(x = yr, mean = null, sd = sr, log = TRUE) -
+##         dnorm(x = yr, mean = yo, sd = sqrt(sr^2 + so^2), log = TRUE)
+##     if (log == TRUE) return(logbf)
+##     else return(exp(logbf))
+## }
+## 
+## ## support interval based on replication BF
+## SIrep <- function(k, yr, sr, yo, so, log = FALSE) {
+##     si <- yr + c(-1, 1)*sr*
+##         sqrt(log(1 + so^2/sr^2) + (yr - yo)^2/(sr^2 + so^2) - 2*log(k))
+##     res <- c(si[1], yr, si[2])
+##     names(res) <- c("lower", "mee", "upper")
+##     return(res)
+## }
+## 
+## 
+## ## compute BFF, k=1 support interval, and MEE
+## smdseq <- seq(-0.2, 0.7, length.out = 500)
+## bff <- sapply(X = seq(1, length(yr)), FUN = function(i) {
+##     repBFF(null = smdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)
+## })
+## si <- t(sapply(X = seq(1, length(yr)), FUN = function(i) {
+##     SIrep(k = 1, yr = yr[i], sr = sr[i], yo = yo, so = so)
+## }))
+## kme <- sapply(X = seq(1, length(yr)), FUN = function(i) {
+##     repBFF(null = yr[i], yr = yr[i], sr = sr[i], yo = yo, so = so)
+## })
+## 
+## ## plot inferences
+## par(mar = c(4, 4, 1, 1), mfrow = c(2, 1))
+## cols <- palette.colors(n = 4, palette = "Okabe-Ito", alpha = 0.9)[2:4]
+## bks <- 10^seq(-6, 3, 1)
+## labs <- c(expression(10^-6), expression(10^-5), expression(10^-4),
+##           expression(10^-3), expression(10^-2), expression(10^-1), "1",
+##           expression(10^1), expression(10^2), expression(10^3))
+## matplot(smdseq, bff, type = "l", lty = 1, ylim = c(1/10^5, 10^3),
+##         lwd = 1.5, col = cols, las = 1, log = "y",
+##         xlab = bquote("Standardized mean difference" ~ theta),
+##         ylab = "Bayes factor",
+##         panel.first = graphics::grid(lty = 3, equilogs = FALSE),
+##         yaxt = "n")
+## axis(side = 2, at = bks, labels = labs, las = 1)
+## abline(h = 1, lty = 2, col = adjustcolor(col = 1, alpha = 0.3))
+## arrows(x0 = si[,1], x1 = si[,3], y0 = kme, col = cols, code = 3,
+##        angle = 90, length = 0, lty = 1)
+## points(x = si[,2], y = kme, col = cols, pch = 20)
+## legend("bottomright", legend = paste("Lab", lab)[lab], col = cols[lab], lty = 1,
+##        bg = "white", lwd = 1.5, cex = 0.7)
+## arrows(x0 = min(smdseq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
+##        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
+## text(x = min(smdseq), y = c(3, 1/3),
+##      labels = c(expression("Support for" ~ theta),
+##                 expression("Support for" ~ italic(H)[1])),
+##      pos = 4, cex = 0.7, col = adjustcolor("black", alpha.f = 0.8))
+## 
+## ## plot posterior
+## prior <- function(smd) dnorm(x = smd, mean = yo, sd = so)
+## posterior <- sapply(X = seq(1, length(yr)), FUN = function(i) {
+##     repBFF(null = smdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)*prior(smdseq)
+## })
+## cri <- t(sapply(X = seq(1, length(yr)), FUN = function(i) {
+##     vpost <- 1/(1/so^2 + 1/sr[i]^2)
+##     mpost <- (yr[i]/sr[i]^2 + yo/so^2)*vpost
+##     cri <- mpost + c(-1, 1)*sqrt(vpost)*qnorm(p = 0.975)
+##     height <- dnorm(mpost, mpost, sqrt(vpost))
+##     res <- c(cri[1], mpost, cri[2], height)
+##     names(res) <- c("lower", "mee", "upper", "height")
+##     return(res)
+## }))
+## matplot(smdseq, posterior, type = "l", lty = 1,
+##         lwd = 1.5, col = cols, las = 1,
+##         xlab = bquote("Standardized mean difference" ~ theta),
+##         ylab = "Posterior density",
+##         panel.first = graphics::grid(lty = 3, equilogs = FALSE))
+## lines(smdseq, prior(smdseq), lty = 2, col = adjustcolor("black", alpha.f = 0.8),
+##       lwd = 1.5)
+## arrows(x0 = cri[,1], x1 = cri[,3], y0 = cri[,4], col = cols, code = 3,
+##        angle = 90, length = 0, lty = 1)
+## points(x = cri[,2], y = cri[,4], col = cols, pch = 20)
+## legend("topright", lty = 2, col = 1,
+##        legend = "Prior based on original study",
+##        ## legend = expression(theta ~ "|" ~ italic(H)[1] ~ "~ N(" * italic(y)["o"] * "," ~ sigma["o"]^2 *")"),
+##        bg = "white", cex = 0.7, lwd = 1.5)
+
+
+## ----"logistic-regression", fig.height = 6------------------------------------
+## load data from Ejbye-Ernst et al. (2023) <https://doi.org/10.1007/s11292-023-09602-9>
+load(file = "../data/Ejbye-Ernst_etal2023.RData")
+dat <- data_frame
+class(dat$dow) <- "factor"
+dat$dealers_presence <- haven::as_factor(dat$dealers_presence)
+dat$dow <- factor(dat$dow, levels = c("wo", "do", "vr", "za"),
+                  labels = c("Wednesday", "Thursday", "Friday", "Saturday"))
+dat$intervention <- factor(dat$intervention_factor,
+                           levels = c("Before intervention", "After intervention"),
+                           labels = c("Before", "After"))
+dat$camera <- factor(dat$camera)
 
 ## fit logistic regression with ML
-glm1 <- glm(death ~ ., data = dat, family = "binomial")
+glm1 <- glm(dealers_presence ~ crowding + dow + intervention + camera +
+                hours_after_eight, family = binomial(link = "logit"), data = dat)
 ## summary(glm1)
 
 ## create prior for brms
@@ -642,59 +785,49 @@ psd <- sqrt(1/2) # prior standard deviation
 prior <- paste0("normal(", pm, ", ", psd, ")")
 
 ## Bayesian logistic regression model
-set.seed(1234)
-nmcmc <- 10000000
-nchain <- 12
+set.seed(4242)
+nmcmc <- 1000000
+nchain <- 10
 if ("stanmcmc.RData" %in% list.files(path = "../data/")) {
     load(file = "../data/stanmcmc.RData")
 } else {
-    bglm1 <- brm(death ~ ., data = dat,
+    bglm1 <- brm(dealers_presence ~ crowding + dow + intervention + camera +
+                     hours_after_eight, data = dat,
                  prior = c(set_prior("", class = "Intercept"), # flat prior
-                           set_prior(prior, class = "b",
-                                     coef = colnames(dat)[-1])),
-                 iter = nmcmc/nchain, chains = nchain,
-                 warmup = 1000, cores = 12,
-                 seed = 1234, family = "bernoulli")
+                           set_prior(prior, class = "b")), iter = nmcmc/nchain,
+                 chains = nchain, warmup = 500, cores = 12, seed = 4242,
+                 family = "bernoulli")
     save(bglm1, file = "../data/stanmcmc.RData")
 }
 ## ## MCMC diagnostics
 ## summary(bglm1)
 ## exp(fixef(bglm1))[-1,]
-## plot(bglm1, N = 15)
+## plot(bglm1, N = 8)
 
-
-## ----"regression-example-inla", cache = TRUE----------------------------------
-## define priors for INLA
+## priors for INLA
 pm <- 0 # prior mean
 prec <- 2 # prior precision
-coefs <- colnames(dat)[-1]
+coefs <- names(coef(glm1))[-1]
 pmeans <- as.list(rep(pm, length(coefs)))
 names(pmeans) <- coefs
 pprec <- as.list(rep(prec, length(coefs)))
 names(pprec) <- coefs
 
 ## fit model with INLA
-model <- death ~ 1 + nonwhite + teenages + nullip + gestage + isoimm + abort +
-    hydram + dyslab + placord + nomonit + twint + ward + prerupt + malpres
+dat$dealers_presence_bin <- as.numeric(dat$dealers_presence == "yes")
+model <- dealers_presence_bin ~ crowding + dow + intervention + camera +
+    hours_after_eight
 bglm2 <- inla(formula = model, data = dat, family = "binomial",
               control.fixed = list(mean = pmeans, prec = pprec))
+## summary(bglm2)
 
-
-## ----"regression-analysis", fig.height = 9, fig.width = 8, cache = TRUE-------
-coefs <- c("Non-White" = "nonwhite",
-           "Early age" = "teenages",
-           "Nulliparity" = "nullip",
-           "Isoimmunization" = "isoimm",
-           "Labour progress" = "dyslab",
-           "Placental or cord anomaly" = "placord",
-           "No monitor" = "nomonit",
-           "Public ward" = "ward",
-           "Premature rupture of membranes" = "prerupt",
-           "Gestational age" = "gestage",
-           "Hydramnios" = "hydram",
-           "Twin, triplet" = "twint",
-           "Malpresented" = "malpres",
-           "Past abortion" = "abort")
+coefs <- c("Crowding" = "crowding",
+           "Day: Thursday" = "dowThursday",
+           "Day: Friday" = "dowFriday",
+           "Day: Saturday" = "dowSaturday",
+           "After intervention" = "interventionAfter",
+           "Camera 2" = "camera1",
+           "Hours after 8PM" = "hours_after_eight")
 logORseq <- seq(log(1/30), log(100), length.out = 2^10)
 ORseq <- exp(logORseq)
 bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
@@ -705,14 +838,16 @@ glmdat <- summary(glm1)$coefficients
 
 bffres <- lapply(X = seq(1, length(coefs)), FUN = function(i) {
     coef <- coefs[i]
-    ## glm conjugate analysis
+    ## Univariate normal analysis
     glmest <- glmdat[rownames(glmdat) == coef, 1]
     glmse <- glmdat[rownames(glmdat) == coef, 2]
-    ## mcmc analysis
+    ## MCMC analysis
     mcmcdraws <- brms::as_draws_matrix(bglm1, variable = paste0("b_", coef))
+    priordraws <- rnorm(n = length(mcmcdraws), mean = pm, sd = psd)
     postdens <- density(mcmcdraws,  from = min(logORseq), to = max(logORseq),
                         n = length(logORseq))
-    ## compute BFFs
+
+    ## compute SCs
     priordens <- dnorm(x = logORseq, mean = pm, sd = psd)
     bffmcmc <- postdens$y/priordens
     bffglm <- dnorm(x = glmest, mean = logORseq, sd = glmse) /
@@ -742,19 +877,11 @@ bffres <- lapply(X = seq(1, length(coefs)), FUN = function(i) {
         sqrt(log(1 + psd^2/glmse^2) + (glmest - pm)^2/(psd^2 + glmse^2 - log(k)))
     lowerSInorm <- SInorm[1]
     upperSInorm <- SInorm[2]
-    ## HACK compute mcmc based SI for selected coefficients
-    if (coef == "teenages") {
-        lowerSImcmc <- logORseq[which.min(abs(log(bffmcmc[logORseq < meemcmc]) - log(k)))]
-        upperSImcmc <- logORseq[logORseq > meemcmc][
-            which.min(abs(log(bffmcmc[logORseq > meemcmc]) - log(k)))]
-    } else if (coef == "hydram") {
-        lowerSImcmc <- logORseq[which.min(abs(log(bffmcmc[logORseq < meemcmc]) - log(k)))]
-        upperSImcmc <- logORseq[logORseq > meemcmc][
-            which.min(abs(log(bffmcmc[logORseq > meemcmc]) - log(k)))]
-    } else {
-        lowerSImcmc <- NaN
-        upperSImcmc <- NaN
-    }
+    ## HACKY way to compute the MCMC SIs
+    lowerSImcmc <- logORseq[which.min(abs(log(bffmcmc[
+        logORseq < meemcmc]) - log(k)))]
+    upperSImcmc <- logORseq[logORseq > meemcmc][
+        which.min(abs(log(bffmcmc[logORseq > meemcmc]) - log(k)))]
 
     out <- list(bffDF,
                 rbind(data.frame(coef = names(coefs)[i], lowerSI = lowerSImcmc,
@@ -770,6 +897,7 @@ bffres <- lapply(X = seq(1, length(coefs)), FUN = function(i) {
     return(out)
 })
 
+## ----"logistic-regression-plot", fig.height = 6, dependson = "logistic-regression"----
 meeDF <- do.call("rbind", lapply(X = bffres, FUN = function(x) x[[2]]))
 bffDF <- do.call("rbind", lapply(X = bffres, FUN = function(x) x[[1]]))
 cols <- palette.colors(n = 4, palette = "Okabe-Ito")[2:4]
@@ -777,14 +905,16 @@ names(cols) <- c("MCMC", "INLA", "Univariate normal")
 bffDF$method <- factor(bffDF$method, levels = c("MCMC", "INLA", "Univariate normal"))
 bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
-orbks <- c(bfbks, 1/30, 1/3, 3, 30)
-orlabs <- c(bflabs, "1/30", "1/3", "3", "30")
-ggplot(data = bffDF, aes(x = exp(logOR), y = bff, color = method)) +
-    facet_wrap(~ coef, ncol = 3) +
-    geom_hline(yintercept = 1, col = 1, linetype = "dashed", alpha = 0.05) +
+orbks <- c(32, 16, 8, 4, 2, 1, 1/2, 1/4, 1/8, 1/16, 1/32)
+orlabs <- c("32", "16", "8", "4", "2", "1", "1/2", "1/4", "1/8", "1/16", "1/32")
+ggplot(data = subset(bffDF, bff != 0),
+       aes(x = exp(logOR), y = bff, color = method)) +
+    facet_wrap(~ coef, ncol = 2) +
+    geom_hline(yintercept = 1, col = 1, linetype = "dashed", alpha = 0.2) +
+    ## geom_vline(xintercept = 1, col = 1, linetype = "dashed", alpha = 0.2) +
     geom_line(aes(linetype = method), linewidth = 0.8, alpha = 0.8) +
     geom_point(data = meeDF, aes(x = exp(mee), y = k), show.legend = FALSE, alpha = 0.8) +
-    coord_cartesian(xlim = c(1/30, 100), ylim = c(1/100, 100)) +
+    coord_cartesian(xlim = c(1/10, 30), ylim = c(1/300, 300)) +
     scale_x_log10(breaks = orbks, labels = orlabs) +
     scale_y_log10(breaks = bfbks, labels = bflabs) +
     scale_color_manual(values = cols) +

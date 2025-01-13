@@ -23,7 +23,7 @@ Our results can be reproduced by installing the necessary packages
 
 ``` r
 ## CRAN packages
-pkgs <- c("ReplicationSuccess", "brms", "ggplot2", "remotes", "knitr")
+pkgs <- c("brms", "ggplot2", "remotes", "knitr", "haven")
 install.packages(pkgs)
 
 ## other packages
@@ -37,8 +37,8 @@ install.packages("INLA",
 ```
 
 and then rerunning the code in `paper/bff.R`. To recompile the manuscript make
-sure to have LaTeX installed (tested only with TeX Live 2022/dev/Debian) and
-then run
+sure to have LaTeX installed (tested only with TeX Live 2023/Debian) and then
+run
 
 ``` sh
 cd paper
@@ -52,13 +52,13 @@ the following output
 ``` r
 sessionInfo()
 
-#> R version 4.3.3 (2024-02-29)
-#> Platform: x86_64-pc-linux-gnu (64-bit)
-#> Running under: Ubuntu 22.04.4 LTS
+#> R version 4.4.1 (2024-06-14)
+#> Platform: x86_64-pc-linux-gnu
+#> Running under: Ubuntu 24.04.1 LTS
 #> 
 #> Matrix products: default
-#> BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0 
-#> LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.10.0
+#> BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.12.0 
+#> LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.12.0
 #> 
 #> locale:
 #>  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -75,50 +75,42 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#>  [1] ggplot2_3.5.0            INLA_24.02.09            sp_2.1-3                
-#>  [4] Matrix_1.6-3             brms_2.20.4              Rcpp_1.0.12             
-#>  [7] metabf_0.1               ReplicationSuccess_1.3.2 metadat_1.3-0           
-#> [10] knitr_1.45              
+#>  [1] ggplot2_3.5.1            INLA_24.06.27            sp_2.1-3                
+#>  [4] Matrix_1.7-1             brms_2.21.0              Rcpp_1.0.13-1           
+#>  [7] metabf_0.1               ReplicationSuccess_1.3.3 metadat_1.3-0           
+#> [10] knitr_1.48              
 #> 
 #> loaded via a namespace (and not attached):
-#>   [1] DBI_1.1.3            gridExtra_2.3        inline_0.3.19       
-#>   [4] sandwich_3.1-0       rlang_1.1.1          magrittr_2.0.3      
-#>   [7] multcomp_1.4-25      e1071_1.7-13         matrixStats_1.0.0   
-#>  [10] compiler_4.3.3       loo_2.6.0            callr_3.7.3         
-#>  [13] vctrs_0.6.5          reshape2_1.4.4       stringr_1.5.0       
-#>  [16] pkgconfig_2.0.3      crayon_1.5.2         fastmap_1.1.1       
-#>  [19] backports_1.4.1      ellipsis_0.3.2       utf8_1.2.3          
-#>  [22] threejs_0.3.3        promises_1.2.1       markdown_1.12       
-#>  [25] ps_1.7.5             MatrixModels_0.5-3   xfun_0.40           
-#>  [28] jsonlite_1.8.7       later_1.3.1          parallel_4.3.3      
-#>  [31] prettyunits_1.1.1    R6_2.5.1             dygraphs_1.1.1.6    
-#>  [34] stringi_1.7.12       StanHeaders_2.32.5   estimability_1.4.1  
-#>  [37] rstan_2.32.5         zoo_1.8-12           base64enc_0.1-3     
-#>  [40] bayesplot_1.11.0     httpuv_1.6.11        splines_4.3.3       
-#>  [43] igraph_2.0.1.1       tidyselect_1.2.0     abind_1.4-5         
-#>  [46] codetools_0.2-19     miniUI_0.1.1.1       processx_3.8.2      
-#>  [49] pkgbuild_1.4.2       lattice_0.22-5       tibble_3.2.1        
-#>  [52] plyr_1.8.9           withr_2.5.0          shiny_1.7.5         
-#>  [55] bridgesampling_1.1-2 posterior_1.5.0      coda_0.19-4         
-#>  [58] survival_3.5-7       sf_1.0-14            units_0.8-4         
-#>  [61] proxy_0.4-27         RcppParallel_5.1.7   xts_0.13.2          
-#>  [64] pillar_1.9.0         tensorA_0.36.2.1     KernSmooth_2.23-22  
-#>  [67] checkmate_2.2.0      DT_0.31              stats4_4.3.3        
-#>  [70] shinyjs_2.1.0        distributional_0.4.0 generics_0.1.3      
-#>  [73] mathjaxr_1.6-0       rstantools_2.4.0     munsell_0.5.0       
-#>  [76] scales_1.3.0         gtools_3.9.5         xtable_1.8-4        
-#>  [79] class_7.3-22         glue_1.6.2           cubature_2.1.0      
-#>  [82] emmeans_1.8.9        tools_4.3.3          shinystan_2.6.0     
-#>  [85] colourpicker_1.3.0   mvtnorm_1.2-3        grid_4.3.3          
-#>  [88] QuickJSR_1.1.3       crosstalk_1.2.1      colorspace_2.1-0    
-#>  [91] nlme_3.1-163         cli_3.6.1            fansi_1.0.4         
-#>  [94] fmesher_0.1.5        Brobdingnag_1.2-9    dplyr_1.1.4         
-#>  [97] gtable_0.3.4         digest_0.6.33        classInt_0.4-10     
-#> [100] TH.data_1.1-2        farver_2.1.1         htmlwidgets_1.6.2   
-#> [103] htmltools_0.5.6      lifecycle_1.0.3      mime_0.12           
-#> [106] shinythemes_1.2.0    MASS_7.3-60.0.1 
- 
+#>  [1] tidyselect_1.2.1     dplyr_1.1.4          farver_2.1.2        
+#>  [4] loo_2.7.0            TH.data_1.1-2        tensorA_0.36.2.1    
+#>  [7] mathjaxr_1.6-0       estimability_1.5     lifecycle_1.0.4     
+#> [10] sf_1.0-19            StanHeaders_2.32.7   survival_3.7-0      
+#> [13] processx_3.8.4       magrittr_2.0.3       posterior_1.5.0     
+#> [16] compiler_4.4.1       rlang_1.1.4          tools_4.4.1         
+#> [19] bridgesampling_1.1-2 pkgbuild_1.4.4       classInt_0.4-10     
+#> [22] multcomp_1.4-25      abind_1.4-5          KernSmooth_2.23-24  
+#> [25] withr_3.0.2          grid_4.4.1           stats4_4.4.1        
+#> [28] xtable_1.8-4         e1071_1.7-14         colorspace_2.1-1    
+#> [31] inline_0.3.19        emmeans_1.10.1       scales_1.3.0        
+#> [34] MASS_7.3-60.2        cli_3.6.3            mvtnorm_1.2-5       
+#> [37] crayon_1.5.3         generics_0.1.3       RcppParallel_5.1.9  
+#> [40] DBI_1.2.3            proxy_0.4-27         rstan_2.32.6        
+#> [43] stringr_1.5.1        splines_4.4.1        bayesplot_1.11.1    
+#> [46] parallel_4.4.1       matrixStats_1.3.0    vctrs_0.6.5         
+#> [49] sandwich_3.1-0       jsonlite_1.8.8       callr_3.7.6         
+#> [52] hms_1.1.3            units_0.8-5          glue_1.8.0          
+#> [55] codetools_0.2-19     ps_1.7.6             distributional_0.4.0
+#> [58] stringi_1.8.4        cubature_2.1.0       gtable_0.3.6        
+#> [61] QuickJSR_1.1.3       munsell_0.5.1        tibble_3.2.1        
+#> [64] pillar_1.10.1        Brobdingnag_1.2-9    R6_2.5.1            
+#> [67] fmesher_0.1.5        evaluate_0.24.0      lattice_0.22-5      
+#> [70] haven_2.5.4          backports_1.5.0      rstantools_2.4.0    
+#> [73] class_7.3-22         MatrixModels_0.5-3   coda_0.19-4.1       
+#> [76] gridExtra_2.3        nlme_3.1-165         checkmate_2.3.1     
+#> [79] xfun_0.49            zoo_1.8-12           forcats_1.0.0       
+#> [82] pkgconfig_2.0.3     
+
 cat(paste(Sys.time(), Sys.timezone(), "\n"))
 
-#> 2024-03-12 15:11:38.508182 Europe/Zurich 
+#> 2025-01-13 14:36:47.005593 Europe/Zurich
 ```
