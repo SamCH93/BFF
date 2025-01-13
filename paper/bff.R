@@ -17,7 +17,7 @@ library(metabf) # BFFs for meta-analysis (not on CRAN, install from GitHub repo)
 library(brms) # Bayesian regression models with MCMC
 library(INLA) # Bayesian regression models with INLA
 library(ggplot2) # plotting
-library(haven)
+library(haven) # handling SPSS imported data set
 
 
 ## ----"pFun-and-BFFun", echo = FALSE, fig.height = 3.25, fig.align = "center"----
@@ -672,98 +672,11 @@ legend("topright", lty = c(2, 1, 1), col = c(1, cols, 2),
        bg = "white", cex = 0.6, lwd = c(1.5, 1, 1.5))
 
 
-## ----"replication-analysis-protzko", fig.height = 6.5, eval = FALSE-----------
-## 
-## ## replication BF
-## repBFF <- function(null, yr, sr, yo, so, log = FALSE) {
-##     logbf <- dnorm(x = yr, mean = null, sd = sr, log = TRUE) -
-##         dnorm(x = yr, mean = yo, sd = sqrt(sr^2 + so^2), log = TRUE)
-##     if (log == TRUE) return(logbf)
-##     else return(exp(logbf))
-## }
-## 
-## ## support interval based on replication BF
-## SIrep <- function(k, yr, sr, yo, so, log = FALSE) {
-##     si <- yr + c(-1, 1)*sr*
-##         sqrt(log(1 + so^2/sr^2) + (yr - yo)^2/(sr^2 + so^2) - 2*log(k))
-##     res <- c(si[1], yr, si[2])
-##     names(res) <- c("lower", "mee", "upper")
-##     return(res)
-## }
-## 
-## 
-## ## compute BFF, k=1 support interval, and MEE
-## smdseq <- seq(-0.2, 0.7, length.out = 500)
-## bff <- sapply(X = seq(1, length(yr)), FUN = function(i) {
-##     repBFF(null = smdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)
-## })
-## si <- t(sapply(X = seq(1, length(yr)), FUN = function(i) {
-##     SIrep(k = 1, yr = yr[i], sr = sr[i], yo = yo, so = so)
-## }))
-## kme <- sapply(X = seq(1, length(yr)), FUN = function(i) {
-##     repBFF(null = yr[i], yr = yr[i], sr = sr[i], yo = yo, so = so)
-## })
-## 
-## ## plot inferences
-## par(mar = c(4, 4, 1, 1), mfrow = c(2, 1))
-## cols <- palette.colors(n = 4, palette = "Okabe-Ito", alpha = 0.9)[2:4]
-## bks <- 10^seq(-6, 3, 1)
-## labs <- c(expression(10^-6), expression(10^-5), expression(10^-4),
-##           expression(10^-3), expression(10^-2), expression(10^-1), "1",
-##           expression(10^1), expression(10^2), expression(10^3))
-## matplot(smdseq, bff, type = "l", lty = 1, ylim = c(1/10^5, 10^3),
-##         lwd = 1.5, col = cols, las = 1, log = "y",
-##         xlab = bquote("Standardized mean difference" ~ theta),
-##         ylab = "Bayes factor",
-##         panel.first = graphics::grid(lty = 3, equilogs = FALSE),
-##         yaxt = "n")
-## axis(side = 2, at = bks, labels = labs, las = 1)
-## abline(h = 1, lty = 2, col = adjustcolor(col = 1, alpha = 0.3))
-## arrows(x0 = si[,1], x1 = si[,3], y0 = kme, col = cols, code = 3,
-##        angle = 90, length = 0, lty = 1)
-## points(x = si[,2], y = kme, col = cols, pch = 20)
-## legend("bottomright", legend = paste("Lab", lab)[lab], col = cols[lab], lty = 1,
-##        bg = "white", lwd = 1.5, cex = 0.7)
-## arrows(x0 = min(smdseq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
-##        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
-## text(x = min(smdseq), y = c(3, 1/3),
-##      labels = c(expression("Support for" ~ theta),
-##                 expression("Support for" ~ italic(H)[1])),
-##      pos = 4, cex = 0.7, col = adjustcolor("black", alpha.f = 0.8))
-## 
-## ## plot posterior
-## prior <- function(smd) dnorm(x = smd, mean = yo, sd = so)
-## posterior <- sapply(X = seq(1, length(yr)), FUN = function(i) {
-##     repBFF(null = smdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)*prior(smdseq)
-## })
-## cri <- t(sapply(X = seq(1, length(yr)), FUN = function(i) {
-##     vpost <- 1/(1/so^2 + 1/sr[i]^2)
-##     mpost <- (yr[i]/sr[i]^2 + yo/so^2)*vpost
-##     cri <- mpost + c(-1, 1)*sqrt(vpost)*qnorm(p = 0.975)
-##     height <- dnorm(mpost, mpost, sqrt(vpost))
-##     res <- c(cri[1], mpost, cri[2], height)
-##     names(res) <- c("lower", "mee", "upper", "height")
-##     return(res)
-## }))
-## matplot(smdseq, posterior, type = "l", lty = 1,
-##         lwd = 1.5, col = cols, las = 1,
-##         xlab = bquote("Standardized mean difference" ~ theta),
-##         ylab = "Posterior density",
-##         panel.first = graphics::grid(lty = 3, equilogs = FALSE))
-## lines(smdseq, prior(smdseq), lty = 2, col = adjustcolor("black", alpha.f = 0.8),
-##       lwd = 1.5)
-## arrows(x0 = cri[,1], x1 = cri[,3], y0 = cri[,4], col = cols, code = 3,
-##        angle = 90, length = 0, lty = 1)
-## points(x = cri[,2], y = cri[,4], col = cols, pch = 20)
-## legend("topright", lty = 2, col = 1,
-##        legend = "Prior based on original study",
-##        ## legend = expression(theta ~ "|" ~ italic(H)[1] ~ "~ N(" * italic(y)["o"] * "," ~ sigma["o"]^2 *")"),
-##        bg = "white", cex = 0.7, lwd = 1.5)
-
-
 ## ----"logistic-regression", fig.height = 6------------------------------------
-## load data from Ejbye-Ernst et al. (2023) <https://doi.org/10.1007/s11292-023-09602-9>
-load(file = "../data/Ejbye-Ernst_etal2023.RData")
+## load data from Ejbye-Ernst et al. (2023)
+## <https://doi.org/10.1007/s11292-023-09602-9>
+## <https://osf.io/nb56d>
+load(file = "../data/data.RData")
 dat <- data_frame
 class(dat$dow) <- "factor"
 dat$dealers_presence <- haven::as_factor(dat$dealers_presence)

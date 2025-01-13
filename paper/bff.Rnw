@@ -93,7 +93,7 @@ library(metabf) # BFFs for meta-analysis (not on CRAN, install from GitHub repo)
 library(brms) # Bayesian regression models with MCMC
 library(INLA) # Bayesian regression models with INLA
 library(ggplot2) # plotting
-library(haven)
+library(haven) # handling SPSS imported data set
 @
 
 \begin{document}
@@ -1570,8 +1570,6 @@ with the hypothesis from \citet{Diaconis2007}. At the same time, there seems to
 be non-negligible between-flipper heterogeneity, with a betwen-flipper standard
 deviation of around one to two percent.
 
-% write something unique about SC analysis that cannot be done with ordinary
-% analysis
 
 << "data-protzko", eval = FALSE >>=
 ## load data from Protzko et al. (2023)
@@ -1624,23 +1622,6 @@ and $k$ support interval
   y_{r} \pm \sigma_{r} \sqrt{\log\left(1 + \frac{\sigma^{2}_{o}}{\sigma^2_{r}}\right) +
   \frac{(y_{r} - y_{0})^{2}}{\sigma^{2}_{r} + \sigma^{2}_{o}} - \log k^{2}}.
 \end{align*}
-
-%% We will now demonstrate application of the replication SC by reanalyzing data
-%% from three replication studies that were part of the large-scale replication
-%% project in the social-behavioral sciences \citep{Protzko2023}. The original
-%% experiment termed `Labels' found the following central result:
-%% \begin{quote}
-%%   `\emph{When a researcher uses a label to describe people who hold a certain
-%%     opinion, he or she is interpreted as disagreeing with that opinion when a
-%%     negative label is used and agreeing with that opinion when a positive label
-%%     is used.}' \citet[p. 312]{Protzko2023}
-%% \end{quote}
-%% which was based on an estimated standardized mean difference
-%% $y_{o} = \Sexpr{yo}$ with standard error $\sigma_{o} = \Sexpr{round(so, 3)}$.
-%% The replication studies conducted in three other labs found a smaller, a
-%% similar, and a much larger effect estimate ($y_{ri} \in \{\Sexpr{yr[lab]}\}$
-%% with standard errors $\sigma_{ri} \in \{\Sexpr{round(sr, 3)[lab]}\}$,
-%% respectively).
 
 << "data-wagenmakers" >>=
 ## Data from 10.1177/1745691616674458
@@ -1857,189 +1838,6 @@ presented here, can be useful because it can clearly show whether or not there
 are parameter values that are better supported than the prior based on the
 original study.
 
-%% The replication from lab 2 produced an effect estimate
-%% identical to the original one, so there is little support of its MEE over the
-%% alternative based on the original study as the estimates from both studies are
-%% in close agreement. In contrast, the MEEs from lab 1 and lab 3 receive
-%% substantial and very strong support over the alternative because they are either
-%% smaller or larger. In turn, their $k = 1$ support intervals are much wider
-%% compared to the narrow support interval from lab 2. Finally, we can also see
-%% that the SC from lab 1 indicates that there is absence of evidence regarding
-%% whether or not the data support the value of no effect ($\BF_{01} \approx 1$ at
-%% $\theta = 0$), whereas the SCs from labs 2 and 3 indicate strong and decisive
-%% evidence against no effect up to very small effects of around $\theta = 0.1$,
-%% respectively.
-%% % , but neither indicates conclusive evidence against a small effect
-%% % ($\theta \approx 0.3$).
-
-
-%% . For example, the
-%% posterior from lab 3 is centered around $\Sexpr{round(cri[lab == 3, 2], 2)}$
-%% with 95\% credible interval from $\Sexpr{round(cri[lab == 3, 1], 2)}$ to
-%% $\Sexpr{round(cri[lab == 3, 3], 1)}$. Clearly, this interval excludes both the
-%% original ($y_{o} = \Sexpr{yo}$) and the replication effect estimates
-%% ($y_{r3} = \Sexpr{yr[lab == 3]}$), leading to a different conclusion from the
-%% SC, which indicates decisive evidence for the MEE at
-%% $y_{r3} = \Sexpr{yr[lab == 3]}$ ($\kME = \Sexpr{round(kme[lab == 3])}$).
-%% % This phenomenon is perhaps best described in the words of Stephen Senn
-%% % \begin{quote}
-%% %   `\emph{\textbf{Bayesian}: One who, vaguely expecting a horse and catching a
-%% %   glimpse of a donkey, strongly concludes he has seen a mule.}' \citep[p.
-%% %   46]{Senn2008}
-%% % \end{quote}
-%% % It raises the question of whether a synthesis of prior and likelihood is
-%% % appropriate in this situation.
-
-
-%% \begin{figure}[!tb]
-<< "replication-analysis-protzko", fig.height = 6.5, eval = FALSE >>=
-
-## replication BF
-repBFF <- function(null, yr, sr, yo, so, log = FALSE) {
-    logbf <- dnorm(x = yr, mean = null, sd = sr, log = TRUE) -
-        dnorm(x = yr, mean = yo, sd = sqrt(sr^2 + so^2), log = TRUE)
-    if (log == TRUE) return(logbf)
-    else return(exp(logbf))
-}
-
-## support interval based on replication BF
-SIrep <- function(k, yr, sr, yo, so, log = FALSE) {
-    si <- yr + c(-1, 1)*sr*
-        sqrt(log(1 + so^2/sr^2) + (yr - yo)^2/(sr^2 + so^2) - 2*log(k))
-    res <- c(si[1], yr, si[2])
-    names(res) <- c("lower", "mee", "upper")
-    return(res)
-}
-
-
-## compute BFF, k=1 support interval, and MEE
-smdseq <- seq(-0.2, 0.7, length.out = 500)
-bff <- sapply(X = seq(1, length(yr)), FUN = function(i) {
-    repBFF(null = smdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)
-})
-si <- t(sapply(X = seq(1, length(yr)), FUN = function(i) {
-    SIrep(k = 1, yr = yr[i], sr = sr[i], yo = yo, so = so)
-}))
-kme <- sapply(X = seq(1, length(yr)), FUN = function(i) {
-    repBFF(null = yr[i], yr = yr[i], sr = sr[i], yo = yo, so = so)
-})
-
-## plot inferences
-par(mar = c(4, 4, 1, 1), mfrow = c(2, 1))
-cols <- palette.colors(n = 4, palette = "Okabe-Ito", alpha = 0.9)[2:4]
-bks <- 10^seq(-6, 3, 1)
-labs <- c(expression(10^-6), expression(10^-5), expression(10^-4),
-          expression(10^-3), expression(10^-2), expression(10^-1), "1",
-          expression(10^1), expression(10^2), expression(10^3))
-matplot(smdseq, bff, type = "l", lty = 1, ylim = c(1/10^5, 10^3),
-        lwd = 1.5, col = cols, las = 1, log = "y",
-        xlab = bquote("Standardized mean difference" ~ theta),
-        ylab = "Bayes factor",
-        panel.first = graphics::grid(lty = 3, equilogs = FALSE),
-        yaxt = "n")
-axis(side = 2, at = bks, labels = labs, las = 1)
-abline(h = 1, lty = 2, col = adjustcolor(col = 1, alpha = 0.3))
-arrows(x0 = si[,1], x1 = si[,3], y0 = kme, col = cols, code = 3,
-       angle = 90, length = 0, lty = 1)
-points(x = si[,2], y = kme, col = cols, pch = 20)
-legend("bottomright", legend = paste("Lab", lab)[lab], col = cols[lab], lty = 1,
-       bg = "white", lwd = 1.5, cex = 0.7)
-arrows(x0 = min(smdseq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
-       col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
-text(x = min(smdseq), y = c(3, 1/3),
-     labels = c(expression("Support for" ~ theta),
-                expression("Support for" ~ italic(H)[1])),
-     pos = 4, cex = 0.7, col = adjustcolor("black", alpha.f = 0.8))
-
-## plot posterior
-prior <- function(smd) dnorm(x = smd, mean = yo, sd = so)
-posterior <- sapply(X = seq(1, length(yr)), FUN = function(i) {
-    repBFF(null = smdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)*prior(smdseq)
-})
-cri <- t(sapply(X = seq(1, length(yr)), FUN = function(i) {
-    vpost <- 1/(1/so^2 + 1/sr[i]^2)
-    mpost <- (yr[i]/sr[i]^2 + yo/so^2)*vpost
-    cri <- mpost + c(-1, 1)*sqrt(vpost)*qnorm(p = 0.975)
-    height <- dnorm(mpost, mpost, sqrt(vpost))
-    res <- c(cri[1], mpost, cri[2], height)
-    names(res) <- c("lower", "mee", "upper", "height")
-    return(res)
-}))
-matplot(smdseq, posterior, type = "l", lty = 1,
-        lwd = 1.5, col = cols, las = 1,
-        xlab = bquote("Standardized mean difference" ~ theta),
-        ylab = "Posterior density",
-        panel.first = graphics::grid(lty = 3, equilogs = FALSE))
-lines(smdseq, prior(smdseq), lty = 2, col = adjustcolor("black", alpha.f = 0.8),
-      lwd = 1.5)
-arrows(x0 = cri[,1], x1 = cri[,3], y0 = cri[,4], col = cols, code = 3,
-       angle = 90, length = 0, lty = 1)
-points(x = cri[,2], y = cri[,4], col = cols, pch = 20)
-legend("topright", lty = 2, col = 1,
-       legend = "Prior based on original study",
-       ## legend = expression(theta ~ "|" ~ italic(H)[1] ~ "~ N(" * italic(y)["o"] * "," ~ sigma["o"]^2 *")"),
-       bg = "white", cex = 0.7, lwd = 1.5)
-@
-%% \caption{Support curves with maximum evidence estimates and $k=1$
-%%   support intervals (top) and posterior distribution with posterior modes and
-%%   95\% highest posterior density credible intervals (bottom) for the three
-%%   replication studies from the `Labels' experiment \citep{Protzko2023}. The
-%%   original study found an estimated standardized mean difference of
-%%   $y_{o} = \Sexpr{yo}$ with standard error $\sigma_{o} = \Sexpr{round(so, 3)}$
-%%   which is used to formulate the prior distribution under the alternative
-%%   $\theta \mid H_{1} \sim \Nor(y_{o}, \sigma^{2}_{o})$. The replication effect
-%%   estimates were $y_{ri} \in \{\Sexpr{yr[lab]}\}$ with standard errors
-%%   $\sigma_{ri} \in \{\Sexpr{round(sr, 3)[lab]}\}$, respectively, and are assumed
-%%   to be normally distributed
-%%   $y_{ri} \mid \theta \sim \Nor(\theta, \sigma^{2}_{ri})$. The posterior is
-%%   obtained by multiplying the BFF with the prior density. }
-%% \label{fig:replication}
-%% \end{figure}
-
-
-%% The top plot in Figure~\ref{fig:replication} shows the associated
-%% SCs, MEEs, and $k=1$ support intervals. We see that, the SCs peak at the
-%% corresponding replication estimate, but the height of these peaks differs
-%% between replications. The replication from lab 2 produced an effect estimate
-%% identical to the original one, so there is little support of its MEE over the
-%% alternative based on the original study as the estimates from both studies are
-%% in close agreement. In contrast, the MEEs from lab 1 and lab 3 receive
-%% substantial and very strong support over the alternative because they are either
-%% smaller or larger. In turn, their $k = 1$ support intervals are much wider
-%% compared to the narrow support interval from lab 2. Finally, we can also see
-%% that the SC from lab 1 indicates that there is absence of evidence regarding
-%% whether or not the data support the value of no effect ($\BF_{01} \approx 1$ at
-%% $\theta = 0$), whereas the SCs from labs 2 and 3 indicate strong and decisive
-%% evidence against no effect up to very small effects of around $\theta = 0.1$,
-%% respectively.
-%% % , but neither indicates conclusive evidence against a small effect
-%% % ($\theta \approx 0.3$).
-
-%% The bottom plot in Figure~\ref{fig:replication} illustrates the posterior
-%% distributions, conveniently obtained by multiplying the SC by the prior
-%% distribution based on the original data since this SC has a Savage-Dickey
-%% density ratio representation. We can see that the $k=1$ support intervals from
-%% the top plot are given by the set of effect sizes with posterior density larger
-%% than the prior density. These posteriors represent a synthesis of the original
-%% and replication studies, as they lie somewhere in between the likelihood of the
-%% replication data and the prior based on the original study. For example, the
-%% posterior from lab 3 is centered around $\Sexpr{round(cri[lab == 3, 2], 2)}$
-%% with 95\% credible interval from $\Sexpr{round(cri[lab == 3, 1], 2)}$ to
-%% $\Sexpr{round(cri[lab == 3, 3], 1)}$. Clearly, this interval excludes both the
-%% original ($y_{o} = \Sexpr{yo}$) and the replication effect estimates
-%% ($y_{r3} = \Sexpr{yr[lab == 3]}$), leading to a different conclusion from the
-%% SC, which indicates decisive evidence for the MEE at
-%% $y_{r3} = \Sexpr{yr[lab == 3]}$ ($\kME = \Sexpr{round(kme[lab == 3])}$).
-%% % This phenomenon is perhaps best described in the words of Stephen Senn
-%% % \begin{quote}
-%% %   `\emph{\textbf{Bayesian}: One who, vaguely expecting a horse and catching a
-%% %   glimpse of a donkey, strongly concludes he has seen a mule.}' \citep[p.
-%% %   46]{Senn2008}
-%% % \end{quote}
-%% % It raises the question of whether a synthesis of prior and likelihood is
-%% % appropriate in this situation.
-
-
 
 \subsection{Logistic regression}
 \label{sec:logisticregression}
@@ -2058,8 +1856,10 @@ effect of the intervention, as we will see in the following.
 
 \begin{figure}[!htb]
 << "logistic-regression", fig.height = 6 >>=
-## load data from Ejbye-Ernst et al. (2023) <https://doi.org/10.1007/s11292-023-09602-9>
-load(file = "../data/Ejbye-Ernst_etal2023.RData")
+## load data from Ejbye-Ernst et al. (2023)
+## <https://doi.org/10.1007/s11292-023-09602-9>
+## <https://osf.io/nb56d>
+load(file = "../data/data.RData")
 dat <- data_frame
 class(dat$dow) <- "factor"
 dat$dealers_presence <- haven::as_factor(dat$dealers_presence)
@@ -2402,7 +2202,7 @@ We declare no conflict of interest.
 %% contained in `\texttt{Supplementary Data.zip}' available
 %% at \url{https://doi.org/10.1093/ije/dys213}.
 The data from \citet{EjbyeErnst2023} where obtained from the
-`\texttt{data.RData}' file available at \url{https://osf.io/qpb47}. The data
+`\texttt{data.RData}' file available at \url{https://osf.io/nb56d}. The data
 from \citet{Wagenmakers2016} were manually extracted from Figure 4 in their
 paper. The standard errors were recomputed by dividing the difference of the
 upper and the lower confidence interval bounds by twice the 97.5\% quantile of
@@ -2422,6 +2222,7 @@ programming language \Sexpr{R.Version()[["version.string"]]} for analyses
 \bibliography{bibliography}
 }
 
+\begin{spacing}{1}
 << "sessionInfo1", eval = Reproducibility, results = "asis" >>=
 ## print R sessionInfo to see system information and package versions
 ## used to compile the manuscript (set Reproducibility = FALSE, to not do that)
@@ -2431,5 +2232,6 @@ cat("\\newpage \\section*{Computational details}")
 cat(paste(Sys.time(), Sys.timezone(), "\n"))
 sessionInfo()
 @
+\end{spacing}
 
 \end{document}

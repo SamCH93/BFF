@@ -36,9 +36,10 @@ install.packages("INLA",
                  dep = TRUE) 
 ```
 
-and then rerunning the code in `paper/bff.R`. To recompile the manuscript make
-sure to have LaTeX installed (tested only with TeX Live 2023/Debian) and then
-run
+downloading the file `data.RData` from <https://osf.io/nb56d>, saving it under
+`data/data.RData`, and then rerunning the code in `paper/bff.R`. To recompile
+the manuscript make sure to have LaTeX installed (tested only with TeX Live
+2023/Debian) and then run
 
 ``` sh
 cd paper
@@ -75,40 +76,35 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#>  [1] ggplot2_3.5.1            INLA_24.06.27            sp_2.1-3                
-#>  [4] Matrix_1.7-1             brms_2.21.0              Rcpp_1.0.13-1           
-#>  [7] metabf_0.1               ReplicationSuccess_1.3.3 metadat_1.3-0           
-#> [10] knitr_1.48              
+#>  [1] haven_2.5.4   ggplot2_3.5.1 INLA_24.06.27 sp_2.1-3      Matrix_1.7-1 
+#>  [6] brms_2.21.0   Rcpp_1.0.13-1 metabf_0.1    metadat_1.3-0 knitr_1.48   
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] tidyselect_1.2.1     dplyr_1.1.4          farver_2.1.2        
-#>  [4] loo_2.7.0            TH.data_1.1-2        tensorA_0.36.2.1    
-#>  [7] mathjaxr_1.6-0       estimability_1.5     lifecycle_1.0.4     
-#> [10] sf_1.0-19            StanHeaders_2.32.7   survival_3.7-0      
-#> [13] processx_3.8.4       magrittr_2.0.3       posterior_1.5.0     
-#> [16] compiler_4.4.1       rlang_1.1.4          tools_4.4.1         
-#> [19] bridgesampling_1.1-2 pkgbuild_1.4.4       classInt_0.4-10     
-#> [22] multcomp_1.4-25      abind_1.4-5          KernSmooth_2.23-24  
-#> [25] withr_3.0.2          grid_4.4.1           stats4_4.4.1        
-#> [28] xtable_1.8-4         e1071_1.7-14         colorspace_2.1-1    
-#> [31] inline_0.3.19        emmeans_1.10.1       scales_1.3.0        
-#> [34] MASS_7.3-60.2        cli_3.6.3            mvtnorm_1.2-5       
-#> [37] crayon_1.5.3         generics_0.1.3       RcppParallel_5.1.9  
-#> [40] DBI_1.2.3            proxy_0.4-27         rstan_2.32.6        
-#> [43] stringr_1.5.1        splines_4.4.1        bayesplot_1.11.1    
-#> [46] parallel_4.4.1       matrixStats_1.3.0    vctrs_0.6.5         
-#> [49] sandwich_3.1-0       jsonlite_1.8.8       callr_3.7.6         
-#> [52] hms_1.1.3            units_0.8-5          glue_1.8.0          
-#> [55] codetools_0.2-19     ps_1.7.6             distributional_0.4.0
-#> [58] stringi_1.8.4        cubature_2.1.0       gtable_0.3.6        
-#> [61] QuickJSR_1.1.3       munsell_0.5.1        tibble_3.2.1        
-#> [64] pillar_1.10.1        Brobdingnag_1.2-9    R6_2.5.1            
-#> [67] fmesher_0.1.5        evaluate_0.24.0      lattice_0.22-5      
-#> [70] haven_2.5.4          backports_1.5.0      rstantools_2.4.0    
-#> [73] class_7.3-22         MatrixModels_0.5-3   coda_0.19-4.1       
-#> [76] gridExtra_2.3        nlme_3.1-165         checkmate_2.3.1     
-#> [79] xfun_0.49            zoo_1.8-12           forcats_1.0.0       
-#> [82] pkgconfig_2.0.3     
+#>  [1] gtable_0.3.6         tensorA_0.36.2.1     xfun_0.49           
+#>  [4] QuickJSR_1.1.3       inline_0.3.19        lattice_0.22-5      
+#>  [7] mathjaxr_1.6-0       vctrs_0.6.5          tools_4.4.1         
+#> [10] generics_0.1.3       stats4_4.4.1         parallel_4.4.1      
+#> [13] sandwich_3.1-0       proxy_0.4-27         tibble_3.2.1        
+#> [16] pkgconfig_2.0.3      KernSmooth_2.23-24   checkmate_2.3.1     
+#> [19] distributional_0.4.0 RcppParallel_5.1.9   cubature_2.1.0      
+#> [22] lifecycle_1.0.4      compiler_4.4.1       stringr_1.5.1       
+#> [25] fmesher_0.1.5        Brobdingnag_1.2-9    munsell_0.5.1       
+#> [28] codetools_0.2-19     class_7.3-22         bayesplot_1.11.1    
+#> [31] pillar_1.10.1        MASS_7.3-60.2        classInt_0.4-10     
+#> [34] StanHeaders_2.32.7   bridgesampling_1.1-2 abind_1.4-5         
+#> [37] multcomp_1.4-25      nlme_3.1-165         posterior_1.5.0     
+#> [40] rstan_2.32.6         tidyselect_1.2.1     mvtnorm_1.2-5       
+#> [43] stringi_1.8.4        sf_1.0-19            dplyr_1.1.4         
+#> [46] forcats_1.0.0        splines_4.4.1        grid_4.4.1          
+#> [49] colorspace_2.1-1     cli_3.6.3            magrittr_2.0.3      
+#> [52] loo_2.7.0            survival_3.7-0       pkgbuild_1.4.4      
+#> [55] e1071_1.7-14         TH.data_1.1-2        withr_3.0.2         
+#> [58] scales_1.3.0         backports_1.5.0      estimability_1.5    
+#> [61] matrixStats_1.3.0    emmeans_1.10.1       gridExtra_2.3       
+#> [64] hms_1.1.3            zoo_1.8-12           coda_0.19-4.1       
+#> [67] rstantools_2.4.0     rlang_1.1.4          xtable_1.8-4        
+#> [70] glue_1.8.0           DBI_1.2.3            jsonlite_1.8.8      
+#> [73] R6_2.5.1             units_0.8-5  
 
 cat(paste(Sys.time(), Sys.timezone(), "\n"))
 
