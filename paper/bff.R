@@ -29,7 +29,9 @@ sei <- 0.8
 t0 <- -0.5
 
 ## p-value function
-pval <- function(yi, sei, null) {2*pnorm(q = abs(yi - null)/sei, lower.tail = FALSE)}
+pval <- function(yi, sei, null) {
+    2*pnorm(q = abs(yi - null)/sei, lower.tail = FALSE)
+}
 p <- pval(yi, sei, null)
 p0 <- pval(yi, sei, t0)
 alpha <- 0.2
@@ -522,17 +524,6 @@ phn. <- function(x, s) integrate(f = function(x) 2*dnorm(x, sd = s),
 phn <- Vectorize(FUN = phn.)
 ## plot(tauseq, phn(x = tauseq, s = scale), type = "l")
 ## phn(x = 0.05, s = scale)
-
-
-## ----"data-protzko", eval = FALSE---------------------------------------------
-## ## load data from Protzko et al. (2023)
-## protzko <- protzko2020
-## labels <- subset(protzko, experiment == "Labels")
-## yo <- subset(labels, type == "original")$smd
-## so <- subset(labels, type == "original")$se
-## yr <- subset(labels, type == "external-replication")$smd
-## sr <- subset(labels, type == "external-replication")$se
-## lab <- as.numeric(as.character(subset(labels, type == "external-replication")$lab))
 
 
 ## ----"data-wagenmakers"-------------------------------------------------------

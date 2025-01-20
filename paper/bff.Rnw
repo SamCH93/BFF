@@ -39,7 +39,7 @@
   Center for Reproducible Science (CRS) \\
   University of Zurich \\
   E-mail: \href{mailto:\mail}{\mail} \\[2ex]
-  {\color{blue} Preprint version January 13, 2025}
+  {\color{blue} Preprint version January 20, 2025}
 }
 \date{}
 
@@ -101,7 +101,7 @@ library(haven) # handling SPSS imported data set
 \maketitle
 
 \begin{abstract}
-  The Bayes factor, the data-based updating factor of the prior to posterior odds of two hypotheses, is a natural measure of statistical evidence for one hypothesis over the other. We show how Bayes factors can also be used for parameter estimation. The key idea is to consider the Bayes factor as a function of the parameter value under the null hypothesis. This `support curve' is inverted to obtain point estimates (`maximum evidence estimates') and interval estimates (`support intervals'), similar to how \textit{P}-value functions are inverted to obtain point estimates and confidence intervals. This provides data analysts with a unified inference framework as Bayes factors (for any tested parameter value), support intervals (at any level), and point estimates can be easily read off from a plot of the support curve. This approach shares similarities but is also distinct from conventional Bayesian and frequentist approaches: It uses the Bayesian evidence calculus, but without synthesizing data and prior, and it defines statistical evidence in terms of (integrated) likelihood ratios, but also includes a natural way for dealing with nuisance parameters. Applications to real-world examples illustrate how our framework is of practical value for making quantitative inferences.
+  The Bayes factor, the data-based updating factor of the prior to posterior odds of two hypotheses, is a natural measure of statistical evidence for one hypothesis over the other. We show how Bayes factors can also be used for parameter estimation. The key idea is to consider the Bayes factor as a function of the parameter value under the null hypothesis. This `support curve' is inverted to obtain point estimates (`maximum evidence estimates') and interval estimates (`support intervals'), similar to how \textit{P}-value functions are inverted to obtain point estimates and confidence intervals. This provides data analysts with a unified inference framework as Bayes factors (for any tested parameter value), support intervals (at any level), and point estimates can be easily read off from a plot of the support curve. This approach shares similarities but is also distinct from conventional Bayesian and frequentist approaches: It uses the Bayesian evidence calculus, but without synthesizing data and prior, and it defines statistical evidence in terms of (integrated) likelihood ratios, but also includes a natural way for dealing with nuisance parameters. Applications to meta-analysis, replication studies, and logistic regression illustrate how our framework is of practical value for making quantitative inferences.
   \\[1ex]
   \emph{Keywords}: Bayesian inference, integrated likelihood, meta-analysis,
   nuisance parameters, replication studies, support interval
@@ -154,7 +154,9 @@ sei <- 0.8
 t0 <- -0.5
 
 ## p-value function
-pval <- function(yi, sei, null) {2*pnorm(q = abs(yi - null)/sei, lower.tail = FALSE)}
+pval <- function(yi, sei, null) {
+    2*pnorm(q = abs(yi - null)/sei, lower.tail = FALSE)
+}
 p <- pval(yi, sei, null)
 p0 <- pval(yi, sei, t0)
 alpha <- 0.2
@@ -244,32 +246,25 @@ probabilities such as `$\Pr(\text{the treatment effect is absent})$' and
 
 One approach to address this issue is to report the \emph{Bayes factor}
 \citep{Jeffreys1939, Good1958, Kass1995}, i.e., the updating factor of the prior
-to posterior odds of two hypotheses.
-% However, the posterior However, for
-% testing of point hypotheses and model comparisons, Bayes factors
-%  are often considered to be a principled
-% alternative as they represents the updating factor dictates how the data change
-% the relative plausibility of competing hypotheses and is as such often
-% considered to be a gold standard for assessing statistical evidence
-% \citep{Goodman1999, Goodman2016}.
-As such, Bayes factors allow data analysts to evaluate the relative evidence for
-two hypotheses without depending on the prior probabilities of the hypotheses;
-for example, a Bayes factor can quantify the evidence for the presence or
-absence of a treatment effect without having to assign prior probabilities to
-these hypotheses (although one still has to specify a prior for the parameter
-under the alternative, which is challenging in itself). However, the use of
-Bayes factors comes at the cost of lacking an overarching concept, such as a
-\textit{P}-value function or posterior distribution, that can provide data
-analyst with a coherent set of point and interval estimates. In practice, data
-analysts who wish to perform hypothesis testing with Bayes factors but also
-parameter estimation are therefore faced with a dilemma; they can either supply
-their Bayes factors with a posterior distribution conditional on one hypothesis
-being true (e.g., the posterior of a treatment effect, assuming the effect is
-indeed present), which can lead to contradictory conclusions with the Bayes
-factor \citep[for examples, see][]{Stone1997, Wagenmakers2020}, or they can
-assign prior probabilities to the tested hypotheses and report a posterior
-averaged over both hypotheses \citep[known as Bayesian model averaging, see
-e.g.,][]{Hoeting1999,Campbell2022}, but this requires specification of prior
+to posterior odds of two hypotheses. As such, Bayes factors allow data analysts
+to evaluate the relative evidence for two hypotheses without depending on the
+prior probabilities of the hypotheses; for example, a Bayes factor can quantify
+the evidence for the presence or absence of a treatment effect without having to
+assign prior probabilities to these hypotheses (although one still has to
+specify a prior for the parameter under the alternative, which is challenging in
+itself). However, the use of Bayes factors comes at the cost of lacking an
+overarching concept, such as a \textit{P}-value function or posterior
+distribution, that can provide data analyst with a coherent set of point and
+interval estimates. In practice, data analysts who wish to perform hypothesis
+testing with Bayes factors but also parameter estimation are therefore faced
+with a dilemma; they can either supply their Bayes factors with a posterior
+distribution conditional on one hypothesis being true (e.g., the posterior of a
+treatment effect, assuming the effect is indeed present), which can lead to
+contradictory conclusions with the Bayes factor \citep[for examples,
+  see][]{Stone1997, Wagenmakers2020}, or they can assign prior probabilities to
+the tested hypotheses and report a posterior averaged over both hypotheses
+\citep[known as Bayesian model averaging, see
+  e.g.,][]{Hoeting1999,Campbell2022}, but this requires specification of prior
 probabilities which is highly controversial and the reason why the Bayes factor
 was reported in the first place rather than the posterior probabilities of the
 hypotheses.
@@ -305,12 +300,11 @@ a focus on the `Bayesian evidence value' has been recently investigated by
 This paper is structured as follows. In the following
 (Section~\ref{sec:BFtheory}), we introduce the theoretical foundations of Bayes
 factors, support sets, and maximum evidence estimates. We then explore their
-connection to other statistical frameworks (Section~\ref{sec:connections}).
-Various real data examples in Section~\ref{sec:applications}, inlcuding
-meta-analysis, replication studies, and logistic regression, illustrate
-properties of the Bayes factor framework. We conclude with a discussion of
-limitations, advantages, and directions for future research
-(Section~\ref{sec:discussion}).
+connection to other statistical frameworks (Section~\ref{sec:connections}). Real
+data examples from meta-analysis, replication studies, and logistic regression
+then illustrate properties of the Bayes factor framework
+(Section~\ref{sec:applications}). We conclude with a discussion of limitations,
+advantages, and directions for future research (Section~\ref{sec:discussion}).
 
 
 \section{Support curve inference}
@@ -353,10 +347,10 @@ alternative hypothesis $H_{1}$ in predicting the data $y$, and vice versa
 \citep{Good1952, Gneiting2007}. Finally, the last
 equation~\eqref{eq:bf01compute} shows how the Bayes factor can be calculated,
 i.e., by dividing the likelihood of $y$ under the null value $\theta_0$
-(possibly integrated over the prior of $\psi$ under $H_0$) by the likelihood
-of $y$ integrated over the prior of $\theta$ (and possibly $\psi$)
-under~$H_1$. The priors for $\theta$ and $\psi$ may also be point priors, in
-which case the Bayes factor reduces to a likelihood ratio.
+(possibly integrated over the prior of $\psi$ under $H_0$) by the likelihood of
+$y$ integrated over the prior of $\theta$ (and possibly $\psi$) under~$H_1$. The
+priors for $\theta$ and $\psi$ may also be point mass priors, in which case the
+Bayes factor reduces to a likelihood ratio.
 
 The idea now is to consider the Bayes factor~\eqref{eq:bf01} as a function of
 $\theta_0$, that is, to vary the tested parameter value (the point null
@@ -1571,17 +1565,6 @@ be non-negligible between-flipper heterogeneity, with a betwen-flipper standard
 deviation of around one to two percent.
 
 
-<< "data-protzko", eval = FALSE >>=
-## load data from Protzko et al. (2023)
-protzko <- protzko2020
-labels <- subset(protzko, experiment == "Labels")
-yo <- subset(labels, type == "original")$smd
-so <- subset(labels, type == "original")$se
-yr <- subset(labels, type == "external-replication")$smd
-sr <- subset(labels, type == "external-replication")$se
-lab <- as.numeric(as.character(subset(labels, type == "external-replication")$lab))
-@
-
 \subsection{Replication studies}
 \label{sec:replicationstudies}
 
@@ -2198,9 +2181,6 @@ does not imply their endorsement of the paper.
 We declare no conflict of interest.
 
 \section*{Software and data}
-%% The data from \citet{Neutra1978} where obtained from the `\texttt{fm0.asc}' file
-%% contained in `\texttt{Supplementary Data.zip}' available
-%% at \url{https://doi.org/10.1093/ije/dys213}.
 The data from \citet{EjbyeErnst2023} where obtained from the
 `\texttt{data.RData}' file available at \url{https://osf.io/nb56d}. The data
 from \citet{Wagenmakers2016} were manually extracted from Figure 4 in their
