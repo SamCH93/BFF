@@ -36,4 +36,4 @@ clean:
 	$(FILE)-changes.aux  $(FILE)-changes.blg  $(FILE)-changes.log \
 	$(FILE)-changes.tex  $(FILE)-changes.bbl $(FILE)-changes.out \
 	$(FILE)-changes.brf $(FILE)-changes.synctex.gz
-	-rm -r ./figure/
+# -rm -r ./figure/
