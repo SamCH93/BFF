@@ -13,14 +13,14 @@ Reproducibility <- TRUE
 
 ## packages
 library(metadat) # data set from Bartos (2023)
-library(metabf) # BFFs for meta-analysis (not on CRAN, install from GitHub repo)
+library(metabf) # SCs for meta-analysis (not on CRAN, install from GitHub repo)
 library(brms) # Bayesian regression models with MCMC
 library(INLA) # Bayesian regression models with INLA
 library(ggplot2) # plotting
 library(haven) # handling SPSS imported data set
 
 
-## ----"pFun-and-BFFun", echo = FALSE, fig.height = 3.25, fig.align = "center"----
+## ----"pFun-and-SC", echo = FALSE, fig.height = 3.25, fig.align = "center"-----
 ## Create cartoon that shows p-value function and support curve
 par("mar" = c(2.75, 3.5, 1.5, 0.5), mfrow = c(1, 2))
 null <- seq(-2.5, 2.5, length.out = 500)
@@ -101,32 +101,20 @@ text(x = -2.8, y = bf0 - 0.4, label = bquote("Bayes factor for" ~ theta[0]),
 lines(null, bf, lwd = 2)
 
 
-## ----"RECOVERY-example"-------------------------------------------------------
-## Baricitinib in patients admitted to hospital with COVID-19 (RECOVERY): a
-## randomised, controlled, open-label, platform trial and updated meta-analysis
-## https://doi.org/10.1016/S0140-6736(22)01109-6
-
-## Overall, 514 (12%) of 4148 patients allocated to baricitinib versus 546 (14%)
-## of 4008 patients allocated to usual care died within 28 days (age-adjusted
-## rate ratio 0.87; 95% CI 0.77–0.99; p=0.028).
-HR <- 0.87
-ciHR <- c(0.77, 0.99)
-p <- 0.028
-y <- log(HR)
-se <- diff(log(ciHR))/2/qnorm(p = 0.975)
+## ----"test-example"-----------------------------------------------------------
+y <- 110
+usd <- 15
+n <- 30
+se <- usd/sqrt(n)
 se2 <- se^2
-## This 13% proportional reduction in mortality was somewhat smaller than that
-## seen in a meta-analysis of eight previous trials of a JAK inhibitor
-## (involving 3732 patients and 425 deaths), in which allocation to a JAK
-## inhibitor was associated with a 43% proportional reduction in mortality (rate
-## ratio 0.57; 95% CI 0.45–0.72)
-HRprior <- 0.57
-ciHRprior <- c(0.45, 0.72)
-m <- log(HRprior)
-s <- diff(log(ciHRprior))/2/qnorm(p = 0.975)
+
+yprior <- 120
+nprior <- 50
+m <- yprior
+s <- usd/sqrt(nprior)
 v <- s^2
-t0seq <- seq(-0.5, 0.1, 0.01)
-delta <- 0.1
+t0seq <- seq(90, 120, 0.01)
+delta <- 5
 
 k <- 1
 ## normal prior
@@ -154,7 +142,7 @@ bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
 par(mar = c(4, 5, 1, 1.5))
 matplot(t0seq, bfs, type = "l", lty = 1, col = colors, lwd = 1.5, las = 1,
-        xlab = bquote("Log hazard ratio" ~ theta), ylab = "Bayes factor",
+        xlab = bquote("Mean test score" ~ theta[0]), ylab = "Bayes factor",
         log = "y", yaxt = "n", ylim = c(1/1000, 1000),
         panel.first = graphics::grid(lty = 3, equilogs = FALSE))
 axis(side = 2, at = bfbks, labels = bflabs, las = 1)
@@ -164,39 +152,24 @@ arrows(x0 = sis[,1], x1 = sis[,2], y0 = k + c(-0.0025, 0.0025, 0, 0), col = colo
 points(x = c(y, y, y), y = c(bf1(y), bf1b(y), bf2(y)), col = colors[1:3], pch = 20)
 legend("topleft", lty = 1, col = colors, lwd = 1.5, cex = 0.7,
        title = expression("Prior under"~ italic(H)[1]),
-       legend = c(bquote(theta ~ "~ N(" * .(round(m, 2)) * "," ~ .(round(sqrt(v), 2))^2 * ")"),
-                  bquote(theta ~ "~ N(" * .(round(y, 2)) * "," ~ .(round(sqrt(v), 2))^2 * ")"),
-                  bquote(theta ~ "~ N(" * theta[0] * "," ~ .(round(sqrt(v), 2))^2 * ")"),
+       legend = c(bquote(theta ~ "~ N(" * .(round(m, 2)) * "," ~
+                             .(round(usd, 2))^2/.(nprior) * ")"),
+                  bquote(theta ~ "~ N(" * .(round(y, 2)) * "," ~
+                             .(round(usd, 2))^2/.(nprior) * ")"),
+                  bquote(theta ~ "~ N(" * theta[0] * "," ~
+                             .(round(usd, 2))^2/.(nprior) * ")"),
                   bquote(theta == theta[0] + .(delta))),
        bg = "white")
-mtext(text = bquote("" %->% "Harm"), side = 1, line = 0, at = 0.045, cex = 0.9)
-mtext(text = bquote("Benefit" %<-% ""), side = 1, line = 0, at = -0.05, cex = 0.9)
 arrows(x0 = min(t0seq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = min(t0seq), y = c(2, 1/2),
-     labels = c(expression("Support for" ~ theta),
+     labels = c(expression("Support for" ~ theta[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
 
 
-## ----"distribution-k"---------------------------------------------------------
-## ## generate data under H1, what is the distribution of k?
-## ## the theoretical density
-## fk <- function(k, v, se) sqrt(2/pi*(1 + v/se^2)/k^4/log(k^2/(1 + v/se^2)))
-
-## set.seed(42)
-## ysim <- rnorm(n = 100000, mean = m, sd = sqrt(v + se^2))
-## ksim <- bffun(yi = ysim, sei = se, muPrior = m, sdPrior = sqrt(v), null = ysim)
-
-## hist(ksim, probability = TRUE, xlim = c(1, 20),
-##      breaks = seq(0, 100000, 0.1))
-
-## kseq <- seq(0, 100, 0.01)
-## lines(kseq, fk(kseq), lty = 2, lwd = 2)
-
-
 ## ----"BF-asymptotic", fig.height = 4.5, fig.width = 8-------------------------
-## BFF for normal mean
+## SC for normal mean
 bff <- function(t0, y, kappa, n, m, v) {
     sqrt(1 + v*n/kappa^2)*
         exp(-0.5*((y - t0)^2*n/kappa^2 - (y - m)^2/(kappa^2/n + v)))
@@ -269,7 +242,7 @@ bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100")
 matplot(t0seq, y = bfupper, type = "l", lty = 2,
         col = cols2, log = "y", ylim = c(1/1000, 120),
-        las = 1, xlab = bquote("Mean" ~ theta),
+        las = 1, xlab = bquote("Mean" ~ theta[0]),
         ylab = bquote("SC distribution (" *
                       .(round(plower*100, 1)) * "/" * .(round(p*100, 1)) * "/" *
                           .(round(pupper*100, 1)) * "% quantiles)"),
@@ -291,7 +264,7 @@ legend("topright", legend = rev(ns), title = expression("Sample size" ~ italic(n
 arrows(x0 = min(t0seq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = min(t0seq), y = c(2.5, 1/2.5),
-     labels = c(expression("Support for" ~ theta),
+     labels = c(expression("Support for" ~ theta[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
 
@@ -307,7 +280,7 @@ l <- 0.5
 
 
 ## ----"Bartos-analysis", fig.height = 4----------------------------------------
-## BFF for binomial proportion based on truncated beta prior under the alternative
+## SC for binomial proportion based on truncated beta prior under the alternative
 BFFbinomial <- function(p, y, n, a, b, l = 0.5, u = 1, log = FALSE) {
     logbf <- y*log(p) + (n - y)*log(1 - p) - lbeta(a + y, b + n - y) + lbeta(a, b) +
         log(pbeta(q = u, shape1 = a, shape2 = b) -
@@ -342,7 +315,7 @@ si <- SIbinomial(k = 1, y = y, n = n, a = a, b = b)
 ## compute BF for p = 0.5
 bf05 <- BFFbinomial(p = 0.5, y = y, n = n, a = a, b = b)
 
-## compute BFF
+## compute SC
 p0seq <- seq(from = 0.5, to = 0.515, length.out = 500)
 bff <- BFFbinomial(p = p0seq, y = y, n = n, a = a, b = b)
 
@@ -355,7 +328,7 @@ par(mar = c(4, 5, 2, 1.5))
 plot(x = p0seq, y = bff,
      type = "l", log = "y", lwd = 1.5,
      ylab = bquote("Bayes factor"),
-     xlab = bquote("Probability of coin landing on same side" ~ theta),
+     xlab = bquote("Probability of coin landing on same side" ~ theta[0]),
      ylim = c(1/10^18, 10),
      yaxt = "n",
      panel.first = graphics::grid(lty = 3, equilogs = FALSE))
@@ -367,7 +340,7 @@ points(x = mee, y = kME, pch = 20, col = 1)
 arrows(x0 = min(p0seq), y0 = c(2, 1/2), y1 = c(40, 1/40),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = min(p0seq), y = c(7, 1/7),
-     labels = c(expression("Support for" ~ theta),
+     labels = c(expression("Support for" ~ theta[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
 
@@ -409,7 +382,7 @@ sensitivityList <- lapply(X = scales, FUN = function(scale) {
                                 rel.tol = .Machine$double.eps^0.5,
                                 abs.tol = .Machine$double.eps^0.5,
                                 tol = .Machine$double.eps^0.5, maxiter = 1000))
-    plotdat <- plot(ma, thetaRange = c(0.5, 0.52), tauRange =  c(0, 0.04),
+    plotdat <- plot(ma, thetaRange = c(0.5, 0.52), tauRange = c(0, 0.04),
                     plot = FALSE)
     list("tauDF" = data.frame(plotdat$tauDF, scale = scale),
          "meetau" = data.frame(unname(as.data.frame(t(plotdat$MEEtau))),
@@ -447,13 +420,13 @@ arrows(x = dat$lower, x1 = dat$upper, y0 = ybreaks, angle = 90, code = 3,
        length = 0)
 points(x = dat$yi, y = ybreaks, pch = 20, cex = 1)
 
-## 2D BFF plot
+## 2D SC plot
 bfMatrix <- matrix(plotdat$contourDF$bf, ncol = 200, byrow = TRUE)
 image(x = plotdat$tauDF$tau, y = plotdat$thetaDF$theta, z = bfMatrix,
       col = grDevices::hcl.colors(n = 100, palette = "Blues 3", rev = TRUE),
       las = 1,
-      xlab = bquote("Heterogeneity" ~ tau),
-      ylab = bquote("Probability of coin landing on same side" ~ theta),
+      xlab = bquote("Heterogeneity" ~ tau[0]),
+      ylab = bquote("Probability of coin landing on same side" ~ theta[0]),
       main = bquote("Bayes factor surface" ~ ""))
 contour(x = plotdat$tauDF$tau, y = plotdat$thetaDF$theta, z = bfMatrix,
         levels = c(1/1000, 1/100, 1/10, 3, 10, 30, 100), add = TRUE,
@@ -466,7 +439,7 @@ points(x = res$MEEjoint[2], y = res$MEEjoint[1], pch = 20, col = 1)
 legend("topright", legend = "", title = paste("HN prior scale", scale),
        bty = "n", cex = 0.85)
 
-## BFF plot for probability
+## SC plot for probability
 colors <- hcl.colors(n = length(scales), alpha = 0.3)
 colors[4:5] <- colors[3:4]
 colors[3] <- "black"
@@ -476,7 +449,7 @@ bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100")
 matplot(sensitivityList[[1]]$thetaDF$theta, thetasens, type = "l", lty = lty,
         ylim = c(1/1000, 100), lwd = 1.5, col = colors, las = 1, log = "y",
         main = bquote(tau ~ "is the nuisance parameter"),
-        xlab = bquote("Probability of coin landing on same side" ~ theta),
+        xlab = bquote("Probability of coin landing on same side" ~ theta[0]),
         ylab = "Bayes factor",
         panel.first = graphics::grid(lty = 3, ny = NA, equilogs = FALSE),
         yaxt = "n")
@@ -491,15 +464,15 @@ legend("topright", title = "HN prior scale", bg = "white", pch = 20,
 arrows(x0 = 0.5, y0 = c(1.5, 1/1.5), y1 = c(3, 1/3),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = 0.5, y = c(2, 1/2),
-     labels = c(expression("Support for" ~ theta),
+     labels = c(expression("Support for" ~ theta[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.6, col = adjustcolor("black", alpha.f = 0.8))
 
-## BFF plot for heterogeneity
+## SC plot for heterogeneity
 matplot(sensitivityList[[1]]$tauDF$tau, tausens, type = "l", lty = lty,
         ylim = c(1/1000, 100), lwd = 1.5, col = colors, las = 1, log = "y",
         main = bquote(theta ~ "is the nuisance parameter"),
-        xlab = bquote("Heterogeneity" ~ tau), ylab = "Bayes factor",
+        xlab = bquote("Heterogeneity" ~ tau[0]), ylab = "Bayes factor",
         panel.first = graphics::grid(lty = 3, ny = NA, equilogs = FALSE),
         yaxt = "n")
 axis(side = 2, at = bfbks, labels = bflabs, las = 1)
@@ -511,7 +484,7 @@ abline(h = 1, lty = 2, col = transpblack)
 arrows(x0 = 0, y0 = c(1.5, 1/1.5), y1 = c(3, 1/3),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = 0, y = c(2, 1/2),
-     labels = c(expression("Support for" ~ tau),
+     labels = c(expression("Support for" ~ tau[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.6, col = adjustcolor("black", alpha.f = 0.8))
 
@@ -571,7 +544,7 @@ SIrep <- function(k, yr, sr, yo, so, log = FALSE) {
 }
 
 
-## compute BFF, k=1 support interval, and MEE
+## compute SC, k=1 support interval, and MEE
 mdseq <- c(seq(-2, 0, length.out = 500), seq(0.001, 2, length.out = 500))
 bff <- sapply(X = seq(1, length(yr)), FUN = function(i) {
     repBFF(null = mdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)
@@ -595,7 +568,7 @@ labs <- c(expression(10^-6), expression(10^-5), expression(10^-4),
           expression(10^1), expression(10^2), expression(10^3))
 matplot(mdseq, bff, type = "l", lty = 1, ylim = c(1/10^5, 10^3),
         lwd = 1.5, col = cols, las = 1, log = "y",
-        xlab = bquote("Mean difference" ~ theta),
+        xlab = bquote("Mean difference" ~ theta[0]),
         ylab = "Bayes factor",
         panel.first = graphics::grid(lty = 3, equilogs = FALSE),
         yaxt = "n")
@@ -611,7 +584,7 @@ points(x = sipool[2], y = kmepool, col = 2, pch = 20)
 arrows(x0 = min(mdseq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = min(mdseq), y = c(3, 1/3),
-     labels = c(expression("Support for" ~ theta),
+     labels = c(expression("Support for" ~ theta[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.7, col = adjustcolor("black", alpha.f = 0.8))
 legend("topright", lty = c(1, 1), col = c(cols, 2),
@@ -748,7 +721,7 @@ bffres <- lapply(X = seq(1, length(coefs)), FUN = function(i) {
     ## MCMC analysis
     mcmcdraws <- brms::as_draws_matrix(bglm1, variable = paste0("b_", coef))
     priordraws <- rnorm(n = length(mcmcdraws), mean = pm, sd = psd)
-    postdens <- density(mcmcdraws,  from = min(logORseq), to = max(logORseq),
+    postdens <- density(mcmcdraws, from = min(logORseq), to = max(logORseq),
                         n = length(logORseq))
 
     ## compute SCs

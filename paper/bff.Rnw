@@ -27,6 +27,18 @@
   bottom=25mm,
 }
 
+% for anonymization
+\newif\ifanonymize % Boolean variable to control anonymization
+\newcommand{\anonymize}[1]{%
+  \ifanonymize
+    \phantom{#1}%
+  \else
+    #1%
+  \fi
+}
+\anonymizefalse % set to false to deanonymize
+%\anonymizetrue % set to true to anonymize
+
 
 %% title, authors, affiliations, mail
 \newcommand\mail{samuel.pawel@uzh.ch}
@@ -34,12 +46,12 @@
   \textbf{\textsf{A Bayes Factor Framework for Unified Parameter Estimation and Hypothesis Testing}}
 }
 \author{
-  \textbf{Samuel Pawel} \orcidlink{0000-0003-2779-320X} \\
-  Epidemiology, Biostatistics and Prevention Institute (EBPI) \\
-  Center for Reproducible Science (CRS) \\
-  University of Zurich \\
-  E-mail: \href{mailto:\mail}{\mail} \\[2ex]
-  {\color{blue} Preprint version January 20, 2025}
+ \anonymize{\textbf{Samuel Pawel} \orcidlink{0000-0003-2779-320X}} \\
+  \anonymize{Epidemiology, Biostatistics and Prevention Institute (EBPI)} \\
+  \anonymize{Center for Reproducible Science (CRS)} \\
+  \anonymize{University of Zurich} \\
+  \anonymize{E-mail: \href{mailto:\mail}{\mail}} \\[2ex]
+  \anonymize{{\color{blue} Preprint version July 2, 2025}}
 }
 \date{}
 
@@ -59,7 +71,7 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \lhead{A Bayes Factor Framework for Unified Parameter Estimation and Hypothesis Testing}
-\rhead{S. Pawel}
+\rhead{\anonymize{S. Pawel}}
 
 %% for math
 \DeclareMathOperator{\BF}{BF} % Bayes factor
@@ -89,7 +101,7 @@ Reproducibility <- TRUE
 
 ## packages
 library(metadat) # data set from Bartos (2023)
-library(metabf) # BFFs for meta-analysis (not on CRAN, install from GitHub repo)
+library(metabf) # SCs for meta-analysis (not on CRAN, install from GitHub repo)
 library(brms) # Bayesian regression models with MCMC
 library(INLA) # Bayesian regression models with INLA
 library(ggplot2) # plotting
@@ -101,7 +113,7 @@ library(haven) # handling SPSS imported data set
 \maketitle
 
 \begin{abstract}
-  The Bayes factor, the data-based updating factor of the prior to posterior odds of two hypotheses, is a natural measure of statistical evidence for one hypothesis over the other. We show how Bayes factors can also be used for parameter estimation. The key idea is to consider the Bayes factor as a function of the parameter value under the null hypothesis. This `support curve' is inverted to obtain point estimates (`maximum evidence estimates') and interval estimates (`support intervals'), similar to how \textit{P}-value functions are inverted to obtain point estimates and confidence intervals. This provides data analysts with a unified inference framework as Bayes factors (for any tested parameter value), support intervals (at any level), and point estimates can be easily read off from a plot of the support curve. This approach shares similarities but is also distinct from conventional Bayesian and frequentist approaches: It uses the Bayesian evidence calculus, but without synthesizing data and prior, and it defines statistical evidence in terms of (integrated) likelihood ratios, but also includes a natural way for dealing with nuisance parameters. Applications to meta-analysis, replication studies, and logistic regression illustrate how our framework is of practical value for making quantitative inferences.
+  The Bayes factor, the data-based updating factor of the prior to posterior odds of two hypotheses, is a natural measure of statistical evidence for one hypothesis over the other. We show how Bayes factors can also be used for parameter estimation. The key idea is to consider the Bayes factor as a function of the parameter value under a point null null hypothesis. This `support curve' is inverted to obtain point estimates (`maximum evidence estimates') and interval estimates (`support intervals'), similar to how \textit{P}-value functions are inverted to obtain point estimates and confidence intervals. This provides data analysts with a unified inference framework as Bayes factors (for any tested parameter value), support intervals (at any level), and point estimates can be easily read off from a plot of the support curve. This approach shares similarities but is also distinct from conventional Bayesian and frequentist approaches: It uses the Bayesian evidence calculus, but without synthesizing data and prior, and it defines statistical evidence in terms of (integrated) likelihood ratios, but also includes a natural way for dealing with nuisance parameters. Applications to meta-analysis, replication studies, and logistic regression illustrate how our framework is of practical value for making quantitative inferences.
   \\[1ex]
   \emph{Keywords}: Bayesian inference, integrated likelihood, meta-analysis,
   nuisance parameters, replication studies, support interval
@@ -145,7 +157,7 @@ and confidence intervals \citep[among others]{Greenland2016, Infanger2019,
 
 
 \begin{figure}[!htb]
-<< "pFun-and-BFFun", echo = FALSE, fig.height = 3.25, fig.align = "center" >>=
+<< "pFun-and-SC", echo = FALSE, fig.height = 3.25, fig.align = "center" >>=
 ## Create cartoon that shows p-value function and support curve
 par("mar" = c(2.75, 3.5, 1.5, 0.5), mfrow = c(1, 2))
 null <- seq(-2.5, 2.5, length.out = 500)
@@ -244,6 +256,7 @@ particular, for testing of hypotheses, it can be difficult to specify prior
 probabilities such as `$\Pr(\text{the treatment effect is absent})$' and
 `$\Pr(\text{the treatment effect is present})$'.
 
+\begin{sloppypar}
 One approach to address this issue is to report the \emph{Bayes factor}
 \citep{Jeffreys1939, Good1958, Kass1995}, i.e., the updating factor of the prior
 to posterior odds of two hypotheses. As such, Bayes factors allow data analysts
@@ -261,41 +274,58 @@ with a dilemma; they can either supply their Bayes factors with a posterior
 distribution conditional on one hypothesis being true (e.g., the posterior of a
 treatment effect, assuming the effect is indeed present), which can lead to
 contradictory conclusions with the Bayes factor \citep[for examples,
-  see][]{Stone1997, Wagenmakers2020}, or they can assign prior probabilities to
-the tested hypotheses and report a posterior averaged over both hypotheses
-\citep[known as Bayesian model averaging, see
-  e.g.,][]{Hoeting1999,Campbell2022}, but this requires specification of prior
-probabilities which is highly controversial and the reason why the Bayes factor
-was reported in the first place rather than the posterior probabilities of the
-hypotheses.
+  see][]{Stone1997, Wagenmakers2020, Kelter2022}, or they can assign prior
+probabilities to the tested hypotheses and report a posterior averaged over both
+hypotheses \citep[known as Bayesian model averaging, see
+  e.g.,][]{Hoeting1999,Rouder2018b,Campbell2022}, but this requires
+specification of prior probabilities which is highly controversial and the
+reason why the Bayes factor was reported in the first place rather than the
+posterior probabilities of the hypotheses.
+\end{sloppypar}
 
 Our goal is therefore to resolve this dilemma and provide a unified framework
 for estimation and hypothesis testing based on Bayes factors. The idea is the
 same as for the \textit{P}-value function; we consider the Bayes factor as a
-function of the tested parameter. We then use this \emph{support curve}
-to derive point estimates, interval estimates, and Bayes factors (as shown in
-the right plot in Figure~\ref{fig:pvalfun}), establishing a duality between
-hypothesis testing and parameter estimation. Our framework builds on the
-recently proposed Bayesian support interval \citep{Wagenmakers2020, Pawel2023}
-and extends it with the novel concept of point estimation based on Bayes
-factors. We call the resulting estimate the \emph{maximum evidence estimate}
-(MEE) -- the parameter value that receives the most evidential support from the
-data over a specified alternative hypothesis. This provides data analysts with a
+function of the tested parameter. We then use this \emph{support curve} to
+derive point estimates, interval estimates, and Bayes factors (as shown in the
+right plot in Figure~\ref{fig:pvalfun}), establishing a duality between
+hypothesis testing and parameter estimation. This provides data analysts with a
 unified framework for statistical inference centred around the Bayes factor.
 
-Approaches related to the support curve have recently been proposed in the
-physics community under the names of `Bayes factor surface' \citep{Fowlie2024}
-and `\textit{K} ratio' \citep{Afzal2023}. Another method called `Bayes factor
-function' has recently been proposed by \citet{Johnson2023}. In this approach,
-Bayes factors are viewed as a function of a hyperparameter of the prior
-\emph{under the alternative hypothesis} but for a fixed null hypothesis. The
-Bayes factor function can in some cases be made equivalent to the support curve
-if the roles of the null and alternative hypothesis are reversed and point mass
-priors are assigned to the parameter under the alternative, yet this seems
-rather unnatural from the perspective of both methods. Finally, a similar
-attempt of reconciling Bayesian interval estimation and hypothesis testing with
-a focus on the `Bayesian evidence value' has been recently investigated by
-\citet{Kelter2022}.
+Interval estimates based on the Bayes factor have been proposed under the name
+of the Bayesian support interval \citep{Wagenmakers2020, Pawel2023}. Similarly,
+looking at the Bayes factor as a function of parameter values has been proposed
+in the physics community under the names of `Bayes factor surface'
+\citep{Fowlie2024} and `\textit{K} ratio' \citep{Afzal2023}, and by
+\citet{Rouder2018} in the context of teaching Bayesian statistics. Another
+method called `Bayes factor function' has been proposed by \citet{Johnson2023}.
+In this approach, Bayes factors are viewed as a function of a hyperparameter of
+the prior \emph{under the alternative hypothesis} but for a fixed null
+hypothesis. The Bayes factor function can in some cases be made equivalent to
+the support curve if the roles of the null and alternative hypothesis are
+reversed and point mass priors are assigned to the parameter under the
+alternative, yet this seems rather unnatural from the perspective of both
+methods. Finally, a similar attempt of reconciling Bayesian interval estimation
+and hypothesis testing with a focus on the `Bayesian evidence value' has been
+investigated by \citet{Kelter2022}.
+
+While many elements of support curve inference have been considered in earlier
+articles, this paper provides a synthesis of these ideas and considers the
+support curve as a counterpart to the \textit{P}-value function. An entirely
+novel contribution is the concept of point estimation based on Bayes factors. We
+call the resulting estimate the \emph{maximum evidence estimate} (MEE). The MEE
+is the parameter value that maximizes the support curve, and as such, is the
+parameter value that receives the most evidential support from the data over a
+specified alternative hypothesis.
+
+It is important to note that our intent is not to fuel the `statistics wars' and
+entertain the position that Bayesian inference or Bayes factors are the best or
+only valid form of statistical inference. The goal is simply to explore the idea
+of a Bayes factor analogue of a \textit{P}-value function, find out how such an
+approach can be useful, and how it connects to other approaches. Bayes factors,
+just as \textit{P}-values and posterior probabilitites, can be delicate tools
+and users should be wary of their limitations, misuses, and misinterpretations
+\citep{Tendeiro2019, Wong2022, Tendeiro2024}.
 
 This paper is structured as follows. In the following
 (Section~\ref{sec:BFtheory}), we introduce the theoretical foundations of Bayes
@@ -306,20 +336,20 @@ then illustrate properties of the Bayes factor framework
 (Section~\ref{sec:applications}). We conclude with a discussion of limitations,
 advantages, and directions for future research (Section~\ref{sec:discussion}).
 
-
 \section{Support curve inference}
 \label{sec:BFtheory}
 
 Suppose we observe data $y$ with an assumed distribution with probability
 density/mass function $p(y \mid \theta, \psi)$ that depends on parameters
 $\theta \in \Theta$ and $\psi \in \Psi$, with $\theta$ being the focus
-parameters and $\psi$ being possible nuisance parameters. Consider two
-hypotheses, the null hypothesis $H_0 \colon \theta = \theta_0$ postulating that
-$\theta$ takes a certain value $\theta_{0}$ and the alternative hypothesis
-$H_1 \colon \theta \neq \theta_0$ postulating that $\theta$ takes a different
-value. A natural measure of relative evidence for the two hypotheses is the
-Bayes factor \citep{Jeffreys1939, Good1958, Kass1995}, the data-based updating
-factor of the prior odds of the hypotheses to their posterior odds
+parameters (the parameters of substantial interest) and $\psi$ being possible
+nuisance parameters. Consider two hypotheses, the null hypothesis $H_0 \colon
+\theta = \theta_0$ postulating that $\theta$ takes a certain value $\theta_{0}$
+and the alternative hypothesis $H_1 \colon \theta \neq \theta_0$ postulating
+that $\theta$ takes a different value. A natural measure of relative evidence
+for the two hypotheses is the Bayes factor \citep{Jeffreys1939, Good1958,
+  Kass1995}, the data-based updating factor of the prior odds of the hypotheses
+to their posterior odds
 \begin{subequations}
 \begin{align}
     \BF_{01}(y;\theta_0)
@@ -333,18 +363,30 @@ factor of the prior odds of the hypotheses to their posterior odds
 \label{eq:bf01}
 \end{subequations}
 with $p(\theta, \psi \mid H_1)$ denoting the prior assigned to the parameters
-under $H_1$ and $p(\psi \mid H_0)$ the prior assigned to the nuisance
-parameters under $H_0$.
+under $H_1$ and $p(\psi \mid H_0)$ the prior assigned to the nuisance parameters
+under $H_0$. Note that Bayes factors do not require the null and alternative
+models to be nested but are applicable to general model comparisons. However,
+due to more intuitive interpretation and computational advantages, we will focus
+on nested models only and touch on extensions to non-nested models in
+Section~\ref{sec:discussion}.
+%% However, we restrict ourselves to
 
 As~\eqref{eq:bf01update} shows, the Bayes factor represents the data-based core
-of the Bayesian belief calculus. It remains useful even if one rejects the idea
-of assigning probabilities to $H_0$ and $H_1$, since this is not necessary
-\citep{Goodman1999}. The alternative expression of the Bayes factor in
-equation~\eqref{eq:bf01predictive} shows that this update is dictated by the
-relative predictive accuracy of the two hypotheses. That is, the posterior odds
-of the null hypothesis $H_{0}$ increase if it outperforms the competing
-alternative hypothesis $H_{1}$ in predicting the data $y$, and vice versa
-\citep{Good1952, Gneiting2007}. Finally, the last
+of the Bayesian belief calculus since it transforms the prior odds of $H_0$
+versus $H_1$ to the corresponding posterior odds \citep{Goodman1999}. The
+alternative expression of the Bayes factor in equation~\eqref{eq:bf01predictive}
+shows that this update is dictated by the relative predictive accuracy of the
+two hypotheses. That is, the posterior odds of the null hypothesis $H_{0}$
+increase if it outperforms the competing alternative hypothesis $H_{1}$ in
+predicting the data $y$, and vice versa \citep{Good1952, Gneiting2007}. Since
+the Bayes factor remains the same for any pair of prior hypothesis probabilities
+$p(H_0)$ and $p(H_1)$, it remains useful to different analysts with different
+prior hypothesis probabilities, or even if one rejects the idea of assigning
+probabilities to $H_0$ and $H_1$. However, this does not mean that the Bayes
+factor does not depend on any prior distributions; in fact, it can be quite
+sensitive to the priors assigned to the parameters $\psi$ (and $\theta$) under
+$H_0$ and $H_1$, respectively \citep{Kass1995}. We will return to the choice of
+parameter priors in Section~\ref{sec:priorchoice}. Finally, the last
 equation~\eqref{eq:bf01compute} shows how the Bayes factor can be calculated,
 i.e., by dividing the likelihood of $y$ under the null value $\theta_0$
 (possibly integrated over the prior of $\psi$ under $H_0$) by the likelihood of
@@ -369,12 +411,21 @@ receive equal support as the value of no treatment effect \citep[sometimes
 
 For one- or two-dimensional focus parameters $\theta$, the SC can be plotted as
 a curve or surface, respectively, so that the relative support for parameter
-values can be visually assessed. For higher dimensional focus parameters, this
-becomes more difficult and the SC may need to be summarized in some way, which
-we discuss in the following.
+values can be visually assessed. For higher dimensional focus parameters (for
+example, more than two regression coefficients), this becomes more difficult. In
+this case, some focus parameters can be re-considered as nuisance parameters to
+reduce the SC visualization again to a curve or surface. This is similar to
+ordinary Bayesian inference where a marginal posterior is obtained from
+marginalizing a joint posterior.
+%% This approach will be illustrated in Sections~\ref{sec:metaanalysis}
+%% and~\ref{sec:logisticregression}.
+%% Another option could be to project the high-dimensional SC in into one or two
+%% dimensions, for example, to `profile' out the parameters that are not visualized
+%% similar to the profile likelihood.
 
 
 \subsection{Support sets}
+Apart from visual inspections, we may also want to summarize the SC numerically.
 The SC can be used to obtain \emph{support sets} \citep{Wagenmakers2020} which
 are set-valued estimates for $\theta$ based on inverting the Bayes
 factor~\eqref{eq:bf01} similar to how \textit{P}-value functions are inverted to
@@ -384,22 +435,28 @@ defined by
     S_k = \left\{\theta_0 : \BF_{01}(y;\theta_0) \geq k\right\}
 \end{align*}
 that is, the parameter values for which the Bayes factor indicates at least
-evidence of level~$k$ over the specified alternative. In practice, a $k$ support
-set (typically an interval) is obtained from `cutting' the SC at $k$ and taking
-the parameter values above as part of the support set (see the right plot in
-Figure~\ref{fig:pvalfun} for illustration). It may happen that for certain
-choices of $k$ the support set is empty because the data do not constitute
-relative evidence at that level.
+evidence of level~$k$ over the specified alternative. A $k$ support set thus
+contains all the parameter values that, when considered as individual point null
+hypotheses compared to an alternative, receive a Bayes factor of at least $k$.
+Each included parameter value is therefore associated with an updating factor of
+at least $k$ or, equally, relative predictive performance of at least $k$.
+Support sets are thus `calibrated' with respect to prior-posterior updating, as
+opposed to the calibration of confidence sets with respect to long-run coverage,
+or that of posterior credible intervals with respect to posterior belief.
 
-The choice of the support level is arbitrary, just as the choice of the
-confidence level from a confidence set is. One may, for example, report the
-support level $k = 1$ as it represents the tipping point at which the parameter
-values begin to be supported over the alternative. Conventions for Bayes factor
-evidence levels can also be used. For example, based on the convention from
-\citet{Jeffreys1961}, a support set at level $k = 10$ includes the parameter
-values that receive `strong' relative support from the data, while a $k = 1/10$
-support set includes the parameter values that are at least not strongly
-contradicted.
+In practice, a $k$ support set (typically an interval) is obtained from
+`cutting' the SC at $k$ and taking the parameter values above as part of the
+support set (see the right plot in Figure~\ref{fig:pvalfun} for illustration).
+It may happen that for certain choices of $k$ the support set is empty because
+the data do not constitute relative evidence at that level. The choice of the
+support level is arbitrary, just as the choice of the confidence level from a
+confidence set is. One may, for example, report the support level $k = 1$ as it
+represents the tipping point at which the parameter values begin to be supported
+over the alternative. Conventions for Bayes factor evidence levels can also be
+used. For example, based on the convention from \citet{Jeffreys1961}, a support
+set at level $k = 10$ includes the parameter values that receive `strong'
+relative support from the data, while a $k = 1/10$ support set includes the
+parameter values that are at least not strongly contradicted.
 
 
 \subsection{The maximum evidence estimate}
@@ -461,33 +518,23 @@ lowers the evidence for the corresponding hypothesis. In sum, finding the MEE
 corresponds approximately to maximizing the profile likelihood that is adjusted
 based on the accuracy of the prior of the parameters and the modal dispersion.
 
+\subsection{Example: Normal mean}
+\label{sec:normalmean}
 
-<< "RECOVERY-example" >>=
-## Baricitinib in patients admitted to hospital with COVID-19 (RECOVERY): a
-## randomised, controlled, open-label, platform trial and updated meta-analysis
-## https://doi.org/10.1016/S0140-6736(22)01109-6
-
-## Overall, 514 (12%) of 4148 patients allocated to baricitinib versus 546 (14%)
-## of 4008 patients allocated to usual care died within 28 days (age-adjusted
-## rate ratio 0.87; 95% CI 0.77–0.99; p=0.028).
-HR <- 0.87
-ciHR <- c(0.77, 0.99)
-p <- 0.028
-y <- log(HR)
-se <- diff(log(ciHR))/2/qnorm(p = 0.975)
+<< "test-example" >>=
+y <- 110
+usd <- 15
+n <- 30
+se <- usd/sqrt(n)
 se2 <- se^2
-## This 13% proportional reduction in mortality was somewhat smaller than that
-## seen in a meta-analysis of eight previous trials of a JAK inhibitor
-## (involving 3732 patients and 425 deaths), in which allocation to a JAK
-## inhibitor was associated with a 43% proportional reduction in mortality (rate
-## ratio 0.57; 95% CI 0.45–0.72)
-HRprior <- 0.57
-ciHRprior <- c(0.45, 0.72)
-m <- log(HRprior)
-s <- diff(log(ciHRprior))/2/qnorm(p = 0.975)
+
+yprior <- 120
+nprior <- 50
+m <- yprior
+s <- usd/sqrt(nprior)
 v <- s^2
-t0seq <- seq(-0.5, 0.1, 0.01)
-delta <- 0.1
+t0seq <- seq(90, 120, 0.01)
+delta <- 5
 
 k <- 1
 ## normal prior
@@ -509,21 +556,14 @@ si3 <- function(k) c(y + se2*log(k)/delta - delta/2, 1e+100) #Inf)
 sis <- t(sapply(X = list(si1, si1b, si2, si3), FUN = function(f) f(k)))
 @
 
-
-\subsection{Example: Normal mean}
-\label{sec:normalmean}
-Suppose we observe a single observation $y$ assumed to be sampled (at least
-approximately) from a normal distribution
-$Y \mid \theta \sim \Nor(\theta, \sigma^{2})$. Assume that $\sigma^{2}$ is known
-and we want to conduct inferences regarding $\theta$. This is a simple but
-frequently encountered scenario, for example, $y$ could be an estimated
-regression coefficient from a generalized linear model and $\sigma$ its
-estimated standard error. In the following we will consider an example from
-\citet{Abani2022}. This randomised controlled trial found a reduction in
-mortality of patients hospitalised with COVID-19 when treated with baricitinib
-compared to usual care (age-adjusted log hazard ratio $y = \Sexpr{round(y, 2)}$
-with standard error $\sigma = \Sexpr{round(se, 3)}$ estimated with Cox
-regression). To obtain a Bayes factor for contrasting
+Suppose we observe a mean $\bar{y}$ from $n$ observations, assumed to be sampled
+(at least approximately) from a normal distribution $\bar{Y} \mid \theta \sim
+\Nor(\theta, \kappa^{2}/n)$. Assume that the variance $\kappa^{2}$ is known and
+we want to conduct inferences regarding $\theta$. This is a simple but
+frequently encountered scenario. For example, suppose we observed a mean test
+score of $\bar{y} = \Sexpr{110}$ in a sample of $n = \Sexpr{n}$ students. Also
+assume that in the general population the average score is 100 and the standard
+deviation is $\kappa = \Sexpr{usd}$. To obtain a Bayes factor for contrasting
 $H_{0} \colon \theta = \theta_{0}$ against $H_{1} \colon \theta \neq \theta_{0}$
 we need to formulate a prior for $\theta$ under the alternative $H_{1}$. We will
 now discuss three choices with different characteristics shown in
@@ -533,15 +573,14 @@ Table~\ref{tab:normalinference}.
 \renewcommand{\arraystretch}{2.25}
 \begin{table}[!htb]
   \centering
-  \caption{Support curve $\BF_{01}$, maximum evidence estimate
-    $\thatME$, evidence value $\kME$, and $k$ support interval (SI) for a normal
-    mean based on one observation $y$ from
-    $Y \mid \theta \sim \Nor(\theta, \sigma^{2})$ with known variance
-    $\sigma^{2}$ and for three prior distributions for $\theta$ under the
-    alternative $H_{1}$: A normal prior (left), a normal prior centered around
-    the parameter value of the null hypothesis $\theta_{0}$ (middle), a point
-    prior shifted away from the parameter value of the null hypothesis
-    $\theta_{0}$ by $d > 0$ (right).}
+  \caption{Support curve $\BF_{01}$, maximum evidence estimate $\thatME$,
+    evidence value $\kME$, and $k$ support interval (SI) for a normal mean based
+    on an observed mean $\bar{y}$ from $\bar{Y} \mid \theta \sim \Nor(\theta,
+    \kappa^{2}/n)$ with known variance $\kappa^{2}$ and for three prior
+    distributions for $\theta$ under the alternative $H_{1}$: A normal prior
+    (left), a normal prior centered around the parameter value of the null
+    hypothesis $\theta_{0}$ (middle), a point prior shifted away from the
+    parameter value of the null hypothesis $\theta_{0}$ by $d > 0$ (right).}
   \label{tab:normalinference}
   \resizebox{\columnwidth}{!}{%
   \begin{tabular}{l c c c}
@@ -550,35 +589,30 @@ Table~\ref{tab:normalinference}.
     \cmidrule(lr){2-4}
     & $\theta \sim \Nor(m, v)$ & $\theta \sim \Nor(\theta_{0}, v)$ & $\theta = \theta_{0} + d$\\
     \midrule
-    $\BF_{01}$ & $\exp\left[-\frac{1}{2}\left\{\frac{(y - \theta_{0})^{2}}{\sigma^{2}} - \frac{(y - m)^{2}}{\sigma^{2} + v}  \right\}\right] \sqrt{1 + \frac{v}{\sigma^2}}$ & $\exp\left[-\frac{1}{2}\left\{\frac{(y - \theta_{0})^{2}}{\sigma^{2}(1 + \sigma^{2}/v)}\right\}\right] \sqrt{1 + \frac{v}{\sigma^2}}$ & $\exp\left\{\frac{2 d (\theta_{0} - y) + d^{2}}{2 \sigma^{2}}\right\}$\\
-    $\thatME$ & $y$ & $y$ & non-existent \\
-    $\kME$ & $\exp\left\{\frac{(y - m)^{2}}{2(\sigma^{2} + v)}  \right\} \sqrt{1 + \frac{v}{\sigma^2}}$ & $\sqrt{1 + \frac{v}{\sigma^2}}$ & non-existent \\
-    $k$ SI & $y \pm \sigma \sqrt{\log(1 + \frac{v}{\sigma^2}) + \frac{(y - m)^{2}}{\sigma^{2} + v} - \log k^{2}}$ & $y \pm \sigma \sqrt{\left\{\log(1 + \frac{v}{\sigma^2}) - \log k^{2}\right\}(1 + \frac{\sigma^{2}}{v})}$ & $\left[y + \frac{\sigma^{2}\log k}{d} - \frac{d}{2}, \infty\right]$\\
+    $\BF_{01}$ & $\exp\left[-\frac{1}{2}\left\{\frac{(\bar{y} - \theta_{0})^{2}}{\kappa^{2}/n} - \frac{(\bar{y} - m)^{2}}{v +\kappa^{2}/n}  \right\}\right] \sqrt{1 + \frac{v\, n}{\kappa^2}}$ & $\exp\left[-\frac{1}{2}\left\{\frac{n(\bar{y} - \theta_{0})^{2}}{\kappa^{2}\{1 + \kappa^{2}/(v\,n)\}}\right\}\right] \sqrt{1 + \frac{v\,n}{\kappa^2}}$ & $\exp\left\{\frac{2 d (\theta_{0} - \bar{y}) + d^{2}}{2 \kappa^{2}/n}\right\}$\\
+    $\thatME$ & $\bar{y}$ & $\bar{y}$ & non-existent \\
+    $\kME$ & $\exp\left\{\frac{(\bar{y} - m)^{2}}{2(v + \kappa^{2}/n)}  \right\} \sqrt{1 + \frac{v\, n}{\kappa^2}}$ & $\sqrt{1 + \frac{v\, n}{\kappa^2}}$ & non-existent \\
+    $k$ SI & $\bar{y} \pm \frac{\kappa}{\sqrt{n}} \sqrt{\log(1 + \frac{v\, n}{\kappa^2}) + \frac{(\bar{y} - m)^{2}}{v + \kappa^{2}/n} - \log k^{2}}$ & $\bar{y} \pm \frac{\kappa}{\sqrt{n}} \sqrt{\left\{\log(1 + \frac{v \, n}{\kappa^2}) - \log k^{2}\right\}(1 + \frac{\kappa^{2}}{v \, n})}$ & $\bigg[\bar{y} + \frac{\kappa^{2}\log k}{n\, d} - \frac{d}{2}, \infty\bigg)$\\
     \bottomrule
   \end{tabular}%
   }
 \end{table}
 \endgroup
-
-
 Perhaps the simplest choice is a prior that does not depend on the parameter
 value $\theta_0$ of the null hypothesis, such as a normal prior with mean $m$
 and variance $v$ (left column in Table~\ref{tab:normalinference}). The
 hyperparameters $m$ and $v$ may be specified based on external data or based on
-an alternative hypothesis of interest (e.g., the prior mean $m$ could be set to
-a minimum clinically important treatment effect and $v$ could be set to zero to
-obtain a point prior as typically used in a power analysis). \citet{Abani2022}
-reported a meta-analytic log hazard ratio and standard error based on eight
-previous trials, which we now use to set the prior mean and variance to
-$m = \Sexpr{round(m, 2)}$ and $v = \Sexpr{round(s, 3)}^{2}$, see
+an alternative hypothesis of interest. For example, suppose that
+$\Sexpr{nprior}$ students from the previous year had a mean test score of
+$\Sexpr{m}$, which we now use to set the prior mean and variance to $m =
+\Sexpr{round(m, 2)}$ and $v = \Sexpr{round(usd, 2)}^2/\Sexpr{nprior}$, see
 Figure~\ref{fig:normal} for the resulting SC (orange). In this case, the MEE is
-given by $\thatME =y = \Sexpr{round(y, 2)}$ with the support interval centered
-around it. Due to the apparent conflict between the observed data and the
-specified prior under the alternative, the $k = 1$ support interval spans an
-wide range from $\Sexpr{round(sis[1,1], 2)}$ to $\Sexpr{round(sis[1,2], 2)}$,
-indicating that very beneficial up to slightly harmful treatment effects are
-supported by the data over the alternative.
-
+given by $\thatME = \bar{y} = \Sexpr{round(y, 2)}$ with the support interval
+centered around it. Due to the apparent conflict between the observed data and
+the specified prior under the alternative, the $k = 1$ support interval spans an
+wide range from $\Sexpr{round(sis[1,1], 1)}$ to $\Sexpr{round(sis[1,2], 1)}$,
+indicating that average up to above average test scores are supported by the
+data over the alternative.
 
 The formulae in Table~\ref{tab:normalinference} (left column) show that as the
 prior mean $m$ becomes closer to the observed data $y$, the evidence level
@@ -586,13 +620,11 @@ $\kME$ decreases and the support interval becomes narrower. This is because an
 alternative closer to the data clearly has better predictive accuracy of the
 data than an alternative further away, and thus fewer point null hypotheses can
 outpredict it. Figure~\ref{fig:normal} illustrates this phenomenon with another
-prior distributions (one with mean at the observed log hazard ratio
-$y = \Sexpr{round(y, 2)}$, the blue SC). The SC has its mode still at the
-observed log hazard ratio estimate but shows a far narrower $k = 1$ support
-interval from $\Sexpr{round(sis[2,1], 2)}$ to $\Sexpr{round(sis[2,2], 2)}$ than
-the orange SC with the mean $m = \Sexpr{round(m, 2)}$ based on the eight
-previous trials.
-
+prior distributions (one with mean at the observed test score $\bar{y} =
+\Sexpr{round(y, 2)}$, the blue SC). The SC has its mode still at the observed
+mean test score but shows a far narrower $k = 1$ support interval from
+$\Sexpr{round(sis[2,1], 1)}$ to $\Sexpr{round(sis[2,2], 1)}$ than the orange SC
+with the mean $m = \Sexpr{round(m, 2)}$ based on the previous year students.
 
 \begin{figure}[!htb]
 << "normal-mean-example", fig.height = 4 >>=
@@ -601,7 +633,7 @@ bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100, 1000)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100", "1000")
 par(mar = c(4, 5, 1, 1.5))
 matplot(t0seq, bfs, type = "l", lty = 1, col = colors, lwd = 1.5, las = 1,
-        xlab = bquote("Log hazard ratio" ~ theta), ylab = "Bayes factor",
+        xlab = bquote("Mean test score" ~ theta[0]), ylab = "Bayes factor",
         log = "y", yaxt = "n", ylim = c(1/1000, 1000),
         panel.first = graphics::grid(lty = 3, equilogs = FALSE))
 axis(side = 2, at = bfbks, labels = bflabs, las = 1)
@@ -611,28 +643,29 @@ arrows(x0 = sis[,1], x1 = sis[,2], y0 = k + c(-0.0025, 0.0025, 0, 0), col = colo
 points(x = c(y, y, y), y = c(bf1(y), bf1b(y), bf2(y)), col = colors[1:3], pch = 20)
 legend("topleft", lty = 1, col = colors, lwd = 1.5, cex = 0.7,
        title = expression("Prior under"~ italic(H)[1]),
-       legend = c(bquote(theta ~ "~ N(" * .(round(m, 2)) * "," ~ .(round(sqrt(v), 2))^2 * ")"),
-                  bquote(theta ~ "~ N(" * .(round(y, 2)) * "," ~ .(round(sqrt(v), 2))^2 * ")"),
-                  bquote(theta ~ "~ N(" * theta[0] * "," ~ .(round(sqrt(v), 2))^2 * ")"),
+       legend = c(bquote(theta ~ "~ N(" * .(round(m, 2)) * "," ~
+                             .(round(usd, 2))^2/.(nprior) * ")"),
+                  bquote(theta ~ "~ N(" * .(round(y, 2)) * "," ~
+                             .(round(usd, 2))^2/.(nprior) * ")"),
+                  bquote(theta ~ "~ N(" * theta[0] * "," ~
+                             .(round(usd, 2))^2/.(nprior) * ")"),
                   bquote(theta == theta[0] + .(delta))),
        bg = "white")
-mtext(text = bquote("" %->% "Harm"), side = 1, line = 0, at = 0.045, cex = 0.9)
-mtext(text = bquote("Benefit" %<-% ""), side = 1, line = 0, at = -0.05, cex = 0.9)
 arrows(x0 = min(t0seq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = min(t0seq), y = c(2, 1/2),
-     labels = c(expression("Support for" ~ theta),
+     labels = c(expression("Support for" ~ theta[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
 @
-\caption{Support curve, MEE, and $k = \Sexpr{k}$ support interval for a
-  log hazard ratio $\theta$ based on estimated log hazard ratio
-  $y =\Sexpr{round(y, 2)}$ with standard error $\sigma = \Sexpr{round(se, 3)}$
-  from the RECOVERY trial \citep{Abani2022} for different prior distributions
-  for the $\theta$ under the alternative $H_{1}$. A normal likelihood
-  $Y \mid \theta \sim \Nor(\theta, \sigma^{2}_{i})$ is assumed for the data.}
+\caption{Support curve, MEE, and $k = \Sexpr{k}$ support interval for a mean test
+  score $\theta$ based on the observed mean $\bar{y} =\Sexpr{round(y, 2)}$ from
+  $n = \Sexpr{n}$ observations for different prior distributions for $\theta$
+  under the alternative $H_{1}$. A normal likelihood $Y \mid \theta \sim
+  \Nor(\theta, \kappa^{2}_{i} = \Sexpr{usd}^2)$ is assumed for the data.}
 \label{fig:normal}
 \end{figure}
+
 
 Another approach to formulating a prior distribution for $\theta$ under the
 alternative commonly suggested in `objective' Bayes theories is to center the
@@ -640,27 +673,26 @@ prior around the tested parameter value $\theta_{0}$ \citep{Jeffreys1961,
   Berger1987b, Kass1995b}. For example, one can specify a normal prior with mean
 at the null value $\theta_{0}$ (middle column in
 Table~\ref{tab:normalinference}). Thus, the resulting SC varies both the null
-and the alternative, unlike the SC based on the `global' normal prior with
-fixed mean $m$. As a result, the interpretation of the SC is different: For
-such a `local' normal prior, the SC quantifies the support of parameter values
-over alternative parameter values in a neighborhood around them. As for the
-global normal prior, the MEE based on the local normal prior is given by
-$\thatME = y$ and support intervals are centered around it, but the associated,
-Bayes factor, evidence level and support interval are different.
-Figure~\ref{fig:normal} illustrates % with the data from the RECOVERY trial
-that when the mean $m$ of a global normal prior is too different from the
-observed data $y$ (as in the case of the orange SC, where the prior was
-specified based on the eight previous trials), the $k=1$ support interval based
-on the local prior with the same variance is narrower. On the other hand, when
-the mean $m$ of the global prior is equal to the data (blue SC), the support
-interval based on the local prior is wider.
+and the alternative, unlike the SC based on the `global' normal prior with fixed
+mean $m$. As a result, the interpretation of the SC is different: For such a
+`local' normal prior, the SC quantifies the support of parameter values over
+alternative parameter values in a neighborhood around them. As for the global
+normal prior, the MEE based on the local normal prior is given by $\thatME = y$
+and support intervals are centered around it, but the associated, Bayes factor,
+evidence level and support interval are different. Figure~\ref{fig:normal}
+illustrates that when the mean $m$ of a global normal prior is too different
+from the observed mean $\bar{y}$ (as in the case of the orange SC, where the
+prior was specified based on the students from the previous year), the $k=1$
+support interval based on the local prior with the same variance is narrower. On
+the other hand, when the mean $m$ of the global prior is equal to the data (blue
+SC), the support interval based on the local prior is wider.
 
 
 The last prior in the right most column of Table~\ref{tab:normalinference}
 represents a point prior shifted from the null value $\theta_{0}$ by $d > 0$.
 The prior is again `local' in the sense that it is different for each tested
 parameter value of the null hypothesis $\theta_{0}$, and as such encodes an
-alternative hypothesis that the log hazard ratio is greater than the tested
+alternative hypothesis that the mean test score is greater than the tested
 parameter value. However, this leads to an ever-increasing SC, see
 Figure~\ref{fig:normal} for a numerical illustration. As a result, the MEE and
 its evidence level do not exist, while the support interval still exists but its
@@ -669,61 +701,70 @@ example demonstrates that a poorly chosen prior can lead to pathological
 behavior of the resulting SC.
 
 
-<< "distribution-k" >>=
-## ## generate data under H1, what is the distribution of k?
-## ## the theoretical density
-## fk <- function(k, v, se) sqrt(2/pi*(1 + v/se^2)/k^4/log(k^2/(1 + v/se^2)))
-
-## set.seed(42)
-## ysim <- rnorm(n = 100000, mean = m, sd = sqrt(v + se^2))
-## ksim <- bffun(yi = ysim, sei = se, muPrior = m, sdPrior = sqrt(v), null = ysim)
-
-## hist(ksim, probability = TRUE, xlim = c(1, 20),
-##      breaks = seq(0, 100000, 0.1))
-
-## kseq <- seq(0, 100, 0.01)
-## lines(kseq, fk(kseq), lty = 2, lwd = 2)
-@
-
 \subsection{Choice of the prior}
+\label{sec:priorchoice}
+While Bayes factors do not depend on the prior probabilities of their contrasted
+hypothesis, they can be sensitive to the prior distributions specified for model
+parameters under each hypothesis. As the previous example showed, the prior
+assigned to the parameters under the alternative hypothesis also has a
+substantial impact on SC inferences. Moreover, unlike posterior distributions,
+where the influence of the prior diminishes as data accumulate, the sensitivity
+of Bayes factors to prior distributions persists even with large samples
+\citep{Kass1995}.
 
-As the previous example showed, the prior assigned to the parameters under the
-alternative has a substantial impact on SC inference. This `sensitivity' of
-Bayes factors to prior distributions enables data analysts to accurately
-quantify the support of parameter values over informative alternative hypotheses
-when they are available, but poses a challenge in their absence
-\citep{Kass1995}. Various approaches have been proposed to deal with this issue,
-for example, `default' or `objective' prior distributions \citep{Bayarri2012,
-  Consonni2018}, reverse-Bayes analysis \citep{Held2021b}, prior elicitation
-\citep{OHagan2019}, or sensitivity analysis \citep{Franck2019}, all with
-advantages and disadvantages. Here we will not reiterate general considerations
-on prior specification for Bayes factors \citep[see e.g., Section 5
-in][]{Kass1995} but focus on specific considerations related to SCs.
+This sensitivity is not inherently a weakness. It enables data analysts to
+accurately quantify the support of parameter values over informative alternative
+hypotheses when they are available \citep{Vanpaemel2010}, but poses a challenge
+in their absence \citep{Liu2008, Williams2023}. Even when external information
+exists, translating it into a formal prior distribution is often nontrivial. For
+instance, knowing that a parameter lies within a certain range still leaves
+considerable flexibility in the actual specification of the prior.
+
+Several strategies have been proposed to address these challenges, each with
+advantages and limitations. First, so-called `default' or `objective' priors aim
+to yield Bayes factors with desirable properties, such as model selection
+consistency, without incorporating prior knowledge \citep{Bayarri2012,
+  Consonni2018}. Second, prior elicitation techniques formally translate expert
+judgments into quantitative priors \citep{OHagan2019, Stefan2022b, Mikkola2024}.
+Third, Bayes factor bounds \citep{Berger1987, Sellke2001, Held2018} and
+sensitivity analysis \citep{Kass1995, Sinharay2002, Franck2019} explore how
+Bayes factors change across a class of priors to assess robustness of
+conclusions. Finally, reverse-Bayes analyses identify the priors that lead to
+the Bayes factor crossing a tipping point, allowing analysts to assess the
+plausibility of such a prior in light of external knowledge
+\citep{Good1950,Held2021b}. As all of these techniques are applicable to Bayes
+factors, they are also applicable to SCs. We will now focus on more specific
+considerations related to SCs.
 
 As in other Bayes factor applications, SCs are only unambiguously defined if
-priors for focus parameters are proper under the alternative $H_1$ (i.e.,
-integrate to one), whereas priors for nuisance parameters may be improper as
-long as the same prior is assigned under both the null $H_0$ and the alternative
-$H_1$ so that arbitrary constants cancel out.
-A general distinction can be made between \emph{global} priors, which do not
-depend on the value of $\theta_{0}$ under the null hypothesis and \emph{local}
-priors, which do. In the latter case, the interpretation of the SC is more
-intricate, since for each parameter value the SC quantifies the support over a
-different alternative. For a more natural interpretation, global priors may
-hence be preferred over local priors. At the same time, local priors correspond
-to the typical use of `default' Bayes factors, which is to center the prior
-around $\theta_{0}$, and as such may be preferred in the same situations where
-default Bayes factors would be used.
+priors for focus parameters are proper (i.e., integrate to one) under the
+alternative $H_1$. Assigning improper or very vague priors can lead SCs to
+diverge to infinity thereby proving overwhelming support for every tested
+parameter value $\theta_0$, which is known as the `Jeffreys-Lindley paradox'
+\citep{Robert2014, Wagenmakers2021a, Pawel2023}. Priors for nuisance parameters
+may be improper as long as the same prior is assigned under both the null $H_0$
+and the alternative $H_1$ so that arbitrary constants cancel out.
 
-Finally, it is usually advisable to report sensitivity analyses for plausible
-ranges of priors, to assess the robustness of the conclusions. A convenient
-visual sensitivity analysis is, for example, to plot different SCs resulting
-from different prior specifications, as shown in Figure~\ref{fig:normal}. One
-can go a step further and use a `reverse-Bayes` approach \citep{Good1950,
-  Held2021b}, which involves systematically determining the prior that
-represents the tipping point and changes the conclusions of the analysis. Data
-analysts can then reason about whether or not such a prior is plausible in the
-light of external knowledge and data.
+A general distinction can be made between \emph{global} and \emph{local} priors.
+Global priors do not depend on the parameter value $\theta_{0}$ of the null
+hypothesis. In contrast, local priors are defined relative to $\theta_0$. For
+example, a local prior may be centered around $\theta_0$ or shifted away from
+it, as the priors underlying the green and yellow SCs in
+Figure~\ref{fig:normal}. This results in a different alternative hypothesis for
+each tested parameter value, making the interpretation of the SC more intricate.
+For a more natural interpretation, global priors may hence be preferred over
+local priors. At the same time, local priors correspond to the typical use of
+`default' Bayes factors, which is to center the prior around $\theta_{0}$, and
+as such may be preferred in the same situations where default Bayes factors
+would be used.
+
+Given these considerations, SCs, just as Bayes factors, are especially useful if
+informative priors based prior data or external knowledege are available. If
+such priors are lacking and `default' priors are used, it is advisable to report
+sensitivity analyses for plausible ranges of priors or reverse-Bayes analysis,
+to assess the robustness of the conclusions. A convenient visual sensitivity
+analysis is, for example, to plot different SCs resulting from different prior
+specifications, as shown in Figure~\ref{fig:normal}.
 
 
 \subsection{Sequential analysis}
@@ -778,39 +819,40 @@ will go to infinity, while the SC at $\theta_{0} \neq \theta_{*}$ will go to
 zero.
 
 As a concrete example where the distribution of the SC can be derived in
-closed-form, consider again inference about a normal mean based on data
-$Y \mid \theta \sim \Nor(\theta, \kappa^{2}/n)$, where $\kappa^{2}$ denotes a
-unit-variance and $n$ the sample size. The logarithm of the SC based on a
-normal prior $\theta \mid H_{1} \sim \Nor(m, v)$ can then be written as
+closed-form, consider again inference about a normal mean based on the data mean
+$\bar{y}$ with distribution $\bar{Y} \mid \theta \sim \Nor(\theta,
+\kappa^{2}/n)$, where $\kappa^{2}$ denotes a unit-variance and $n$ the sample
+size. The logarithm of the SC based on a normal prior $\theta \mid H_{1} \sim
+\Nor(m, v)$ can then be written as
 \begin{align}
-  \log \BF_{01}(Y;\theta_{0})
+  \log \BF_{01}(\bar{Y};\theta_{0})
   % &= \frac{1}{2}\left\{\log\left(1 + \frac{n \, v}{\kappa^{2}}\right) -
   % \frac{(Y - \theta_{0})^{2}}{\kappa^{2}/n} +
   % \frac{(Y - m)^{2}}{v + \kappa^{2}/n}\right\} \nonumber \\
   &= \frac{1}{2}\left[\log\left(1 + \frac{n \, v}{\kappa^{2}}\right) +
  \frac{(\theta_{0} - m)^{2}}{v} -
-    \left\{Y - \frac{(\theta_{0} - m)\kappa^{2}}{n \, v} - \theta_{0}\right\}^{2}\frac{v \, n}{\kappa^{2}(v + \kappa^{2}/n)} \right].
+    \left\{\bar{Y} - \frac{(\theta_{0} - m)\kappa^{2}}{n \, v} - \theta_{0}\right\}^{2}\frac{v \, n}{\kappa^{2}(v + \kappa^{2}/n)} \right].
   \label{eq:logbfnormal}
 \end{align}
-Hence, when the data are generated from
-$Y \mid \theta_{*} \sim \Nor(\theta_{*}, \kappa^{2}/n)$ with true mean
-$\theta_{*}$, we have that
+Hence, when data means are generated from $\bar{Y} \mid \theta_{*} \sim
+\Nor(\theta_{*}, \kappa^{2}/n)$ with true mean $\theta_{*}$, we have that
 \begin{align*}
   % \left\{
   % -2\log \BF_{01}(Y;\theta_{0}) +
   % \log\left(1 + \frac{n \, v}{\kappa^{2}}\right) +
   % \frac{(\theta_{0} - m)^{2}}{v}
   % \right\} \left(1 + \frac{\kappa^{2}}{v\, n}\right) &=
-    \left\{Y - \frac{(\theta_{0} - m)\kappa^{2}}{n \, v} - \theta_{0}\right\}^{2} \frac{n}{\kappa^{2}} \sim \chi^{2}_{1,\lambda}
+    \left\{\bar{Y} - \frac{(\theta_{0} - m)\kappa^{2}}{n \, v} - \theta_{0}\right\}^{2} \frac{n}{\kappa^{2}} \sim \chi^{2}_{1,\lambda}
 \end{align*}
 with non-centrality parameter
 $\lambda = n\left\{\theta_{*} - \frac{(\theta_{0} - m)\kappa^{2}}{n \, v} - \theta_{0}\right\}^{2}/\kappa^{2}.$
 Thus, by rearranging terms in~\eqref{eq:logbfnormal}, we can compute the
 probability that the Bayes factor is below some threshold $\gamma$ by
-\begin{align*}
-  \Pr\{\BF_{01}(Y;\theta_{0}) \leq \gamma \mid \theta_{*}\} =
+\begin{align}
+  \label{eq:bfcdf}
+  \Pr\{\BF_{01}(\bar{Y};\theta_{0}) \leq \gamma \mid \theta_{*}\} =
   1 - \Pr(\chi_{1,\lambda}^{2} \leq X)
-\end{align*}
+\end{align}
 with
 \begin{align*}
   X = \left\{
@@ -822,7 +864,7 @@ with
 
 \begin{figure}[!tb]
 << "BF-asymptotic", fig.height = 4.5, fig.width = 8 >>=
-## BFF for normal mean
+## SC for normal mean
 bff <- function(t0, y, kappa, n, m, v) {
     sqrt(1 + v*n/kappa^2)*
         exp(-0.5*((y - t0)^2*n/kappa^2 - (y - m)^2/(kappa^2/n + v)))
@@ -895,7 +937,7 @@ bfbks <- c(1/1000, 1/100, 1/10, 1, 10, 100)
 bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100")
 matplot(t0seq, y = bfupper, type = "l", lty = 2,
         col = cols2, log = "y", ylim = c(1/1000, 120),
-        las = 1, xlab = bquote("Mean" ~ theta),
+        las = 1, xlab = bquote("Mean" ~ theta[0]),
         ylab = bquote("SC distribution (" *
                       .(round(plower*100, 1)) * "/" * .(round(p*100, 1)) * "/" *
                           .(round(pupper*100, 1)) * "% quantiles)"),
@@ -917,16 +959,19 @@ legend("topright", legend = rev(ns), title = expression("Sample size" ~ italic(n
 arrows(x0 = min(t0seq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = min(t0seq), y = c(2.5, 1/2.5),
-     labels = c(expression("Support for" ~ theta),
+     labels = c(expression("Support for" ~ theta[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
 @
-\caption{Distribution of the SC for different sample sizes. A data model
-  $Y \mid \theta \sim \Nor(\theta, \kappa^{2}/n)$ is assumed and data are
-  generated from a true mean $\theta_{*} = \Sexpr{tstar}$ and unit-variance
-  $\kappa^{2} = \Sexpr{kappa^2}$. The SC is based on a local normal prior
-  $\theta \mid H_{1} \sim \Nor(\theta_{0}, v = \Sexpr{v})$ assigned to $\theta$
-  under the alternative.}
+\caption{The distribution of the SC, summarized by 5\% quantile (lower dashed
+  line), 50\% quantile (solid line), 95\% quantile (upper dashed line), for
+  different sample sizes $n$ (colors). A data model $\bar{Y} \mid \theta \sim
+  \Nor(\theta, \kappa^{2}/n)$ is assumed with true mean $\theta_{*} =
+  \Sexpr{tstar}$ and unit-variance $\kappa^{2} = \Sexpr{kappa^2}$. The SC is
+  based on a local normal prior $\theta \mid H_{1} \sim \Nor(\theta_{0}, v =
+  \Sexpr{v})$ assigned to $\theta$ under the alternative. Quantiles were
+  computed by numerically inverting the cumulative distribution function of the
+  Bayes factor~\eqref{eq:bfcdf}.}
 \label{fig:SCdistribution}
 \end{figure}
 
@@ -1034,15 +1079,18 @@ Another connection between frequentist and SC inference is given by the
 `universal bound' \citep{Kerridge1963, Robbins1970, Royall1997, Sanborn2013},
 which bounds the frequentist probability of obtaining misleading Bayesian
 evidence. That is, when data are generated under $H_{0}: \theta = \theta_{0}$,
-the probability of obtaining a Bayes factor $\BF_{01}$ less than $k < 1$ is at
-most $k$ for any prior under the alternative
+the probability of obtaining misleading evidence against the null at level $k$
+(with a $\BF_{01} \leq k < 1$) is at most $k$ for any prior under the
+alternative
 \begin{align*}
   \Pr\{\BF_{01}(y) \leq k \mid H_{0}\} \leq k.
 \end{align*}
-If there are nuisance parameters, the bound holds only marginalized over the
-prior of the nuisance parameters. For the bound to hold in a strict sense (i.e.,
-for every possible value of the nuisance parameter), special priors must be
-assigned to them \citep{Hendriksen2021, Grunwald2024}.
+This can be shown by noting that the expectation of $\BF_{10}$ under $H_0$ is 1
+and applying Markov's inequality \citep[see e.g.,][]{Grunwald2024}. If there are
+nuisance parameters, the bound holds only marginalized over the prior of the
+nuisance parameters. For the bound to hold in a strict sense (i.e., for every
+possible value of the nuisance parameter), special priors must be assigned to
+them \citep{Hendriksen2021, Grunwald2024}.
 
 The universal bound can thus be used to transform SCs into conservative
 \textit{P}-values and confidence sets, e.g., a $k = 1/20$ support set obtained
@@ -1188,7 +1236,7 @@ alternative hypothesis that closely aligns with the theoretical prediction from
 
 \begin{figure}[!htb]
 << "Bartos-analysis", fig.height = 4 >>=
-## BFF for binomial proportion based on truncated beta prior under the alternative
+## SC for binomial proportion based on truncated beta prior under the alternative
 BFFbinomial <- function(p, y, n, a, b, l = 0.5, u = 1, log = FALSE) {
     logbf <- y*log(p) + (n - y)*log(1 - p) - lbeta(a + y, b + n - y) + lbeta(a, b) +
         log(pbeta(q = u, shape1 = a, shape2 = b) -
@@ -1223,7 +1271,7 @@ si <- SIbinomial(k = 1, y = y, n = n, a = a, b = b)
 ## compute BF for p = 0.5
 bf05 <- BFFbinomial(p = 0.5, y = y, n = n, a = a, b = b)
 
-## compute BFF
+## compute SC
 p0seq <- seq(from = 0.5, to = 0.515, length.out = 500)
 bff <- BFFbinomial(p = p0seq, y = y, n = n, a = a, b = b)
 
@@ -1236,7 +1284,7 @@ par(mar = c(4, 5, 2, 1.5))
 plot(x = p0seq, y = bff,
      type = "l", log = "y", lwd = 1.5,
      ylab = bquote("Bayes factor"),
-     xlab = bquote("Probability of coin landing on same side" ~ theta),
+     xlab = bquote("Probability of coin landing on same side" ~ theta[0]),
      ylim = c(1/10^18, 10),
      yaxt = "n",
      panel.first = graphics::grid(lty = 3, equilogs = FALSE))
@@ -1248,7 +1296,7 @@ points(x = mee, y = kME, pch = 20, col = 1)
 arrows(x0 = min(p0seq), y0 = c(2, 1/2), y1 = c(40, 1/40),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = min(p0seq), y = c(7, 1/7),
-     labels = c(expression("Support for" ~ theta),
+     labels = c(expression("Support for" ~ theta[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
 @
@@ -1337,7 +1385,7 @@ sensitivityList <- lapply(X = scales, FUN = function(scale) {
                                 rel.tol = .Machine$double.eps^0.5,
                                 abs.tol = .Machine$double.eps^0.5,
                                 tol = .Machine$double.eps^0.5, maxiter = 1000))
-    plotdat <- plot(ma, thetaRange = c(0.5, 0.52), tauRange =  c(0, 0.04),
+    plotdat <- plot(ma, thetaRange = c(0.5, 0.52), tauRange = c(0, 0.04),
                     plot = FALSE)
     list("tauDF" = data.frame(plotdat$tauDF, scale = scale),
          "meetau" = data.frame(unname(as.data.frame(t(plotdat$MEEtau))),
@@ -1375,13 +1423,13 @@ arrows(x = dat$lower, x1 = dat$upper, y0 = ybreaks, angle = 90, code = 3,
        length = 0)
 points(x = dat$yi, y = ybreaks, pch = 20, cex = 1)
 
-## 2D BFF plot
+## 2D SC plot
 bfMatrix <- matrix(plotdat$contourDF$bf, ncol = 200, byrow = TRUE)
 image(x = plotdat$tauDF$tau, y = plotdat$thetaDF$theta, z = bfMatrix,
       col = grDevices::hcl.colors(n = 100, palette = "Blues 3", rev = TRUE),
       las = 1,
-      xlab = bquote("Heterogeneity" ~ tau),
-      ylab = bquote("Probability of coin landing on same side" ~ theta),
+      xlab = bquote("Heterogeneity" ~ tau[0]),
+      ylab = bquote("Probability of coin landing on same side" ~ theta[0]),
       main = bquote("Bayes factor surface" ~ ""))
 contour(x = plotdat$tauDF$tau, y = plotdat$thetaDF$theta, z = bfMatrix,
         levels = c(1/1000, 1/100, 1/10, 3, 10, 30, 100), add = TRUE,
@@ -1394,7 +1442,7 @@ points(x = res$MEEjoint[2], y = res$MEEjoint[1], pch = 20, col = 1)
 legend("topright", legend = "", title = paste("HN prior scale", scale),
        bty = "n", cex = 0.85)
 
-## BFF plot for probability
+## SC plot for probability
 colors <- hcl.colors(n = length(scales), alpha = 0.3)
 colors[4:5] <- colors[3:4]
 colors[3] <- "black"
@@ -1404,7 +1452,7 @@ bflabs <- c("1/1000", "1/100", "1/10", "1", "10", "100")
 matplot(sensitivityList[[1]]$thetaDF$theta, thetasens, type = "l", lty = lty,
         ylim = c(1/1000, 100), lwd = 1.5, col = colors, las = 1, log = "y",
         main = bquote(tau ~ "is the nuisance parameter"),
-        xlab = bquote("Probability of coin landing on same side" ~ theta),
+        xlab = bquote("Probability of coin landing on same side" ~ theta[0]),
         ylab = "Bayes factor",
         panel.first = graphics::grid(lty = 3, ny = NA, equilogs = FALSE),
         yaxt = "n")
@@ -1419,15 +1467,15 @@ legend("topright", title = "HN prior scale", bg = "white", pch = 20,
 arrows(x0 = 0.5, y0 = c(1.5, 1/1.5), y1 = c(3, 1/3),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = 0.5, y = c(2, 1/2),
-     labels = c(expression("Support for" ~ theta),
+     labels = c(expression("Support for" ~ theta[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.6, col = adjustcolor("black", alpha.f = 0.8))
 
-## BFF plot for heterogeneity
+## SC plot for heterogeneity
 matplot(sensitivityList[[1]]$tauDF$tau, tausens, type = "l", lty = lty,
         ylim = c(1/1000, 100), lwd = 1.5, col = colors, las = 1, log = "y",
         main = bquote(theta ~ "is the nuisance parameter"),
-        xlab = bquote("Heterogeneity" ~ tau), ylab = "Bayes factor",
+        xlab = bquote("Heterogeneity" ~ tau[0]), ylab = "Bayes factor",
         panel.first = graphics::grid(lty = 3, ny = NA, equilogs = FALSE),
         yaxt = "n")
 axis(side = 2, at = bfbks, labels = bflabs, las = 1)
@@ -1439,7 +1487,7 @@ abline(h = 1, lty = 2, col = transpblack)
 arrows(x0 = 0, y0 = c(1.5, 1/1.5), y1 = c(3, 1/3),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = 0, y = c(2, 1/2),
-     labels = c(expression("Support for" ~ tau),
+     labels = c(expression("Support for" ~ tau[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.6, col = adjustcolor("black", alpha.f = 0.8))
 @
@@ -1463,12 +1511,14 @@ around a participant specific true probability $\theta_i$, i.e.,
     y_i \mid \theta_i, \sigma^2_i &\sim \Nor(\theta_i, \sigma^2_i) \\
     \theta_i \mid \theta, \tau^2 &\sim \Nor(\theta, \tau^2).
 \end{align*}
-Marginalized over the participant specific probabilities, the distribution of an estimate
-is then
+While in some applications, inferences about the participant specific
+probabilities $\theta_i$ would also be of interest, these are consider nuisance
+parameters in this analysis. Consequently, the distribution of an estimate is
+marginalized over the participant probabilities distribution, leading to
 \begin{align*}
     y_i \mid \theta, \tau, \sigma^2_i &\sim \Nor(\theta, \sigma^2_i + \tau^2).
 \end{align*}
-There are two unknown parameters, $\theta$ and $\tau$. The mean $\theta$
+There are two unknown parameters left, $\theta$ and $\tau$. The mean $\theta$
 quantifies the average probability across participants, while the heterogeneity
 standard deviation $\tau$ quantifies the heterogeneity of these probabilities.
 The Bayes factor for testing $H_{0} \colon \theta = \theta_{0}, \tau = \tau_{0}$
@@ -1669,7 +1719,7 @@ SIrep <- function(k, yr, sr, yo, so, log = FALSE) {
 }
 
 
-## compute BFF, k=1 support interval, and MEE
+## compute SC, k=1 support interval, and MEE
 mdseq <- c(seq(-2, 0, length.out = 500), seq(0.001, 2, length.out = 500))
 bff <- sapply(X = seq(1, length(yr)), FUN = function(i) {
     repBFF(null = mdseq, yr = yr[i], sr = sr[i], yo = yo, so = so)
@@ -1693,7 +1743,7 @@ labs <- c(expression(10^-6), expression(10^-5), expression(10^-4),
           expression(10^1), expression(10^2), expression(10^3))
 matplot(mdseq, bff, type = "l", lty = 1, ylim = c(1/10^5, 10^3),
         lwd = 1.5, col = cols, las = 1, log = "y",
-        xlab = bquote("Mean difference" ~ theta),
+        xlab = bquote("Mean difference" ~ theta[0]),
         ylab = "Bayes factor",
         panel.first = graphics::grid(lty = 3, equilogs = FALSE),
         yaxt = "n")
@@ -1709,7 +1759,7 @@ points(x = sipool[2], y = kmepool, col = 2, pch = 20)
 arrows(x0 = min(mdseq), y0 = c(1.5, 1/1.5), y1 = c(5, 1/5),
        col = adjustcolor("black", alpha.f = 0.8), length = 0.05)
 text(x = min(mdseq), y = c(3, 1/3),
-     labels = c(expression("Support for" ~ theta),
+     labels = c(expression("Support for" ~ theta[0]),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.7, col = adjustcolor("black", alpha.f = 0.8))
 legend("topright", lty = c(1, 1), col = c(cols, 2),
@@ -1774,7 +1824,7 @@ legend("topright", lty = c(2, 1, 1), col = c(1, cols, 2),
   %% are assumed to be normally distributed $y_{ri} \mid \theta \sim \Nor(\theta,
   %% \sigma^{2}_{ri})$ and
   are pooled via inverse variance weighting. The posterior is obtained by
-  multiplying the BFF with the prior density.}
+  multiplying the SC with the prior density.}
 \label{fig:replication}
 \end{figure}
 
@@ -1923,7 +1973,7 @@ bffres <- lapply(X = seq(1, length(coefs)), FUN = function(i) {
     ## MCMC analysis
     mcmcdraws <- brms::as_draws_matrix(bglm1, variable = paste0("b_", coef))
     priordraws <- rnorm(n = length(mcmcdraws), mean = pm, sd = psd)
-    postdens <- density(mcmcdraws,  from = min(logORseq), to = max(logORseq),
+    postdens <- density(mcmcdraws, from = min(logORseq), to = max(logORseq),
                         n = length(logORseq))
 
     ## compute SCs
@@ -2019,6 +2069,63 @@ ggplot(data = subset(bffDF, bff != 0),
 \label{fig:glm}
 \end{figure}
 
+%% \begin{figure}[!phtb]
+%% << "2DMCMC", eval = FALSE >>=
+%% ## 2D MCMC analysis
+%% coefs <- c("After intervention" = "interventionAfter",
+%%            "Camera 2" = "camera1",
+%%            "Crowding" = "crowding",
+%%            "Day: Friday" = "dowFriday",
+%%            "Day: Saturday" = "dowSaturday",
+%%            "Day: Thursday" = "dowThursday",
+%%            "Hours after 8PM" = "hours_after_eight")
+%% combos <- combn(x = coefs, m = 2)
+%% coefgrid <- data.frame(coef1 = combos[1,], coef2 = combos[2,])
+%% res2D <- lapply(X = seq(1, nrow(coefgrid)), FUN = function(i) {
+%%     variable <- paste0("b_", c(coefgrid$coef1[i], coefgrid$coef2[i]))
+%%     mcmcSamples <- brms::as_draws_matrix(bglm1, variable = variable)
+%%     posterior2d <- MASS::kde2d(x = mcmcSamples[,1], y = mcmcSamples[,2], n = 75)
+%%     prior2d <- t(sapply(X = posterior2d$x, FUN = function(x) {
+%%         dnorm(x = x, mean = pm, sd = psd)*
+%%             dnorm(x = posterior2d$y, mean = pm, sd = psd)
+%%     }))
+%%     bf2d <- posterior2d$z/prior2d
+%%     list(xvar = names(coefs[coefs == coefgrid$coef1[i]]),
+%%          yvar = names(coefs[coefs == coefgrid$coef2[i]]),
+%%          x = posterior2d$x,
+%%          y = posterior2d$y,
+%%          bf = bf2d,
+%%          post = posterior2d$z,
+%%          prior = prior2d)
+%% })
+%% @
+%% << "2D-SCs", fig.height = 13.5, fig.width = 10, dev = "png", dpi = 320 >>=
+%% par(mfrow = c(7, 3), mar = c(4, 4, 1, 1))
+%% cols <- grDevices::hcl.colors(n = 100, palette = "Blues 3", rev = TRUE)
+%% ## xlim <- ylim <- log(c(1/8, 32))
+%% maxbf <- max(unlist(lapply(res2D, FUN = function(x) max(x$bf))))
+%% for (x in res2D) {
+%%     image(x = x$x, y = x$y, z = log(x$bf), col = cols, las = 1, xlab = x$xvar,
+%%           ylab = x$yvar, ## xlim = xlim, ylim = ylim
+%%           zlim = c(1, log(maxbf)), xaxt = "n", yaxt = "n")
+%%     axis(side = 1, at = axTicks(side = 1), labels = round(exp(axTicks(side = 1)), 2))
+%%     axis(side = 2, at = axTicks(side = 2), labels = round(exp(axTicks(side = 2)), 2),
+%%          las = 1)
+%%     contour(x = x$x, y = x$y, z = x$bf,
+%%             levels = c(3, 10, 30, 100, 300, 1000), add = TRUE,
+%%             col = 1, lty = 3)
+%%     contour(x = x$x, y = x$y, z = x$bf, levels = 1, add = TRUE, col = 1,
+%%             lty = 1, lwd = 1.5)
+%%     maxind <- which(x$bf == max(x$bf), arr.ind = TRUE)
+%%     points(x$x[maxind[1,1]], x$y[maxind[1,2]], pch = 20, cex = 2)
+%% }
+%% @
+%% \caption{Multiple logistic regression SC analysis of presence of street drug
+%%   dealers in the Amsterdam red-light district before and after intervention
+%%   \citep{EjbyeErnst2023}. Each plot shows swo-dimensional support curves for a
+%%   pair of exponentiated regression coefficients.}
+%% \end{figure}
+
 Figure~\ref{fig:glm} shows the SCs related to a logistic regression analysis of
 the data including an intercept term and a main effect for each covariate. Each
 SC relates to the exponentiated regression coefficient, which can be interpreted
@@ -2032,7 +2139,10 @@ odds ratios are in between $1/4$ and $4$, representing a vague but realistic
 range of odds ratios in observational data \citep{Greenland2006}. For the
 analysis of each coefficient, all other coefficients were considered as nuisance
 parameters with the same priors assigned to them under the null as under the
-alternative.
+alternative. Note that even though we only look at the SC of a single parameter,
+this approach does not ignore the nuisance parameters but averages the marginal
+likelihood over their prior, thereby incorporating nuisance parameter
+uncertainty.
 
 SCs were computed in three ways: i) By first computing the marginal posterior
 distribution for each coefficient from kernel smoothing of $\Sexpr{format(nmcmc,
@@ -2045,10 +2155,11 @@ lines) via \texttt{INLA} \citep{Rue2009} and then computing the SC via the
 Savage-Dickey density. iii) By estimating the parameters of the logistic model
 first with maximum likelihood, and then using each estimated coefficient and its
 standard error for a univariate normal analysis as explained in
-Section~\ref{sec:normalmean}, ignoring the nuisance parameters (long-dashed
-green lines). As a result, the MEEs from the univariate normal analysis
-correspond to maximum likelihood estimates, while the MEEs from the MCMC and
-INLA analyses correspond to integrated maximum likelihood estimates.
+Section~\ref{sec:replicationstudies}, ignoring the nuisance parameters in the SC
+analysis (long-dashed green lines). As a result, the MEEs from the univariate
+normal analysis correspond to maximum likelihood estimates, while the MEEs from
+the MCMC and INLA analyses correspond to integrated maximum likelihood
+estimates.
 
 The MCMC analysis took the longest of the three (around 5 minutes to run),
 followed by the INLA analysis (about a second to run), followed by the
@@ -2075,8 +2186,6 @@ spans the range from ($\text{OR}=1/\Sexpr{round(1/exp(subset(meeDF,coef== "After
 association ($\text{OR} = 1/\Sexpr{round(1/exp(subset(meeDF, coef== "After intervention" & method == "MCMC")["upperSI"]), 1)}$). This suggests some
 negative association between the intervention and the presence of street
 dealers, although the extent of the association being relatively unclear.
-Moreover, the absence of a control condition makes it difficult to infer whether or
-not this association truly represents a causal effect.
 
 Among the remaining variables, the SC related to `Camera 2' clearly suggests a
 higher prevalence of street dealers at the location of camera 2 compared to
@@ -2124,21 +2233,34 @@ priors are assigned, Bayes factors become likelihood ratios, so SC inference
 aligns with likelihoodist inference, but when there are nuisance parameters,
 SCs include a natural way to eliminate them via marginalization over a prior.
 
-Like the likelihoodist and Neyman-Pearson paradigms of statistical inference,
-SC inference requires the formulation of alternative hypotheses. For this
-reason, SCs are particularly valuable in contexts where prior data or theories
-are available to formulate alternative hypotheses. For example, SCs (under the
-name of `\textit{K} ratio`) have been used by the large-scale NANOGrav
-collaboration to quantify the evidence for new physics theories against the
-established Standard Model \citep{Afzal2023}. In cases where there are no clear
-alternative hypotheses, data analysts may use SCs based on `weakly informative`
-\citep{Gelman2009} or `default` prior distributions \citep[e.g.,
-unit-information priors, see][]{Kass1995b}, but should acknowledge this
-limitation and report sensitivity analyses (e.g., SCs for different prior
-distributions). Another possibility is to base SC inference on Bayes factor
-bounds \citep{Berger1987, Sellke2001, Held2018}, which give a bound on the
-maximum evidence against parameter values, but at the cost of losing the ability
-to quantify evidence \emph{in favour} of parameter values \citep{Pawel2023}.
+Like the likelihoodist and Neyman-Pearson paradigms of statistical inference, SC
+inference requires the formulation of alternative hypotheses. For this reason,
+SCs are particularly valuable in contexts where prior data or theories are
+available to formulate alternative hypotheses. For example, SCs (under the name
+of `\textit{K} ratio`) have been used by the large-scale NANOGrav collaboration
+to quantify the evidence for new physics theories against the established
+Standard Model \citep{Afzal2023}. Similarly, our applications of SCs to the coin
+flipping experiment from \citet{Bartos2023} or the replication studies from
+\citet{Wagenmakers2016} was relatively straightforward as the prior distribution
+for the parameters under the alternative could be specified through the a priori
+specified hypotheses and the data from the original study, respectively. In
+cases where there are no clear alternative hypotheses, data analysts may use SCs
+based on `weakly informative` \citep{Gelman2009} or `default` prior
+distributions \citep[e.g., unit-information priors, see][]{Kass1995b}, but
+should acknowledge this limitation and report sensitivity analyses (e.g., SCs
+for different prior distributions). Another possibility is to base SC inference
+on Bayes factor bounds \citep{Berger1987, Sellke2001, Held2018}, which give a
+bound on the maximum evidence against parameter values, but at the cost of
+losing the ability to quantify evidence \emph{in favour} of parameter values
+\citep{Pawel2023}.
+
+We have focused on situations where null models are nested within the
+alternative model. However, SC inference could also be applied to more general
+model comparison where the null is not nested in the alternative. In this case,
+the interpretation of the SC as quantifying relative predictive accuracy still
+holds, yet is more intricate as the comparison does not only involve an
+additional parameter but an entirely different model. Moreover, computing the SC
+via the Savage-Dickey density ratio is not possible.
 
 Where under their control, data analysts should design experiments and studies
 so that conclusive inferences can be drawn from the data collected, including
@@ -2156,26 +2278,32 @@ settings.
 Bayesian, likelihoodist, or predictive reasoning may all motivate the Bayes
 factor as a natural tool for quantifying the relative evidence or support of
 competing hypotheses. Nevertheless, neither the Bayes factor nor any other
-measure of statistical evidence is infallible or suitable for all purposes. For
-example, Bayes factors by construction do not take into account the prior
-probabilities of their contrasted hypotheses, so they may indicate strong
-support for a hypothesis even though this hypothesis would still remain unlikely
-when combined with its prior probability \citep{Lavine1999, Good2001}. Any type
-of statistical inference can lead to distorted scientific inferences if used in
-a bright-line fashion without consideration of contextual factors
-\citep{Goodman2016, Greenland2023}. We believe that SCs are useful in this
-regard because they shift the focus from finding evidence against a single null
-hypothesis to making gradual and quantitative inferences.
+measure of statistical evidence is infallible or suitable for all purposes. In
+fact, there is empirical evidence that Bayes factors tend to be misused or
+misinterpreted. For example, Bayes factors are sometimes erronously interpreted
+as absolute and not relative evidence, or as posterior odds and not as updating
+factors \citep{Wong2022, Tendeiro2024}. Bayes factors by construction do not
+take into account the prior probabilities of their contrasted hypotheses, so
+they may indicate strong support for a hypothesis even though this hypothesis
+would still remain unlikely when combined with its prior probability
+\citep{Lavine1999, Good2001}. Any type of statistical inference can lead to
+distorted scientific inferences if used in a bright-line fashion without
+consideration of contextual factors \citep{Goodman2016, Greenland2023}. We
+believe that SCs are useful in this regard because they shift the focus from
+finding evidence against a single null hypothesis to making gradual and
+quantitative inferences.
 
 
 \section*{Acknowledgments}
 %% We thank \citet{Sullivan2012} for openly sharing the data from
 %% \citet{Neutra1978}.
 We thank \citet{EjbyeErnst2023} and \citet{Bartos2023} for openly sharing their
-data. We thank Riko Kelter, Andrew Fowlie, Eric-Jan Wagenmakers, František
-Bartoš, Leonhard Held, Małgorzata Roos, and Sander Greenland for valuable
-comments on drafts of the manuscript. The acknowledgment of these individuals
-does not imply their endorsement of the paper.
+data. We thank \anonymize{Riko Kelter, Andrew Fowlie, Eric-Jan Wagenmakers,
+  František Bartoš, Leonhard Held, Małgorzata Roos, and Sander Greenland} for
+valuable comments on drafts of the manuscript. We thank Yang Liu, Jonathan
+Williams, and another anonymous reviewer for helpful and constructive comments
+that substantially improved paper. The acknowledgment of these individuals does
+not imply their endorsement of the paper.
 
 \section*{Conflict of interest}
 We declare no conflict of interest.
@@ -2189,12 +2317,13 @@ upper and the lower confidence interval bounds by twice the 97.5\% quantile of
 the standard normal distribution. The data from \citet{Bartos2023} were obtained
 from the \texttt{dat.bartos2023} data set included in the \texttt{metadat} R
 package \citep{White2023}. The code and data to reproduce our analyses is openly
-available at \url{https://github.com/SamCH93/BFF}. A snapshot of the repository
-at the time of writing is available at
-\url{https://doi.org/10.5281/zenodo.10817311}. We used the statistical
-programming language \Sexpr{R.Version()[["version.string"]]} for analyses
-\citep{R} along with the \texttt{brms} \citep{Burkner2021} and \texttt{INLA}
-\citep{Rue2009} packages for the computation of posterior distributions.
+available at \anonymize{\url{https://github.com/SamCH93/BFF}}. A snapshot of the
+repository at the time of writing is available at
+\anonymize{\url{https://doi.org/10.5281/zenodo.10817311}}. We used the
+statistical programming language \Sexpr{R.Version()[["version.string"]]} for
+analyses \citep{R} along with the \texttt{brms} \citep{Burkner2021} and
+\texttt{INLA} \citep{Rue2009} packages for the computation of posterior
+distributions.
 
 {\small
 \setlength{\bibsep}{4pt plus 0.3ex}

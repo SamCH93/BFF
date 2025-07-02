@@ -54,3 +54,14 @@ figure/
 .auctex-auto/
 misc/
 data/bglm1.RData
+*.tex
+*.out
+*.log
+*.bbl
+*.aux
+*.blg
+bff-changes.pdf
+LaTeX-files.zip
+Dockerfile
+Makefile
+data/
