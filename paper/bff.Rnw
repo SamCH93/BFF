@@ -51,7 +51,7 @@
   \anonymize{Center for Reproducible Science (CRS)} \\
   \anonymize{University of Zurich} \\
   \anonymize{E-mail: \href{mailto:\mail}{\mail}} \\[2ex]
-  \anonymize{{\color{blue} Preprint version July 2, 2025}}
+  \anonymize{{\color{blue} Preprint version July 8, 2025}}
 }
 \date{}
 
@@ -100,7 +100,7 @@ opts_chunk$set(fig.height = 4,
 Reproducibility <- TRUE
 
 ## packages
-library(metadat) # data set from Bartos (2023)
+library(metadat) # data set from Bartos et al. (2025)
 library(metabf) # SCs for meta-analysis (not on CRAN, install from GitHub repo)
 library(brms) # Bayesian regression models with MCMC
 library(INLA) # Bayesian regression models with INLA
@@ -189,17 +189,16 @@ p <- pval(yi, sei, null)
 p0 <- pval(yi, sei, t0)
 alpha <- 0.2
 ci <- yi + c(-1, 1)*sei*qnorm(p = 1 - alpha/2)
-plot(null, p, xaxt = "n", yaxt = "n", las = 1, type = "n", bty = "n",
-xlab = "", ylab = "",
-main = bquote(italic(P) * "-value function"))
+plot(null, p, xaxt = "n", yaxt = "n", las = 1, type = "n", bty = "n", xlab = "",
+     ylab = "", main = bquote(italic(P) * "-value function"))
 axis(side = 1, at = c(-3, 3, t0), labels = c("", "", ""))
 mtext(text = expression(theta[0]), side = 1, at = t0, line = 0.5, cex = 0.8)
 axis(side = 2, at = c(alpha, 0, 1), labels = c(expression(alpha), 0, 1), las = 1)
 mtext(text = "Tested parameter value", side = 1, line = 1.5)
 mtext(text = bquote(italic(P) * "-value"), side = 2, line = 1.5)
 abline(h = alpha, lty = 2, col = "darkgrey")
-arrows(x0 = ci[1], x1 = ci[2], y0 = alpha, lwd = 2.5,
-code = 3, length = 0.05, angle = 90, col = "darkgrey")
+arrows(x0 = ci[1], x1 = ci[2], y0 = alpha, lwd = 2.5, code = 3, length = 0.05,
+       angle = 90, col = "darkgrey")
 arrows(x0 = yi + 0.6, x1 = yi + 0.1, y1 = 1, y0 = 1, length = 0.05)
 points(x = yi, y = 1, col = "darkgrey", pch = 20)
 text(x = yi + 0.45, y = 1, label = "Point estimate", cex = 0.7, pos = 4)
@@ -215,7 +214,7 @@ lines(null, p, lwd = 2)
 
 ## support curve
 bffun <- function(yi, sei, muPrior, sdPrior, null) {
-    sqrt(1 +sdPrior^2/sei^2)*
+    sqrt(1 + sdPrior^2/sei^2)*
         exp(-0.5*((yi - null)^2/sei^2 - (yi - muPrior)^2/(sdPrior^2 + sei^2)))
 }
 sdPrior <- 2
@@ -229,8 +228,7 @@ kMEE <- bffun(yi, sei, muPrior, sdPrior, yi)
 si <- yi + c(-1, 1)*sei*sqrt(log(1 + sdPrior^2/sei^2) +
                              (yi - muPrior)^2/(sei^2 + sdPrior^2) - 2*log(k))
 plot(null, bf, xaxt = "n", yaxt = "n", las = 1, type = "n", bty = "n",
-xlab = "", ylab = "",
-main = bquote("Support curve" * " "))
+     xlab = "", ylab = "", main = bquote("Support curve" * " "))
 axis(side = 1, at = c(-3, 3, t0), labels = c("", "", ""))
 axis(side = 2, at = c(0, 100, k), labels = c(0, "", expression(italic(k))), las = 1)
 mtext(text = expression(atop(atop(infinity, " "  %up%  " "), atop(" ", " "))),
@@ -239,8 +237,8 @@ mtext(text = expression(theta[0]), side = 1, at = t0, line = 0.5, cex = 0.8)
 mtext(text = "Tested parameter value", side = 1, line = 1.5)
 mtext(text = "Bayes factor", side = 2, line = 1.5)
 abline(h = k, lty = 2, col = "darkgrey")
-arrows(x0 = si[1], x1 = si[2], y0 = k, lwd = 2.5,
-code = 3, length = 0.05, angle = 90, col = "darkgrey")
+arrows(x0 = si[1], x1 = si[2], y0 = k, lwd = 2.5, code = 3, length = 0.05,
+       angle = 90, col = "darkgrey")
 arrows(x0 = yi + 0.6, x1 = yi + 0.1, y1 = kMEE + 0.02, y0 = kMEE + 0.02, length = 0.05)
 points(x = yi, y = kMEE, col = "darkgrey", pch = 20)
 text(x = yi + 0.45, y = kMEE, label = "Point estimate", cex = 0.7, pos = 4)
@@ -254,7 +252,7 @@ text(x = -2.8, y = bf0 - 0.4, label = bquote("Bayes factor for" ~ theta[0]),
 lines(null, bf, lwd = 2)
 @
 \caption{Examples of \textit{P}-value functions and support curves.
-  \textit{P}-value are two-sided. Bayes factors are oriented in favor of the
+  \textit{P}-value are two-sided. Bayes factors are oriented in favour of the
   tested parameter value over a specified alternative hypothesis (i.e., a higher
   Bayes factor indicates higher support for the parameter value over the
   alternative).}
@@ -294,8 +292,8 @@ contradictory conclusions with the Bayes factor \citep[for examples,
 probabilities to the tested hypotheses and report a posterior averaged over both
 hypotheses \citep[known as Bayesian model averaging, see
   e.g.,][]{Hoeting1999,Rouder2018b,Campbell2022}, but this requires
-specification of prior probabilities which is highly controversial and the
-reason why the Bayes factor was reported in the first place rather than the
+specification of prior probabilities which is highly controversial and usually
+the reason why the Bayes factor was reported in the first place rather than the
 posterior probabilities of the hypotheses.
 \end{sloppypar}
 
@@ -326,24 +324,24 @@ a focus on the `Bayesian evidence value' has been investigated by
 \citet{Kelter2022}.
 
 While many elements of support curve inference have been considered in earlier
-articles, this paper provides a synthesis of these ideas from the alternative
-perspective of the support curve as a counterpart to the \textit{P}-value
-function. A novel contribution is the concept of point estimation based on Bayes
-factors. We call the resulting estimate the \emph{maximum evidence estimate}
-(MEE). The MEE is the parameter value that maximizes the support curve, and as
-such, is the parameter value that receives the most evidential support from the
-data over a specified alternative hypothesis. Finally, this paper shows how
-support curves can be applied in several areas where they have never been used
-before (meta-analysis, replication studies, and logistic regression).
+articles, this paper provides a synthesis of these ideas from the perspective of
+the support curve as a counterpart to the \textit{P}-value function. A novel
+contribution is the concept of point estimation based on Bayes factors. We call
+the resulting estimate the \emph{maximum evidence estimate} (MEE). The MEE is
+the parameter value that maximizes the support curve, and as such, is the
+parameter value that receives the most evidential support from the data over a
+specified alternative hypothesis. Finally, this paper shows how support curves
+can be applied in several areas where they have never been used before
+(meta-analysis, replication studies, and logistic regression).
 
 It is important to note that our intent is not to fuel the `statistics wars' and
 entertain the position that Bayesian inference or Bayes factors are the best or
 only valid form of statistical inference. The goal is simply to explore the idea
-of a Bayes factor analogue of a \textit{P}-value function, find out how such an
-approach can be useful, and how it connects to other approaches. Bayes factors,
-just as \textit{P}-values and posterior probabilitites, can be delicate tools
-and users should be wary of their limitations, misuses, and misinterpretations
-\citep{Tendeiro2019, Wong2022, Tendeiro2024}.
+of a Bayes factor analogue of the \textit{P}-value function, find out how such
+an approach can be useful, and how it connects to other approaches. Bayes
+factors, just as \textit{P}-values and posterior probabilitites, can be delicate
+tools and users should be wary of their limitations, misuses, and
+misinterpretations \citep{Tendeiro2019, Wong2022, Tendeiro2024}.
 
 This paper is structured as follows. In the following
 (Section~\ref{sec:BFtheory}), we introduce the theoretical foundations of Bayes
@@ -674,11 +672,11 @@ text(x = min(t0seq), y = c(2, 1/2),
                 expression("Support for" ~ italic(H)[1])),
      pos = 4, cex = 0.75, col = adjustcolor("black", alpha.f = 0.8))
 @
-\caption{Support curve, MEE, and $k = \Sexpr{k}$ support interval for a mean test
-  score $\theta$ based on the observed mean $\bar{y} =\Sexpr{round(y, 2)}$ from
-  $n = \Sexpr{n}$ observations for different prior distributions for $\theta$
-  under the alternative $H_{1}$. A normal likelihood $Y \mid \theta \sim
-  \Nor(\theta, \kappa^{2}_{i} = \Sexpr{usd}^2)$ is assumed for the data.}
+\caption{Support curve, MEE, and $k = \Sexpr{k}$ support interval for a mean
+  test score $\theta$ based on the observed mean $\bar{y} =\Sexpr{round(y, 2)}$
+  from $n = \Sexpr{n}$ observations for different prior distributions for
+  $\theta$ under the alternative $H_{1}$. A normal likelihood $\bar{Y} \mid
+  \theta \sim \Nor(\theta, \Sexpr{usd}^2/n)$ is assumed for the data.}
 \label{fig:normal}
 \end{figure}
 
@@ -707,11 +705,11 @@ SC), the support interval based on the local prior is wider.
 The last prior in the right most column of Table~\ref{tab:normalinference}
 represents a point prior shifted from the null value $\theta_{0}$ by $d > 0$.
 The prior is again `local' in the sense that it is different for each tested
-parameter value of the null hypothesis $\theta_{0}$, and as such encodes an
+parameter value of the null hypothesis $\theta_{0}$, and as such encodes the
 alternative hypothesis that the mean test score is greater than the tested
 parameter value. However, this leads to an ever-increasing SC, see
-Figure~\ref{fig:normal} for a numerical illustration. As a result, the MEE and
-its evidence level do not exist, while the support interval still exists but its
+Figure~\ref{fig:normal} for an illustration. As a result, the MEE and its
+evidence level do not exist, while the support interval still exists but its
 right limit extends to infinity. Although such a prior seems unrealistic, the
 example demonstrates that a poorly chosen prior can lead to pathological
 behavior of the resulting SC.
@@ -750,8 +748,8 @@ across a class of priors to assess robustness of conclusions. Finally,
 reverse-Bayes analyses identify the priors that lead to the Bayes factor
 crossing a tipping point, allowing analysts to assess the plausibility of such a
 prior in light of external knowledge \citep{Good1950,Held2021b}. As all of these
-techniques are applicable to Bayes factors, they are also applicable to SCs. We
-will now focus on more specific considerations related to SCs.
+techniques are applicable to Bayes factors, they are also applicable to SCs.
+%% We will now focus on more specific considerations related to SCs.
 
 As in other Bayes factor applications, SCs are only unambiguously defined if
 priors for focus parameters are proper (i.e., integrate to one) under the
@@ -771,13 +769,13 @@ Figure~\ref{fig:normal}. This results in a different alternative hypothesis for
 each tested parameter value, making the interpretation of the SC more intricate.
 For a more natural interpretation, global priors may hence be preferred over
 local priors. At the same time, local priors correspond to the typical use of
-`default' Bayes factors, which is to center the prior around $\theta_{0}$, and
-as such may be preferred in the same situations where default Bayes factors
-would be used.
+default Bayes factors, which is to center the prior around $\theta_{0}$, and
+as such may be used in the same situations where default Bayes factors would be
+used.
 
 Given these considerations, SCs, just as Bayes factors, are especially useful if
-informative priors based prior data or external knowledege are available. If
-such priors are lacking and `default' priors are used, it is advisable to report
+informative priors based on prior data or external knowledege are available. If
+such priors are lacking and default priors are used, it is advisable to report
 sensitivity analyses for plausible ranges of priors or reverse-Bayes analysis,
 to assess the robustness of the conclusions. A convenient visual sensitivity
 analysis is, for example, to plot different SCs resulting from different prior
@@ -1164,7 +1162,7 @@ way to compute SCs: One of the many programs for computing Bayesian posterior
 distributions, such as \texttt{Stan} \citep{Carpenter2017} or \texttt{INLA}
 \citep{Rue2009}, can be used to compute a posterior density, which can then be
 divided by the prior density to obtain a SC. The caveat is again that this only
-works for global priors under the alternative and
+works for global priors under the alternative and provided that
 condition~\eqref{eq:SDcondition} holds for the priors assigned to the nuisance
 parameters.
 
@@ -1218,7 +1216,7 @@ regression (Section~\ref{sec:logisticregression}).
 \label{sec:binomial}
 
 << "Bartos-data" >>=
-## data from Bartos
+## data from Bartos et al. (2025)
 y <- 178079
 n <- 350757
 a <- 5100
@@ -1276,11 +1274,11 @@ SIbinomial <- function(k, y, n, a, b, l = 0.5, u = 1) {
     rootFun <- function(p) {
         BFFbinomial(p = p, y = y, n = n, a = a, b = b, l = l, u = u) - k
     }
-    lower <- try({uniroot(f = rootFun, interval = c(0, mee))$root})
-    upper <- try({uniroot(f = rootFun, interval = c(mee, 1))$root})
+    lower <- try(uniroot(f = rootFun, interval = c(0, mee))$root)
+    upper <- try(uniroot(f = rootFun, interval = c(mee, 1))$root)
     if (inherits(lower, "try-error")) res <- c(NaN, NaN, NaN)
     else res <- c(lower, mee, upper)
-    names(res) <- c("lower", "mee", "uppper")
+    names(res) <- c("lower", "mee", "upper")
     return(res)
 }
 
@@ -1372,7 +1370,7 @@ did.
 
 \begin{figure}[!phtb]
 << "bartos-meta-analysis1", cache = TRUE >>=
-## flipper-wise data from Bartos (2023)
+## flipper-wise data from Bartos et al. (2025)
 dat <- dat.bartos2023
 
 ## compute proportions and their variances
@@ -1439,7 +1437,7 @@ plot(x = dat$yi, y = ybreaks, type = "n",
      xlab = "Probability estimate with 95% CI",
      ylab = "",
      panel.first = graphics::grid(ny = NA, lty = 3),
-     main = bquote("Data from Bartos et al. (2023)" * ""))
+     main = bquote("Data from Bartos et al. (2025)" * ""))
 axis(side = 2, at = ybreaks, labels = dat$person, las = 2, cex.axis = 0.5)
 mtext(text = "Participant", side = 2, line = 4)
 arrows(x = dat$lower, x1 = dat$upper, y0 = ybreaks, angle = 90, code = 3,
@@ -1532,7 +1530,7 @@ standard errors $\sigma_i$. The estimates are assumed to be normally distributed
 around a participant specific true probability $\theta_i$, i.e.,
 \begin{align*}
     y_i \mid \theta_i, \sigma^2_i &\sim \Nor(\theta_i, \sigma^2_i) \\
-    \theta_i \mid \theta, \tau^2 &\sim \Nor(\theta, \tau^2).
+    \theta_i \mid \theta, \tau &\sim \Nor(\theta, \tau^2).
 \end{align*}
 While in some applications, inferences about the participant specific
 probabilities $\theta_i$ would also be of interest, these are consider nuisance
@@ -1561,8 +1559,9 @@ $v$ evaluated at $x$.
 << "prior-for-tau" >>=
 tauseq <- seq(0, 0.1, 0.001)
 ## CDF of the halfnormal distribution
-phn. <- function(x, s) integrate(f = function(x) 2*dnorm(x, sd = s),
-                                 lower = 0, upper = x)$value
+phn. <- function(x, s) {
+    integrate(f = function(x) 2*dnorm(x, sd = s), lower = 0, upper = x)$value
+}
 phn <- Vectorize(FUN = phn.)
 ## plot(tauseq, phn(x = tauseq, s = scale), type = "l")
 ## phn(x = 0.05, s = scale)
@@ -1842,13 +1841,8 @@ legend("topright", lty = c(2, 1, 1), col = c(1, cols, 2),
   difference of $y_{o} = \Sexpr{yo}$ with standard error $\sigma_{o} =
   \Sexpr{round(so, 2)}$ which is used to formulate the prior distribution under
   the alternative $\theta \mid H_{1} \sim \Nor(y_{o}, \sigma^{2}_{o})$. The
-  replication effect estimates
-  %%  %% were $y_{ri} \in \{\Sexpr{yr}\}$ with standard
-  %% %% errors $\sigma_{ri} \in \{\Sexpr{round(sr, 3)}\}$, respectively, and
-  %% are assumed to be normally distributed $y_{ri} \mid \theta \sim \Nor(\theta,
-  %% \sigma^{2}_{ri})$ and
-  are pooled via inverse variance weighting. The posterior is obtained by
-  multiplying the SC with the prior density.}
+  replication effect estimates are pooled via inverse variance weighting. The
+  posterior is obtained by multiplying the SC with the prior density.}
 \label{fig:replication}
 \end{figure}
 
@@ -1861,7 +1855,7 @@ evidence compared to the prior based on the original study
 interval from $\Sexpr{round(sipool[1], 2)}$ to $\Sexpr{round(sipool[3], 2)}$),
 all of them being much smaller than the estimated mean difference from the
 original study \Sexpr{yo}. Furthermore, the SC at the mean difference
-of zero indicates strong evidence in favor of no difference over the prior based
+of zero indicates strong evidence in favour of no difference over the prior based
 on the original study ($\mathrm{BF}_{01} = \Sexpr{round(bffpool[which(mdseq ==
     0)], 1)}$). Thus, the replication SC analysis suggests hardly any
 replicability of the original facial feedback effect.
@@ -1900,16 +1894,17 @@ original study.
 \label{sec:logisticregression}
 To illustrate a more computationally demanding application of SCs, we consider
 the criminological study by \citet{EjbyeErnst2023}. This study evaluated the
-effect of a text-based light projection intervention (``It's illegal to buy
-drugs from street dealers'' and a pictogram illustrating the same message) on
-the presence of street drug dealers in Amsterdam's red-light district. To this
-end, the researchers analyzed 765 one-minute segments of video footage from two
-surveillance cameras installed in the red-light district with respect to the
-presence/absence of street dealers before and after the intervention, as well as
-other covariates (day of the week, camera, number of people, and hours after 8
-p.m.). Out of 765 segments, street dealers were identified in 60. This small
-number of events makes it challenging to draw conclusive inferences about the
-effect of the intervention, as we will see in the following.
+effect of a text-based light projection intervention (``\textit{It's illegal to
+  buy drugs from street dealers}'' and a pictogram illustrating the same
+message) on the presence of street drug dealers in Amsterdam's red-light
+district. To this end, the researchers analyzed 765 one-minute segments of video
+footage from two surveillance cameras installed in the red-light district with
+respect to the presence/absence of street dealers before and after the
+intervention, as well as other covariates (day of the week, camera, number of
+people, and hours after 8 p.m.). Out of 765 segments, street dealers were
+identified in 60. This small number of events makes it challenging to draw
+conclusive inferences about the effect of the intervention, as we will see in
+the following.
 
 \begin{figure}[!htb]
 << "logistic-regression", fig.height = 6 >>=
@@ -2027,7 +2022,7 @@ bffres <- lapply(X = seq(1, length(coefs)), FUN = function(i) {
 
     k <- 1
     SInorm <- glmest + glmse*c(-1, 1)*
-        sqrt(log(1 + psd^2/glmse^2) + (glmest - pm)^2/(psd^2 + glmse^2 - log(k)))
+        sqrt(log(1 + psd^2/glmse^2) + (glmest - pm)^2/(psd^2 + glmse^2) - 2*log(k))
     lowerSInorm <- SInorm[1]
     upperSInorm <- SInorm[2]
     ## HACKY way to compute the MCMC SIs
@@ -2077,7 +2072,8 @@ ggplot(data = subset(bffDF, bff != 0),
     theme(panel.grid.minor = element_blank(),
           panel.grid.major = element_line(linetype = "dotted"),
           strip.background = element_rect(fill = "white"),
-          legend.position = c(0.85, 0.075),
+          legend.position = "inside",
+          legend.position.inside = c(0.85, 0.075),
           legend.key.size = unit(1.5, "lines"))
 @
 \caption{Multiple logistic regression SC analysis of presence of street drug
@@ -2206,7 +2202,7 @@ association between the text-based intervention and the presence of street
 dealers, yet this parameter value receives only moderate support over the
 alternative ($\kME = \Sexpr{round(subset(meeDF, coef == "After intervention" &
   method == "MCMC")["k"], 1)}$) and the corresponding $k = 1$ support interval
-spans the range from a moderate association
+spans the range from a noticeable association
 ($\text{OR}=1/\Sexpr{round(1/exp(subset(meeDF,coef== "After intervention" &
   method == "MCMC")["lowerSI"]), 1)}$) up to hardly any association ($\text{OR}
 = 1/\Sexpr{round(1/exp(subset(meeDF, coef== "After intervention" & method ==
@@ -2266,13 +2262,13 @@ SCs are particularly valuable in contexts where prior data or theories are
 available to formulate alternative hypotheses. For example, SCs (under the name
 of `\textit{K} ratio`) have been used by the large-scale NANOGrav collaboration
 to quantify the evidence for new physics theories against the established
-Standard Model \citep{Afzal2023}. Similarly, our applications of SCs to the coin
+Standard Model \citep{Afzal2023}. Similarly, our application of SCs to the coin
 flipping experiment from \citet{Bartos2023} or the replication studies from
 \citet{Wagenmakers2016} was relatively straightforward as the prior distribution
 for the parameters under the alternative could be specified through the a priori
 specified hypotheses and the data from the original study, respectively. In
 cases where there are no clear alternative hypotheses, data analysts may use SCs
-based on `weakly informative` \citep{Gelman2009} or `default` prior
+based on `weakly informative' \citep{Gelman2009} or `default' prior
 distributions \citep[e.g., unit-information priors, see][]{Kass1995b}, but
 should acknowledge this limitation and report sensitivity analyses (e.g., SCs
 for different prior distributions). Another possibility is to base SC inference
@@ -2284,10 +2280,9 @@ losing the ability to quantify evidence \emph{in favour} of parameter values
 We have focused on situations where null models are nested within the
 alternative model. However, SC inference could also be applied to more general
 model comparison where the null is not nested in the alternative. In this case,
-the interpretation of the SC as quantifying relative predictive accuracy still
-holds, yet is more intricate as the comparison does not only involve an
-additional parameter but an entirely different model. Moreover, computing the SC
-via the Savage-Dickey density ratio is not possible.
+the interpretation of the SC is more intricate as the comparison does not only
+involve an additional parameter but an entirely different model. Moreover,
+computing the SC via the Savage-Dickey density ratio is not possible anymore.
 
 Where under their control, data analysts should design experiments and studies
 so that conclusive inferences can be drawn from the data collected, including
@@ -2306,15 +2301,15 @@ Bayesian, likelihoodist, or predictive reasoning may all motivate the Bayes
 factor as a natural tool for quantifying the relative evidence or support of
 competing hypotheses. Nevertheless, neither the Bayes factor nor any other
 measure of statistical evidence is infallible or suitable for all purposes. In
-fact, there is empirical evidence that Bayes factors tend to be misused or
-misinterpreted. For example, Bayes factors are sometimes erronously interpreted
-as absolute and not relative evidence, or as posterior odds and not as updating
-factors \citep{Wong2022, Tendeiro2024}. Bayes factors by construction do not
-take into account the prior probabilities of their contrasted hypotheses, so
-they may indicate strong support for a hypothesis even though this hypothesis
-would still remain unlikely when combined with its prior probability
-\citep{Lavine1999, Good2001}. Any type of statistical inference can lead to
-distorted scientific inferences if used in a bright-line fashion without
+fact, there is empirical evidence that researchers sometimes misuse or
+misinterpret Bayes factors. For example, Bayes factors are sometimes erronously
+interpreted as absolute rather than relative evidence, or as posterior odds
+rather than updating factors \citep{Wong2022, Tendeiro2024}. Bayes factors by
+construction do not take into account the prior probabilities of their
+contrasted hypotheses, so they may indicate strong support for a hypothesis even
+though this hypothesis would still remain unlikely when combined with its prior
+probability \citep{Lavine1999, Good2001}. Any type of statistical inference can
+lead to distorted scientific inferences if used in a bright-line fashion without
 consideration of contextual factors \citep{Goodman2016, Greenland2023}. We
 believe that SCs are useful in this regard because they shift the focus from
 finding evidence against a single null hypothesis to making gradual and

@@ -12,7 +12,7 @@ opts_chunk$set(fig.height = 4,
 Reproducibility <- TRUE
 
 ## packages
-library(metadat) # data set from Bartos (2023)
+library(metadat) # data set from Bartos et al. (2025)
 library(metabf) # SCs for meta-analysis (not on CRAN, install from GitHub repo)
 library(brms) # Bayesian regression models with MCMC
 library(INLA) # Bayesian regression models with INLA
@@ -36,17 +36,16 @@ p <- pval(yi, sei, null)
 p0 <- pval(yi, sei, t0)
 alpha <- 0.2
 ci <- yi + c(-1, 1)*sei*qnorm(p = 1 - alpha/2)
-plot(null, p, xaxt = "n", yaxt = "n", las = 1, type = "n", bty = "n",
-xlab = "", ylab = "",
-main = bquote(italic(P) * "-value function"))
+plot(null, p, xaxt = "n", yaxt = "n", las = 1, type = "n", bty = "n", xlab = "",
+     ylab = "", main = bquote(italic(P) * "-value function"))
 axis(side = 1, at = c(-3, 3, t0), labels = c("", "", ""))
 mtext(text = expression(theta[0]), side = 1, at = t0, line = 0.5, cex = 0.8)
 axis(side = 2, at = c(alpha, 0, 1), labels = c(expression(alpha), 0, 1), las = 1)
 mtext(text = "Tested parameter value", side = 1, line = 1.5)
 mtext(text = bquote(italic(P) * "-value"), side = 2, line = 1.5)
 abline(h = alpha, lty = 2, col = "darkgrey")
-arrows(x0 = ci[1], x1 = ci[2], y0 = alpha, lwd = 2.5,
-code = 3, length = 0.05, angle = 90, col = "darkgrey")
+arrows(x0 = ci[1], x1 = ci[2], y0 = alpha, lwd = 2.5, code = 3, length = 0.05,
+       angle = 90, col = "darkgrey")
 arrows(x0 = yi + 0.6, x1 = yi + 0.1, y1 = 1, y0 = 1, length = 0.05)
 points(x = yi, y = 1, col = "darkgrey", pch = 20)
 text(x = yi + 0.45, y = 1, label = "Point estimate", cex = 0.7, pos = 4)
@@ -62,7 +61,7 @@ lines(null, p, lwd = 2)
 
 ## support curve
 bffun <- function(yi, sei, muPrior, sdPrior, null) {
-    sqrt(1 +sdPrior^2/sei^2)*
+    sqrt(1 + sdPrior^2/sei^2)*
         exp(-0.5*((yi - null)^2/sei^2 - (yi - muPrior)^2/(sdPrior^2 + sei^2)))
 }
 sdPrior <- 2
@@ -76,8 +75,7 @@ kMEE <- bffun(yi, sei, muPrior, sdPrior, yi)
 si <- yi + c(-1, 1)*sei*sqrt(log(1 + sdPrior^2/sei^2) +
                              (yi - muPrior)^2/(sei^2 + sdPrior^2) - 2*log(k))
 plot(null, bf, xaxt = "n", yaxt = "n", las = 1, type = "n", bty = "n",
-xlab = "", ylab = "",
-main = bquote("Support curve" * " "))
+     xlab = "", ylab = "", main = bquote("Support curve" * " "))
 axis(side = 1, at = c(-3, 3, t0), labels = c("", "", ""))
 axis(side = 2, at = c(0, 100, k), labels = c(0, "", expression(italic(k))), las = 1)
 mtext(text = expression(atop(atop(infinity, " "  %up%  " "), atop(" ", " "))),
@@ -86,8 +84,8 @@ mtext(text = expression(theta[0]), side = 1, at = t0, line = 0.5, cex = 0.8)
 mtext(text = "Tested parameter value", side = 1, line = 1.5)
 mtext(text = "Bayes factor", side = 2, line = 1.5)
 abline(h = k, lty = 2, col = "darkgrey")
-arrows(x0 = si[1], x1 = si[2], y0 = k, lwd = 2.5,
-code = 3, length = 0.05, angle = 90, col = "darkgrey")
+arrows(x0 = si[1], x1 = si[2], y0 = k, lwd = 2.5, code = 3, length = 0.05,
+       angle = 90, col = "darkgrey")
 arrows(x0 = yi + 0.6, x1 = yi + 0.1, y1 = kMEE + 0.02, y0 = kMEE + 0.02, length = 0.05)
 points(x = yi, y = kMEE, col = "darkgrey", pch = 20)
 text(x = yi + 0.45, y = kMEE, label = "Point estimate", cex = 0.7, pos = 4)
@@ -270,7 +268,7 @@ text(x = min(t0seq), y = c(2.5, 1/2.5),
 
 
 ## ----"Bartos-data"------------------------------------------------------------
-## data from Bartos
+## data from Bartos et al. (2025)
 y <- 178079
 n <- 350757
 a <- 5100
@@ -297,11 +295,11 @@ SIbinomial <- function(k, y, n, a, b, l = 0.5, u = 1) {
     rootFun <- function(p) {
         BFFbinomial(p = p, y = y, n = n, a = a, b = b, l = l, u = u) - k
     }
-    lower <- try({uniroot(f = rootFun, interval = c(0, mee))$root})
-    upper <- try({uniroot(f = rootFun, interval = c(mee, 1))$root})
+    lower <- try(uniroot(f = rootFun, interval = c(0, mee))$root)
+    upper <- try(uniroot(f = rootFun, interval = c(mee, 1))$root)
     if (inherits(lower, "try-error")) res <- c(NaN, NaN, NaN)
     else res <- c(lower, mee, upper)
-    names(res) <- c("lower", "mee", "uppper")
+    names(res) <- c("lower", "mee", "upper")
     return(res)
 }
 
@@ -346,7 +344,7 @@ text(x = min(p0seq), y = c(7, 1/7),
 
 
 ## ----"bartos-meta-analysis1", cache = TRUE------------------------------------
-## flipper-wise data from Bartos (2023)
+## flipper-wise data from Bartos et al. (2025)
 dat <- dat.bartos2023
 
 ## compute proportions and their variances
@@ -413,7 +411,7 @@ plot(x = dat$yi, y = ybreaks, type = "n",
      xlab = "Probability estimate with 95% CI",
      ylab = "",
      panel.first = graphics::grid(ny = NA, lty = 3),
-     main = bquote("Data from Bartos et al. (2023)" * ""))
+     main = bquote("Data from Bartos et al. (2025)" * ""))
 axis(side = 2, at = ybreaks, labels = dat$person, las = 2, cex.axis = 0.5)
 mtext(text = "Participant", side = 2, line = 4)
 arrows(x = dat$lower, x1 = dat$upper, y0 = ybreaks, angle = 90, code = 3,
@@ -492,8 +490,9 @@ text(x = 0, y = c(2, 1/2),
 ## ----"prior-for-tau"----------------------------------------------------------
 tauseq <- seq(0, 0.1, 0.001)
 ## CDF of the halfnormal distribution
-phn. <- function(x, s) integrate(f = function(x) 2*dnorm(x, sd = s),
-                                 lower = 0, upper = x)$value
+phn. <- function(x, s) {
+    integrate(f = function(x) 2*dnorm(x, sd = s), lower = 0, upper = x)$value
+}
 phn <- Vectorize(FUN = phn.)
 ## plot(tauseq, phn(x = tauseq, s = scale), type = "l")
 ## phn(x = 0.05, s = scale)
@@ -751,7 +750,7 @@ bffres <- lapply(X = seq(1, length(coefs)), FUN = function(i) {
 
     k <- 1
     SInorm <- glmest + glmse*c(-1, 1)*
-        sqrt(log(1 + psd^2/glmse^2) + (glmest - pm)^2/(psd^2 + glmse^2 - log(k)))
+        sqrt(log(1 + psd^2/glmse^2) + (glmest - pm)^2/(psd^2 + glmse^2) - 2*log(k))
     lowerSInorm <- SInorm[1]
     upperSInorm <- SInorm[2]
     ## HACKY way to compute the MCMC SIs
@@ -801,7 +800,8 @@ ggplot(data = subset(bffDF, bff != 0),
     theme(panel.grid.minor = element_blank(),
           panel.grid.major = element_line(linetype = "dotted"),
           strip.background = element_rect(fill = "white"),
-          legend.position = c(0.85, 0.075),
+          legend.position = "inside",
+          legend.position.inside = c(0.85, 0.075),
           legend.key.size = unit(1.5, "lines"))
 
 
