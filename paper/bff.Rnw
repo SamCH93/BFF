@@ -51,7 +51,7 @@
   \anonymize{Center for Reproducible Science (CRS)} \\
   \anonymize{University of Zurich} \\
   \anonymize{E-mail: \href{mailto:\mail}{\mail}} \\[2ex]
-  \anonymize{{\color{blue} Preprint version July 8, 2025}}
+  \anonymize{{\color{blue} Version August 29, 2025}}
 }
 \date{}
 
@@ -385,7 +385,6 @@ models to be nested but are applicable to general model comparisons. However,
 due to their more intuitive interpretation and computational advantages, we will
 focus on nested models and discuss extensions to non-nested models in
 Section~\ref{sec:discussion}.
-%% However, we restrict ourselves to
 
 As~\eqref{eq:bf01update} shows, the Bayes factor represents the data-based core
 of the Bayesian belief calculus since it transforms the prior odds of $H_0$
@@ -433,12 +432,6 @@ this case, some focus parameters can be re-considered as nuisance parameters to
 reduce the SC visualization again to a curve or surface. This is similar to
 ordinary Bayesian inference where a marginal posterior is obtained from
 marginalizing a joint posterior.
-%% This approach will be illustrated in Sections~\ref{sec:metaanalysis}
-%% and~\ref{sec:logisticregression}.
-%% Another option could be to project the high-dimensional SC in into one or two
-%% dimensions, for example, to `profile' out the parameters that are not visualized
-%% similar to the profile likelihood.
-
 
 \subsection{Support sets}
 Apart from visual inspections, we may also want to summarize the SC numerically.
@@ -812,11 +805,13 @@ to compute the Bayes factor based on the second batch $y_{2}$
   \BF_{01}(y_{1:n} ; \theta_{0})
   &= \BF_{01}(y_{1} ; \theta_{0}) \times \prod_{i=2}^{n} \BF_{01}(y_{i} \mid y_{1:(i-1)} ; \theta_{0}),
 \end{align*}
-that is, a SC based on all the available data can be obtained by multiplying
-the SC based on the previous batches by the partial Bayes factor based on the
+that is, a SC based on all the available data can be obtained by multiplying the
+SC based on the previous batches by the partial Bayes factor based on the
 current batch. Thus, like ordinary Bayesian inference with posterior
-distributions, SC inference is sequentially coherent.
-
+distributions, SC inference is sequentially coherent. In practice, it may,
+however, not always be computationally straightforward to reuse posterior
+distributions as prior distributions for subsequent analyses, particularly in
+high-dimensional settings.
 
 \subsection{Asymptotic behaviour of the support curve}
 It is of interest to understand the asymptotic behaviour of the SC, that is,
@@ -1100,12 +1095,13 @@ alternative
 \begin{align*}
   \Pr\{\BF_{01}(y) \leq k \mid H_{0}\} \leq k.
 \end{align*}
-This can be shown by noting that the expectation of $\BF_{10}$ under $H_0$ is 1
-and applying Markov's inequality \citep[see e.g.,][]{Grunwald2024}. If there are
-nuisance parameters, the bound holds only marginalized over the prior of the
-nuisance parameters. For the bound to hold in a strict sense (i.e., for every
-possible value of the nuisance parameter), special priors must be assigned to
-them \citep{Hendriksen2021, Grunwald2024}.
+This can be shown by noting that under typical conditions the expectation of
+$\BF_{10}$ under $H_0$ is 1 and applying Markov's inequality \citep[for
+  technical details see e.g.,][]{Grunwald2024}. If there are nuisance
+parameters, the bound holds only marginalized over the prior of the nuisance
+parameters. For the bound to hold in a strict sense (i.e., for every possible
+value of the nuisance parameter), special priors must be assigned to them
+\citep{Hendriksen2021, Grunwald2024}.
 
 The universal bound can thus be used to transform SCs into conservative
 \textit{P}-values and confidence sets, e.g., a $k = 1/20$ support set obtained
@@ -2183,16 +2179,16 @@ estimates.
 
 The MCMC analysis took the longest of the three (around 5 minutes to run),
 followed by the INLA analysis (about a second to run), followed by the
-univariate analysis (almost instantaneous). We can see that the SCs based on
-MCMC and INLA (with default settings) may have inaccuracies or cannot be
-computed in the outer regions of the SC, since these are regions where the
-posterior density is close to zero. We can also see that the univariate normal
-SC agrees reasonably well with the MCMC and INLA SCs in most cases, with the
-exception of the `Camera 2' coefficient. In this case, the MCMC and INLA SCs end
-abruptly around OR = 16, because no larger MCMC samples were observed or because
-the INLA algorithm returned a posterior density of zero. In this case, the
-normal approximation SC could be used cautiously as an extrapolation of the MCMC
-and INLA SCs.
+univariate analysis (almost instantaneous). *Despite the many MCMC samples that
+were taken to obtain smooth SCs*, we can see that the SCs based on MCMC and INLA
+(with default settings) may still have inaccuracies or cannot be computed in the
+outer regions of the SC, since these are regions where the posterior density is
+close to zero. We can also see that the univariate normal SC agrees reasonably
+well with the MCMC and INLA SCs in most cases, with the exception of the `Camera
+2' coefficient. In this case, the MCMC and INLA SCs end abruptly around OR = 16,
+because no larger MCMC samples were observed or because the INLA algorithm
+returned a posterior density of zero. In this case, the normal approximation SC
+could be used cautiously as an extrapolation of the MCMC and INLA SCs.
 
 Concering the effect of the intervention, the SC (based on MCMC) for the
 variable `After intervention (top left panel) has its mode at
@@ -2285,17 +2281,17 @@ involve an additional parameter but an entirely different model. Moreover,
 computing the SC via the Savage-Dickey density ratio is not possible anymore.
 
 Where under their control, data analysts should design experiments and studies
-so that conclusive inferences can be drawn from the data collected, including
-SC inferences. Future research needs to investigate how experiments need to be
-designed to enable conclusive inference with SCs. For example, one may design
-an experiment so that the expected width of a support interval is sufficiently
+so that conclusive inferences can be drawn from the data collected, including SC
+inferences. Future research needs to investigate how experiments need to be
+designed to enable conclusive inference with SCs. For example, one may design an
+experiment so that the expected width of a support interval is sufficiently
 narrow, or so that the expected evidence level for the MEE is sufficiently
 large. Finally, calculating SCs can be challenging, as our logistic regression
 example showed. For example, if a SC is computed via the Savage-Dickey density
-ratio from a posterior distribution computed by MCMC, the SC may be imprecise
-at the tails of the posterior, even with millions of samples. Future work may
-focus on developing more efficient techniques for computing SCs in such
-settings.
+ratio from a posterior distribution computed by MCMC, the SC may be imprecise at
+the tails of the posterior, even with millions of samples. Such problems become
+more pronounced in high-dimensional settings. Future work may focus on
+developing more efficient techniques for computing SCs in such settings.
 
 Bayesian, likelihoodist, or predictive reasoning may all motivate the Bayes
 factor as a natural tool for quantifying the relative evidence or support of
@@ -2317,8 +2313,6 @@ quantitative inferences.
 
 
 \section*{Acknowledgments}
-%% We thank \citet{Sullivan2012} for openly sharing the data from
-%% \citet{Neutra1978}.
 We thank \citet{EjbyeErnst2023} and \citet{Bartos2023} for openly sharing their
 data. We thank \anonymize{Riko Kelter, Andrew Fowlie, Eric-Jan Wagenmakers,
   František Bartoš, Leonhard Held, Małgorzata Roos, and Sander Greenland} for
